@@ -1,26 +1,2 @@
 /* You can add global styles to this file, and also import other style files */
 /* Global Styles */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f9fa;
-    color: #333;
-    line-height: 1.6;
-    overflow-x: hidden;
-}
-
-.container-fluid {
-    padding: 0;
-    height: 100vh;
-    overflow: hidden;
-}
-
-.row {
-    height: 100%;
-    margin: 0;
-}

@@ -12,8 +12,16 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
+  // constructor(private http: HttpClient) {
+  //   this.loadUserFromStorage();
+  // }
   constructor(private http: HttpClient) {
-    this.loadUserFromStorage();
+    // Auto-clear auth data in development mode
+    if (!environment.production) {
+      this.clearAuthData();
+    } else {
+      this.loadUserFromStorage();
+    }
   }
 
   login(loginRequest: LoginRequest): Observable<LoginResponse> {
@@ -38,6 +46,11 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
+    // Always return false in development to force login
+    if (!environment.production) {
+      return false;
+    }
+    
     const token = this.getToken();
     if (!token) return false;
 
@@ -118,5 +131,16 @@ export class AuthService {
     
     console.error('API Error:', error);
     return throwError(() => new Error(errorMessage));
+  }
+
+  private clearAuthData(): void {
+    localStorage.removeItem(environment.USERDATA_KEY);
+    localStorage.removeItem('jwt_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('token_expiry');
+    localStorage.removeItem('refresh_token_expiry');
+    sessionStorage.clear();
+    
+    console.log('🔄 Development Mode: Cleared authentication data');
   }
 }

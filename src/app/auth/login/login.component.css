@@ -1,3 +1,28 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+.container-fluid {
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.row {
+    height: 100%;
+    margin: 0;
+}
+
 /* Left Panel */
 .left-panel {
     background: linear-gradient(135deg, #2c2e72 0%, #4896d1 100%);
