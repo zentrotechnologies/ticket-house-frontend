@@ -1,0 +1,22 @@
+﻿export const environment = {
+    production: false,
+    encb64: 'ZW5jcnlwdGlvbl9raXRvcnRfaWxfZ2NtX2VuY3J5cHQ=',
+    authmode: 0,
+    encmode: 0,
+    reqexpirymode: 0,
+    THapibaseurl: 'https://localhost:7289/',
+    // kitapibaseurl: 'https://kitapp.ortdemo.com/kitversion01/',
+    // kitapiwaurl: 'https://kitapp.ortdemo.com/',
+    // googlclientid: '799019299860-kc86am2cokfgabuqspr3ts477ronttq5.apps.googleusercontent.com',
+    appVersion: '1.0',
+    USERDATA_KEY: 'authf649fc9a5f55',
+    isMockEnabled: true,
+    apiUrl: 'api',
+    appThemeName: 'Metronic',
+    appPurchaseUrl: 'https://1.envato.market/EA4JP',
+    appHTMLIntegration: 'https://preview.keenthemes.com/metronic8/demo1/documentation/base/helpers/flex-layouts.html',
+    appPreviewUrl: 'https://preview.keenthemes.com/metronic8/angular/demo1/',
+    appPreviewAngularUrl: 'https://preview.keenthemes.com/metronic8/angular/demo1',
+    appPreviewDocsUrl: 'https://preview.keenthemes.com/metronic8/angular/docs',
+    appPreviewChangelogUrl: 'https://preview.keenthemes.com/metronic8/angular/docs/changelog'
+};

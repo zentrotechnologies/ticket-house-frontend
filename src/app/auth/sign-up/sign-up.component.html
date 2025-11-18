@@ -1,0 +1,536 @@
+<div class="container-fluid">
+    <div class="row">
+        <!-- Left Panel with Branding -->
+        <div class="col-lg-6 col-md-6 col-sm-12 left-panel">
+            <div class="main-img">
+                <div class="d-flex justify-content-between flex-column px-5">
+                    <div class="sign-logo d-flex justify-content-center">
+                        <svg width="200" height="60" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="200" height="60" rx="12" fill="#2c2e72"/>
+                            <path d="M45 20L50 35L55 20H60L52 40H48L40 20H45Z" fill="white"/>
+                            <path d="M65 20H70V40H65V20Z" fill="white"/>
+                            <path d="M75 20H80V25H75V20Z" fill="white"/>
+                            <path d="M75 30H80V40H75V30Z" fill="white"/>
+                            <path d="M85 20H90L95 30V20H100V40H95L90 30V40H85V20Z" fill="white"/>
+                            <path d="M110 20H120V25H115V40H110V20Z" fill="white"/>
+                            <path d="M125 20H135V25H130V28H135V33H130V40H125V20Z" fill="white"/>
+                            <circle cx="150" cy="30" r="15" fill="#4896d1"/>
+                            <path d="M145 30L148 33L155 26" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    
+                    <div class="decorative-illustration text-center mt-5">
+                        <svg width="300" height="200" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- SVG content remains the same -->
+                        </svg>
+                        <div class="img-text text-center mt-4">
+                            <h5 class="mb-2 text-white">Create Amazing Events</h5>
+                            <p class="mb-0 text-white-50" style="font-size: 0.9rem;">
+                                Join thousands of organizers managing successful events
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel with Registration Form -->
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <div class="sign-up">
+                <form [formGroup]="signUpForm" (ngSubmit)="onSubmit()" autocomplete="off">
+                    <div class="form-heading-text">
+                        <h4 class="mb-0" style="color: #4896d1;">Organizer Registration</h4>
+                        <p class="mb-0" style="color: #2c2e72;">Sign up to enjoy the features of Tickethouse</p>
+                    </div>
+
+                    <!-- Step Indicator -->
+                    <div class="step-indicator">
+                        <div class="step" [class.active]="currentStep === 1">
+                            <div class="circle">1</div>
+                            <span class="step-details">Company Details</span>
+                        </div>
+                        <div class="step-line"></div>
+                        <div class="step" [class.active]="currentStep === 2">
+                            <div class="circle">2</div>
+                            <span class="step-details">Confirm Identity</span>
+                        </div>
+                    </div>
+
+                    <!-- Step 1: Company Details -->
+                    <div class="form-step" [class.active]="currentStep === 1">
+                        <div class="row mb-2">
+                            <div class="col-md-6 mb-2">
+                                <div class="input_wrap">
+                                    <input type="text" class="sign-form-input" 
+                                           formControlName="first_name" 
+                                           [class.invalid]="isFieldInvalid('first_name')"
+                                           required placeholder=" ">
+                                    <label for="first_name">First Name<span class="text-danger">*</span></label>
+                                    <div class="error-message" *ngIf="isFieldInvalid('first_name')">
+                                        {{ getFieldError('first_name') }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <div class="input_wrap">
+                                    <input type="text" class="sign-form-input" 
+                                           formControlName="last_name" 
+                                           [class.invalid]="isFieldInvalid('last_name')"
+                                           required placeholder=" ">
+                                    <label for="last_name">Last Name<span class="text-danger">*</span></label>
+                                    <div class="error-message" *ngIf="isFieldInvalid('last_name')">
+                                        {{ getFieldError('last_name') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="input_wrap mb-3">
+                            <input type="text" class="sign-form-input" 
+                                   formControlName="org_name" 
+                                   [class.invalid]="isFieldInvalid('org_name')"
+                                   required placeholder=" ">
+                            <label for="org_name">Organization Name<span class="text-danger">*</span></label>
+                            <div class="error-message" *ngIf="isFieldInvalid('org_name')">
+                                {{ getFieldError('org_name') }}
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-6 mb-2">
+                                <div class="input_wrap">
+                                    <input type="date" class="sign-form-input calender-icon" 
+                                           formControlName="org_start_date" 
+                                           [class.invalid]="isFieldInvalid('org_start_date')"
+                                           required placeholder=" ">
+                                    <label for="org_start_date">Organization Start Date<span class="text-danger">*</span></label>
+                                    <div class="error-message" *ngIf="isFieldInvalid('org_start_date')">
+                                        {{ getFieldError('org_start_date') }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <div class="input_wrap">
+                                    <input type="text" class="sign-form-input" 
+                                           formControlName="owner_personal_email" 
+                                           [class.invalid]="isFieldInvalid('owner_personal_email')"
+                                           required placeholder=" ">
+                                    <label for="owner_personal_email">Owner Personal Email<span class="text-danger">*</span></label>
+                                    <div class="error-message" *ngIf="isFieldInvalid('owner_personal_email')">
+                                        {{ getFieldError('owner_personal_email') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="input_wrap mb-3">
+                            <input type="text" class="sign-form-input" 
+                                   formControlName="address" 
+                                   [class.invalid]="isFieldInvalid('address')"
+                                   required placeholder=" ">
+                            <label for="address">Street Address<span class="text-danger">*</span></label>
+                            <div class="error-message" *ngIf="isFieldInvalid('address')">
+                                {{ getFieldError('address') }}
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-6 mb-2">
+                                <div class="input_wrap">
+                                    <input type="text" class="sign-form-input" 
+                                           formControlName="city" 
+                                           [class.invalid]="isFieldInvalid('city')"
+                                           required placeholder=" " maxlength="100">
+                                    <label for="city">City<span class="text-danger">*</span></label>
+                                    <div class="error-message" *ngIf="isFieldInvalid('city')">
+                                        {{ getFieldError('city') }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <div class="input_wrap">
+                                    <input type="text" class="sign-form-input" 
+                                           formControlName="state" 
+                                           [class.invalid]="isFieldInvalid('state')"
+                                           required placeholder=" " maxlength="100">
+                                    <label for="state">State<span class="text-danger">*</span></label>
+                                    <div class="error-message" *ngIf="isFieldInvalid('state')">
+                                        {{ getFieldError('state') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-2">
+                                <div class="input_wrap">
+                                    <select class="sign-form-input input-dropdown dropdown-arrow" 
+                                            formControlName="country" 
+                                            [class.invalid]="isFieldInvalid('country')"
+                                            required>
+                                        <option value="" selected disabled>Select Country</option>
+                                        <option value="India">India</option>
+                                        <option value="United States">United States</option>
+                                        <option value="United Kingdom">United Kingdom</option>
+                                        <option value="Canada">Canada</option>
+                                        <option value="Australia">Australia</option>
+                                    </select>
+                                    <label for="country">Country<span class="text-danger">*</span></label>
+                                    <div class="error-message" *ngIf="isFieldInvalid('country')">
+                                        {{ getFieldError('country') }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <div class="input_wrap">
+                                    <input type="text" class="sign-form-input" 
+                                           formControlName="gst_number" 
+                                           [class.invalid]="isFieldInvalid('gst_number')"
+                                           required placeholder=" " maxlength="50">
+                                    <label for="gst_number">GST Number<span class="text-danger">*</span></label>
+                                    <div class="error-message" *ngIf="isFieldInvalid('gst_number')">
+                                        {{ getFieldError('gst_number') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-2">
+                                <div class="input_wrap">
+                                    <input type="text" class="sign-form-input" 
+                                           formControlName="aadhar_number" 
+                                           [class.invalid]="isFieldInvalid('aadhar_number')"
+                                           required placeholder=" " maxlength="12">
+                                    <label for="aadhar_number">Aadhar Number<span class="text-danger">*</span></label>
+                                    <div class="error-message" *ngIf="isFieldInvalid('aadhar_number')">
+                                        {{ getFieldError('aadhar_number') }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <div class="input_wrap">
+                                    <input type="text" class="sign-form-input" 
+                                           formControlName="pancard_number" 
+                                           [class.invalid]="isFieldInvalid('pancard_number')"
+                                           required placeholder=" " maxlength="10">
+                                    <label for="pancard_number">PAN Card Number<span class="text-danger">*</span></label>
+                                    <div class="error-message" *ngIf="isFieldInvalid('pancard_number')">
+                                        {{ getFieldError('pancard_number') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-buttons">
+                            <button type="button" class="next-step" 
+                                    (click)="nextStep()" 
+                                    [disabled]="isLoading">
+                                Next
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Confirm Identity -->
+                    <div class="form-step" [class.active]="currentStep === 2">
+                        <div class="input_wrap mb-3">
+                            <!-- <input type="email" class="sign-form-input" 
+                                   formControlName="email" 
+                                   [class.invalid]="isFieldInvalid('email')"
+                                   required placeholder=" ">
+                            <label for="email">Email Address<span class="text-danger">*</span></label>
+                            <div class="error-message" *ngIf="isFieldInvalid('email')">
+                                {{ getFieldError('email') }}
+                            </div> -->
+
+                            <!-- Email Verification Section -->
+                            <div class="email-verification-section mb-4 p-3 border rounded">
+                                <h6 class="mb-3" style="color: #2c2e72;">Email Verification</h6>
+                                <div class="input_wrap mb-3">
+                                    <input type="email" class="sign-form-input" 
+                                        formControlName="email" 
+                                        [class.invalid]="isFieldInvalid('email')"
+                                        required placeholder=" ">
+                                    <label for="email">Email Address<span class="text-danger">*</span></label>
+                                    <div class="error-message" *ngIf="isFieldInvalid('email')">
+                                        {{ getFieldError('email') }}
+                                    </div>
+                                </div>
+                                
+                                <div class="verification-status" *ngIf="otpService.hasActiveOTPSession()">
+                                    <div class="alert alert-info d-flex align-items-center">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        <small>Email verification pending. Please check your inbox for the OTP.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-md-3 mb-2">
+                                <div class="input_wrap">
+                                    <select class="sign-form-input input-dropdown dropdown-arrow" 
+                                            formControlName="country_code">
+                                        <option value="+91" selected>+91</option>
+                                        <option value="+1">+1</option>
+                                        <option value="+44">+44</option>
+                                        <option value="+61">+61</option>
+                                    </select>
+                                    <label for="country_code">Code</label>
+                                </div>
+                            </div>
+                            <div class="col-md-9 mb-2">
+                                <div class="input_wrap">
+                                    <input type="text" class="sign-form-input" 
+                                           formControlName="mobile" 
+                                           [class.invalid]="isFieldInvalid('mobile')"
+                                           required placeholder=" " maxlength="10">
+                                    <label for="mobile">Mobile Number<span class="text-danger">*</span></label>
+                                    <div class="error-message" *ngIf="isFieldInvalid('mobile')">
+                                        {{ getFieldError('mobile') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-2">
+                                <div class="input_wrap position-relative">
+                                    <input [type]="showPassword ? 'text' : 'password'" 
+                                           class="sign-form-input" 
+                                           formControlName="password" 
+                                           [class.invalid]="isFieldInvalid('password')"
+                                           required placeholder=" ">
+                                    <label for="password">Password<span class="text-danger">*</span></label>
+                                    <i class="fas fa-eye toggle-eye-icon" 
+                                       [class.fa-eye-slash]="showPassword"
+                                       (click)="togglePasswordVisibility()"></i>
+                                    <div class="error-message" *ngIf="isFieldInvalid('password')">
+                                        {{ getFieldError('password') }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <div class="input_wrap position-relative">
+                                    <input [type]="showConfirmPassword ? 'text' : 'password'" 
+                                           class="sign-form-input" 
+                                           formControlName="confirm_password" 
+                                           [class.invalid]="isFieldInvalid('confirm_password')"
+                                           required placeholder=" ">
+                                    <label for="confirm_password">Confirm Password<span class="text-danger">*</span></label>
+                                    <i class="fas fa-eye toggle-eye-icon" 
+                                       [class.fa-eye-slash]="showConfirmPassword"
+                                       (click)="toggleConfirmPasswordVisibility()"></i>
+                                    <div class="error-message" *ngIf="isFieldInvalid('confirm_password')">
+                                        {{ getFieldError('confirm_password') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-2">
+                                <div class="input_wrap">
+                                    <input type="text" class="sign-form-input" 
+                                           formControlName="bank_account_no" 
+                                           [class.invalid]="isFieldInvalid('bank_account_no')"
+                                           required placeholder=" " maxlength="18">
+                                    <label for="bank_account_no">Bank Account Number<span class="text-danger">*</span></label>
+                                    <div class="error-message" *ngIf="isFieldInvalid('bank_account_no')">
+                                        {{ getFieldError('bank_account_no') }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <div class="input_wrap">
+                                    <input type="text" class="sign-form-input" 
+                                           formControlName="bank_ifsc" 
+                                           [class.invalid]="isFieldInvalid('bank_ifsc')"
+                                           required placeholder=" " maxlength="11">
+                                    <label for="bank_ifsc">Bank IFSC Code<span class="text-danger">*</span></label>
+                                    <div class="error-message" *ngIf="isFieldInvalid('bank_ifsc')">
+                                        {{ getFieldError('bank_ifsc') }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="input_wrap mb-3">
+                            <input type="text" class="sign-form-input" 
+                                   formControlName="bank_name" 
+                                   [class.invalid]="isFieldInvalid('bank_name')"
+                                   required placeholder=" " maxlength="255">
+                            <label for="bank_name">Bank Name<span class="text-danger">*</span></label>
+                            <div class="error-message" *ngIf="isFieldInvalid('bank_name')">
+                                {{ getFieldError('bank_name') }}
+                            </div>
+                        </div>
+
+                        <div class="input_wrap mb-3">
+                            <input type="text" class="sign-form-input" 
+                                   formControlName="beneficiary_name" 
+                                   [class.invalid]="isFieldInvalid('beneficiary_name')"
+                                   required placeholder=" " maxlength="255">
+                            <label for="beneficiary_name">Beneficiary Name<span class="text-danger">*</span></label>
+                            <div class="error-message" *ngIf="isFieldInvalid('beneficiary_name')">
+                                {{ getFieldError('beneficiary_name') }}
+                            </div>
+                        </div>
+
+                        <div class="social-links mb-3">
+                            <h6>Social Media Links (Optional)</h6>
+                            <div class="row">
+                                <div class="col-md-6 mb-2">
+                                    <div class="input_wrap">
+                                        <input type="text" class="sign-form-input" 
+                                               formControlName="instagram_link" 
+                                               placeholder=" " maxlength="500">
+                                        <label for="instagram_link">Instagram</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <div class="input_wrap">
+                                        <input type="text" class="sign-form-input" 
+                                               formControlName="facebook_link" 
+                                               placeholder=" " maxlength="500">
+                                        <label for="facebook_link">Facebook</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-2">
+                                    <div class="input_wrap">
+                                        <input type="text" class="sign-form-input" 
+                                               formControlName="twitter_link" 
+                                               placeholder=" " maxlength="500">
+                                        <label for="twitter_link">Twitter</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <div class="input_wrap">
+                                        <input type="text" class="sign-form-input" 
+                                               formControlName="youtube_link" 
+                                               placeholder=" " maxlength="500">
+                                        <label for="youtube_link">YouTube</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- <div class="form-buttons">
+                            <button type="button" class="prev-step" 
+                                    (click)="prevStep()" 
+                                    [disabled]="isLoading">
+                                Previous
+                            </button>
+                            <button type="submit" class="sign-up-btn" 
+                                    [disabled]="isLoading">
+                                <span *ngIf="!isLoading">Sign Up</span>
+                                <span *ngIf="isLoading">Registering...</span>
+                            </button>
+                        </div> -->
+                        <div class="form-buttons">
+                            <button type="button" class="prev-step" 
+                                    (click)="prevStep()" 
+                                    [disabled]="isLoading">
+                                Previous
+                            </button>
+                            <button type="submit" class="sign-up-btn" 
+                                    [disabled]="isLoading || isSendingOTP">
+                                <span *ngIf="!isLoading && !isSendingOTP">
+                                    {{ otpService.hasActiveOTPSession() ? 'Verify & Complete Registration' : 'Verify Email & Continue' }}
+                                </span>
+                                <span *ngIf="isLoading">Registering...</span>
+                                <span *ngIf="isSendingOTP">Sending OTP...</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="have-acct mt-3 text-center">
+                        <div class="have-acct-text">Already have an account?</div>
+                        <div class="sign-IN">
+                            <a routerLink="/auth/login">Sign In</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- OTP Verification Modal -->
+<div class="modal-backdrop fade show" *ngIf="showOTPModal"></div>
+<div class="modal fade show d-block" *ngIf="showOTPModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Verify Your Email</h5>
+                <button type="button" class="btn-close" (click)="closeOTPModal()" [disabled]="isVerifyingOTP"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <i class="fas fa-envelope fa-3x text-primary mb-3"></i>
+                    <h6>Enter the 4-digit OTP sent to</h6>
+                    <p class="text-muted">{{ signUpForm.get('email')?.value }}</p>
+                </div>
+
+                <!-- OTP Input -->
+                <div class="otp-container mb-4">
+                    <div class="row justify-content-center">
+                        <div class="col-2" *ngFor="let i of [0,1,2,3]">
+                            <input type="text" 
+                                   [id]="'otp-' + i"
+                                   class="form-control otp-input text-center" 
+                                   maxlength="1"
+                                   (input)="onOtpInput($event, i)"
+                                   (keydown)="onOtpKeyDown($event, i)"
+                                   [disabled]="isVerifyingOTP">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Countdown Timer -->
+                <div class="text-center mb-3">
+                    <small class="text-muted" *ngIf="countdown > 0">
+                        OTP expires in: <span class="text-warning">{{ countdownFormatted }}</span>
+                    </small>
+                    <small class="text-danger" *ngIf="countdown <= 0">
+                        OTP has expired. Please request a new one.
+                    </small>
+                </div>
+
+                <!-- Resend OTP -->
+                <div class="text-center mb-3">
+                    <button type="button" 
+                            class="btn btn-link p-0" 
+                            (click)="resendOTP()"
+                            [disabled]="countdown > 30 || isVerifyingOTP">
+                        Resend OTP
+                    </button>
+                    <div class="mt-1">
+                        <small class="text-muted">
+                            {{ otpService.getRemainingResendAttempts() }} attempts remaining
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" 
+                        class="btn btn-secondary" 
+                        (click)="closeOTPModal()"
+                        [disabled]="isVerifyingOTP">
+                    Cancel
+                </button>
+                <button type="button" 
+                        class="btn btn-primary" 
+                        (click)="verifyOTP()"
+                        [disabled]="otp.length !== 4 || isVerifyingOTP">
+                    <span *ngIf="!isVerifyingOTP">Verify OTP</span>
+                    <span *ngIf="isVerifyingOTP">
+                        <i class="fas fa-spinner fa-spin me-2"></i>Verifying...
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

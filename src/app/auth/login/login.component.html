@@ -1,0 +1,136 @@
+<div class="container-fluid">
+    <div class="row">
+        <!-- Left Panel with Branding -->
+        <div class="col-lg-6 col-md-6 col-sm-12 left-panel">
+            <div class="main-img">
+                <div class="d-flex justify-content-between flex-column px-5">
+                    <div class="sign-logo d-flex justify-content-center">
+                        <!-- Your SVG logo here -->
+                    </div>
+                    
+                    <!-- Decorative Illustration -->
+                    <div class="decorative-illustration text-center mt-5">
+                        <!-- Your SVG illustration here -->
+                        
+                        <div class="img-text text-center mt-4">
+                            <h5 class="mb-2 text-white">Welcome Back</h5>
+                            <p class="mb-0 text-white-50" style="font-size: 0.9rem;">
+                                Secure access to your organizer account
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel with Login Form -->
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <div class="sign-in">
+                <div class="form-heading-text">
+                    <h4 class="mb-0" style="color: #2c2e72;">Sign In</h4>
+                    <p class="mb-0" style="color: #4896d1;">Please login to continue to your account</p>
+                </div>
+
+                <!-- Error Message -->
+                <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ errorMessage }}
+                    <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+                </div>
+
+                <div class="sign-in-form">
+                    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" autocomplete="off">
+                        <!-- Email Input -->
+                        <div class="input_wrap mb-3">
+                            <input 
+                                type="email" 
+                                class="sign-form-input" 
+                                formControlName="email"
+                                id="email" 
+                                name="email" 
+                                required 
+                                placeholder=" "
+                                [class.invalid]="isFieldInvalid('email')">
+                            <label for="email">Email Address<span class="text-danger">*</span></label>
+                            <div class="error-message" *ngIf="isFieldInvalid('email')">
+                                {{ getFieldError('email') }}
+                            </div>
+                        </div>
+
+                        <!-- Password Input -->
+                        <div class="input_wrap mb-3">
+                            <input 
+                                [type]="showPassword ? 'text' : 'password'" 
+                                class="sign-form-input" 
+                                formControlName="password"
+                                id="password" 
+                                name="password" 
+                                required 
+                                placeholder=" "
+                                [class.invalid]="isFieldInvalid('password')">
+                            <label for="password">Password<span class="text-danger">*</span></label>
+                            <i 
+                                class="fas toggle-eye-icon" 
+                                [class.fa-eye]="!showPassword" 
+                                [class.fa-eye-slash]="showPassword"
+                                (click)="togglePasswordVisibility()"></i>
+                            <div class="error-message" *ngIf="isFieldInvalid('password')">
+                                {{ getFieldError('password') }}
+                            </div>
+                        </div>
+
+                        <!-- Remember Me & Forgot Password -->
+                        <div class="login-options d-flex justify-content-between align-items-center mb-3">
+                            <div class="remember-me d-flex align-items-center">
+                                <input type="checkbox" id="rememberMe" formControlName="rememberMe" class="me-2">
+                                <label for="rememberMe" class="mb-0">Keep me logged in</label>
+                            </div>
+                            <div class="forgot-password">
+                                <a href="#" class="forgot-link">Forgot Password?</a>
+                            </div>
+                        </div>
+
+                        <!-- Sign In Button -->
+                        <button type="submit" class="sign-in-btn" [disabled]="isLoading">
+                            <span *ngIf="!isLoading">Sign In</span>
+                            <span *ngIf="isLoading">
+                                <i class="fas fa-spinner fa-spin me-2"></i>
+                                Signing In...
+                            </span>
+                        </button>
+                    </form>
+
+                    <!-- Divider -->
+                    <div class="divider">
+                        <div class="divider-line"></div>
+                        <div class="divider-text">or</div>
+                        <div class="divider-line"></div>
+                    </div>
+
+                    <!-- Social Login Options -->
+                    <div class="social-login">
+                        <div class="social-text text-center mb-3">
+                            <span>Sign In With</span>
+                        </div>
+                        <div class="social-buttons">
+                            <button type="button" class="social-btn google-btn">
+                                <!-- Google SVG -->
+                                Continue with Google
+                            </button>
+                            
+                            <button type="button" class="social-btn apple-btn">
+                                <!-- Apple SVG -->
+                                Continue with Apple
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sign Up Link -->
+                    <div class="sign-up-link text-center mt-4">
+                        <span class="dont-have-account">Don't have an account?</span>
+                        <a href="#" class="sign-up-btn">Sign Up</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
