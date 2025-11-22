@@ -1,1 +1,87 @@
-<p>admin-dashboard works!</p>
+<div class="dashboard">
+  <div class="dashboard-header">
+    <h1>Welcome back, {{ userName }}!</h1>
+    <p class="role-badge">{{ userRole }}</p>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon events">📅</div>
+      <div class="stat-info">
+        <h3>{{ dashboardStats.totalEvents }}</h3>
+        <p>Total Events</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon users">👥</div>
+      <div class="stat-info">
+        <h3>{{ dashboardStats.totalUsers }}</h3>
+        <p>Total Users</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon categories">📂</div>
+      <div class="stat-info">
+        <h3>{{ dashboardStats.totalCategories }}</h3>
+        <p>Categories</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon pending">⏳</div>
+      <div class="stat-info">
+        <h3>{{ dashboardStats.pendingApprovals }}</h3>
+        <p>Pending Approvals</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="recent-activity">
+    <div class="activity-card">
+      <h2>Recent Activity</h2>
+      <div class="activity-list">
+        <div class="activity-item">
+          <span class="activity-icon">🎭</span>
+          <div class="activity-details">
+            <p>New event "Summer Concert" created</p>
+            <span class="activity-time">2 hours ago</span>
+          </div>
+        </div>
+        <div class="activity-item">
+          <span class="activity-icon">👤</span>
+          <div class="activity-details">
+            <p>User John Doe registered</p>
+            <span class="activity-time">5 hours ago</span>
+          </div>
+        </div>
+        <div class="activity-item">
+          <span class="activity-icon">✅</span>
+          <div class="activity-details">
+            <p>Event "Tech Conference" approved</p>
+            <span class="activity-time">1 day ago</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quick-actions">
+    <h2>Quick Actions</h2>
+    <div class="actions-grid">
+      <button class="action-btn" routerLink="/admin/events">
+        <span class="action-icon">➕</span>
+        <span>Create Event</span>
+      </button>
+      <button class="action-btn" routerLink="/admin/users">
+        <span class="action-icon">👥</span>
+        <span>Manage Users</span>
+      </button>
+      <button class="action-btn" routerLink="/admin/categories">
+        <span class="action-icon">📂</span>
+        <span>Categories</span>
+      </button>
+    </div>
+  </div>
+</div>

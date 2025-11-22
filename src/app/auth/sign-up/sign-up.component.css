@@ -47,6 +47,7 @@ body {
 .sign-logo img {
     max-width: 200px;
     height: auto;
+    background-color: white;
 }
 
 /* Right Panel */

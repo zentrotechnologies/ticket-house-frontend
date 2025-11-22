@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth-guard';
+import { roleGuard } from './core/guards/role-guard';
+import { LayoutComponent } from './layout/layout.component';
 
 export const routes: Routes = [
   {
@@ -8,34 +10,55 @@ export const routes: Routes = [
     pathMatch: 'full'
   },
   {
-    path: 'auth/login',
-    loadComponent: () => import('./auth/login/login.component').then((m) => m.LoginComponent),
+    path: 'auth',
+    children: [
+      {
+        path: 'login',
+        loadComponent: () => import('./auth/login/login.component').then((m) => m.LoginComponent),
+      },
+      {
+        path: 'sign-up',
+        loadComponent: () => import('./auth/sign-up/sign-up.component').then((m) => m.SignUpComponent),
+      }
+    ]
   },
+  // Protected routes with layout
   {
-    path: 'auth/admin-login',
-    loadComponent: () => import('./auth/login/login.component').then((m) => m.LoginComponent),
+    path: '',
+    component: LayoutComponent,
+    canActivate: [authGuard],
+    children: [
+      // Admin routes
+      {
+        path: 'admin',
+        canActivate: [roleGuard],
+        data: { roles: [1, 2] },
+        children: [
+          {
+            path: 'dashboard',
+            loadComponent: () => import('./pages/admin/admin-dashboard/admin-dashboard.component').then((m) => m.AdminDashboardComponent),
+          }
+        ]
+      },
+      // User routes
+      {
+        path: 'user',
+        canActivate: [roleGuard],
+        data: { roles: [3] },
+        children: [
+          {
+            path: 'events',
+            loadComponent: () => import('./pages/user/events/events.component').then((m) => m.EventsComponent),
+          },
+          {
+            path: 'event-booking',
+            loadComponent: () => import('./pages/user/event-booking/event-booking.component').then((m) => m.EventBookingComponent),
+          }
+        ]
+      }
+    ]
   },
-  {
-    path: 'auth/sign-up',
-    loadComponent: () => import('./auth/sign-up/sign-up.component').then((m) => m.SignUpComponent),
-    // canActivate: [guestGuard]
-  },
-  {
-    path: 'admin-dashboard',
-    loadComponent: () => import('./pages/admin/admin-dashboard/admin-dashboard.component').then((m) => m.AdminDashboardComponent),
-    canActivate: [authGuard]
-  },
-  {
-    path: 'events',
-    loadComponent: () => import('./pages/user/events/events.component').then((m) => m.EventsComponent),
-    canActivate: [authGuard]
-  },
-  {
-    path: 'event-booking',
-    loadComponent: () => import('./pages/user/event-booking/event-booking.component').then((m) => m.EventBookingComponent),
-    canActivate: [authGuard]
-  },
-  // Wildcard route - redirect to login for any unknown paths
+  // Wildcard route
   {
     path: '**',
     redirectTo: 'auth/login'

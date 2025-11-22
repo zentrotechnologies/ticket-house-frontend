@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LoginRequest } from '../../core/models/auth.model';
 import { AuthService } from '../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
 })
@@ -17,19 +17,24 @@ export class LoginComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   showPassword = false;
+  returnUrl: string = '';
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.loginForm = this.createForm();
   }
 
   ngOnInit(): void {
-    // If user is already logged in, redirect to admin dashboard
+    // Get return url from route parameters or default to '/'
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '';
+
+    // If user is already logged in, redirect based on role
     if (this.authService.isLoggedIn()) {
-      this.router.navigate(['/admin-dashboard']);
+      this.redirectBasedOnRole();
     }
   }
 
@@ -61,8 +66,8 @@ export class LoginComponent implements OnInit {
               // You can implement remember me logic here
             }
 
-            // Redirect to admin dashboard or intended route
-            this.router.navigate(['/admin-dashboard']);
+            // Redirect based on user role or returnUrl
+            this.handlePostLoginRedirect();
           } else {
             this.errorMessage = response.response.message;
           }
@@ -75,6 +80,27 @@ export class LoginComponent implements OnInit {
       });
     } else {
       this.markFormGroupTouched();
+    }
+  }
+
+  private handlePostLoginRedirect(): void {
+    // If there's a return URL, use it
+    if (this.returnUrl) {
+      this.router.navigateByUrl(this.returnUrl);
+    } else {
+      // Otherwise redirect based on role
+      this.redirectBasedOnRole();
+    }
+  }
+
+  private redirectBasedOnRole(): void {
+    if (this.authService.isAdmin()) {
+      this.router.navigate(['/admin/dashboard']);
+    } else if (this.authService.isAudience()) {
+      this.router.navigate(['/user/events']);
+    } else {
+      // Fallback - should not happen if roles are properly set
+      this.router.navigate(['/auth/login']);
     }
   }
 

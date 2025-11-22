@@ -3,6 +3,7 @@ import { CommonResponse, LoginRequest, LoginResponse, User } from '../models/aut
 import { BehaviorSubject, catchError, Observable, tap, throwError } from 'rxjs';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { MenuItem, MENU_ITEMS, ROLE_NAMES } from '../constants/MenuConst';
 
 @Injectable({
   providedIn: 'root',
@@ -47,9 +48,9 @@ export class AuthService {
 
   isLoggedIn(): boolean {
     // Always return false in development to force login
-    if (!environment.production) {
-      return false;
-    }
+    // if (!environment.production) {
+    //   return false;
+    // }
     
     const token = this.getToken();
     if (!token) return false;
@@ -60,6 +61,24 @@ export class AuthService {
       return new Date() < new Date(expiry);
     }
     return false;
+  }
+
+  // Add method to get user role
+  getUserRole(): number | null {
+    const user = this.currentUserSubject.value;
+    return user ? user.role_id : null;
+  }
+
+  // Add method to check if user is admin (role_id 1 or 2)
+  isAdmin(): boolean {
+    const roleId = this.getUserRole();
+    return roleId === 1 || roleId === 2;
+  }
+
+  // Add method to check if user is audience (role_id 3)
+  isAudience(): boolean {
+    const roleId = this.getUserRole();
+    return roleId === 3;
   }
 
   getToken(): string | null {
@@ -142,5 +161,35 @@ export class AuthService {
     sessionStorage.clear();
     
     console.log('🔄 Development Mode: Cleared authentication data');
+  }
+
+  // Add method to get filtered menu items based on user role
+  getMenuItems(): MenuItem[] {
+    const userRole = this.getUserRole();
+    if (!userRole) return [];
+    
+    return this.filterMenuItemsByRole(MENU_ITEMS, userRole);
+  }
+
+  private filterMenuItemsByRole(menuItems: MenuItem[], role: number): MenuItem[] {
+    return menuItems
+      .filter(item => item.roles.includes(role))
+      .map(item => ({
+        ...item,
+        children: item.children ? this.filterMenuItemsByRole(item.children, role) : undefined
+      }))
+      .filter(item => item.children ? item.children.length > 0 : true);
+  }
+
+  // Add method to get user display name
+  getUserDisplayName(): string {
+    const user = this.currentUserSubject.value;
+    return user ? `${user.first_name} ${user.last_name}` : 'User';
+  }
+
+  // Add method to get user role name
+  getUserRoleName(): string {
+    const roleId = this.getUserRole();
+    return ROLE_NAMES[roleId!] || 'Unknown Role';
   }
 }

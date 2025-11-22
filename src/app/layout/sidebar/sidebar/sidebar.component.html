@@ -1,0 +1,49 @@
+<div class="sidebar" [class.collapsed]="isCollapsed">
+  <div class="sidebar-header">
+    <h3 *ngIf="!isCollapsed">Ticket House</h3>
+    <button class="toggle-btn" (click)="toggleSidebar()">
+      {{ isCollapsed ? '→' : '←' }}
+    </button>
+  </div>
+
+  <nav class="sidebar-nav">
+    <ul class="menu-list">
+      <li *ngFor="let menuItem of menuItems" class="menu-item">
+        <div class="menu-header">
+          <a 
+            *ngIf="!hasChildren(menuItem) && menuItem.route" 
+            [routerLink]="menuItem.route"
+            routerLinkActive="active"
+            class="menu-link"
+          >
+            <span class="menu-icon">📊</span>
+            <span class="menu-text" *ngIf="!isCollapsed">{{ menuItem.title }}</span>
+          </a>
+          
+          <div 
+            *ngIf="hasChildren(menuItem)" 
+            class="menu-parent"
+          >
+            <span class="menu-link">
+              <span class="menu-icon">📋</span>
+              <span class="menu-text" *ngIf="!isCollapsed">{{ menuItem.title }}</span>
+              <span class="menu-arrow" *ngIf="!isCollapsed">▼</span>
+            </span>
+            
+            <ul class="submenu" *ngIf="!isCollapsed">
+              <li *ngFor="let child of menuItem.children" class="submenu-item">
+                <a 
+                  [routerLink]="child.route"
+                  routerLinkActive="active"
+                  class="submenu-link"
+                >
+                  {{ child.title }}
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </nav>
+</div>
