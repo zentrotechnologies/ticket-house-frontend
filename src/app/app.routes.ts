@@ -30,6 +30,11 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/user/events/events.component').then((m) => m.EventsComponent),
     canActivate: [authGuard]
   },
+  {
+    path: 'event-booking',
+    loadComponent: () => import('./pages/user/event-booking/event-booking.component').then((m) => m.EventBookingComponent),
+    canActivate: [authGuard]
+  },
   // Wildcard route - redirect to login for any unknown paths
   {
     path: '**',
