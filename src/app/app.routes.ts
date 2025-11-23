@@ -37,6 +37,18 @@ export const routes: Routes = [
           {
             path: 'dashboard',
             loadComponent: () => import('./pages/admin/admin-dashboard/admin-dashboard.component').then((m) => m.AdminDashboardComponent),
+          },
+          {
+            path: 'events',
+            loadComponent: () => import('./pages/admin/admin-events/admin-events.component').then((m) => m.AdminEventsComponent),
+          },
+          {
+            path: 'event-categories',
+            loadComponent: () => import('./pages/admin/event-category/event-category.component').then((m) => m.EventCategoryComponent),
+          },
+          {
+            path: 'testimonial',
+            loadComponent: () => import('./pages/admin/testimonial/testimonial.component').then((m) => m.TestimonialComponent),
           }
         ]
       },

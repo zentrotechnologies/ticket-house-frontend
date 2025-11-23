@@ -1,0 +1,128 @@
+<!-- MAIN CONTENT: Event Category Listing -->
+<div class="main-content content-card">
+
+  <!-- top row: title + add button -->
+  <div class="page-header">
+    <h2 class="page-title">Event Category Listing</h2>
+    <div class="header-actions">
+      <button class="btn btn-primary btn-add" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+        <i class="fa fa-plus"></i>&nbsp; Add
+      </button>
+    </div>
+  </div>
+
+  <!-- container card -->
+  <div class="card card-white">
+    <!-- search / controls row (optional placeholders) -->
+    <div class="table-controls">
+      <div class="left-controls">
+        <!-- keep small filter area if needed later -->
+        <label class="show-label">Show</label>
+        <select class="per-page-select">
+          <option>10</option>
+          <option>25</option>
+          <option>50</option>
+        </select>
+      </div>
+      <div class="right-controls">
+        <input class="search-input" placeholder="Search categories..." />
+      </div>
+    </div>
+
+    <!-- paginated listing table -->
+    <div class="table-responsive">
+      <table class="table list-table">
+        <thead>
+          <tr>
+            <th class="col-sr">Sr. No</th>
+            <th class="col-name">Event Category Name</th>
+            <th class="col-desc">Event Category Description</th>
+            <th class="col-status text-center">Status</th>
+            <th class="col-action text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- sample rows (static preview) -->
+          <tr>
+            <td>1</td>
+            <td>Music Concert</td>
+            <td>Live music events across genres — local & international artists.</td>
+            <td class="text-center">
+              <label class="switch">
+                <input type="checkbox" checked>
+                <span class="slider"></span>
+              </label>
+            </td>
+            <td class="text-center">
+              <button class="icon-btn" title="Edit"><i class="fa fa-pen"></i></button>
+              <button class="icon-btn danger" title="Delete"><i class="fa fa-trash"></i></button>
+            </td>
+          </tr>
+
+          <tr>
+            <td>2</td>
+            <td>Workshops</td>
+            <td>Hands-on workshops, training & masterclasses for professionals.</td>
+            <td class="text-center">
+              <label class="switch">
+                <input type="checkbox">
+                <span class="slider"></span>
+              </label>
+            </td>
+            <td class="text-center">
+              <button class="icon-btn" title="Edit"><i class="fa fa-pen"></i></button>
+              <button class="icon-btn danger" title="Delete"><i class="fa fa-trash"></i></button>
+            </td>
+          </tr>
+
+          <!-- add more preview rows as needed -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- pagination footer -->
+    <div class="table-footer">
+      <div class="rows-info">Showing 1 to 2 of 2 entries</div>
+      <nav aria-label="Page navigation">
+        <ul class="pagination">
+          <li class="page-item disabled"><a class="page-link" href="#">‹</a></li>
+          <li class="page-item active"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">›</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<!-- ADD CATEGORY MODAL (Bootstrap) -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryLabel" aria-hidden="true">
+  <div class="modal-dialog modal-md modal-dialog-centered">
+    <div class="modal-content modal-card">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addCategoryLabel">Add Event Category</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <form class="form-grid">
+          <div class="form-row">
+            <label>Event Category Name</label>
+            <input type="text" class="form-control" placeholder="Enter category name" />
+          </div>
+
+          <div class="form-row">
+            <label>Event Category Description</label>
+            <textarea class="form-control" rows="4" placeholder="Enter description"></textarea>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary btn-modal-add" data-bs-dismiss="modal">
+          <i class="fa fa-plus"></i> Add
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

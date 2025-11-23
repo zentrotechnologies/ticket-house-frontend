@@ -12,24 +12,30 @@ export const MENU_ITEMS: MenuItem[] = [
     icon: 'dashboard',
     route: '/admin/dashboard',
     roles: [1, 2] // Role 1 and 2 can access
-  }
-//   {
-//     title: 'Event Management',
-//     icon: 'event',
-//     roles: [1, 2],
-//     children: [
-//       {
-//         title: 'Events',
-//         route: '/admin/events',
-//         roles: [1, 2]
-//       },
-//       {
-//         title: 'Categories',
-//         route: '/admin/categories',
-//         roles: [1, 2]
-//       }
-//     ]
-//   },
+  },
+  {
+    title: 'Event Management',
+    icon: 'event',
+    roles: [1, 2],
+    children: [
+      {
+        title: 'Events',
+        route: '/admin/events',
+        roles: [1, 2]
+      },
+      {
+        title: 'Event Categories',
+        route: '/admin/event-categories',
+        roles: [1, 2]
+      }
+    ]
+  },
+  {
+    title: 'Testimonial',
+    icon: '',
+    route: '/admin/testimonial',
+    roles: [1, 2] // Role 1 and 2 can access
+  },
 //   {
 //     title: 'User Management',
 //     icon: 'people',
