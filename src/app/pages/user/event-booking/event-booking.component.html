@@ -1,51 +1,32 @@
+<!-- booking-page.component.html -->
 <div class="booking-page">
-    <header class="wrap topbar">
-        <img class="logo"
-            src="https://zentrotechnologies.com/wp-content/uploads/2025/02/Zentro_Final-Logo-05-scaled-e1753251642526.png"
-            alt="Zentro Logo">
-        <div class="search">
-            <input placeholder="Search for Events, Artists, Location..."
-                aria-label="search">
-        </div>
-        <div class="user-actions">
-            <div class="muted">Pune ▼</div>
-            <div class="pill">Sign In</div>
-        </div>
-    </header>
-
-    <main class="wrap">
-        <div class="layout">
+    <main class="booking-container">
+        <div class="booking-layout">
             <!-- LEFT: Hero + Content -->
-            <div>
+            <div class="booking-main-content">
                 <div class="event-hero" role="region" aria-label="event hero">
                     <!-- Large image / poster -->
                     <div class="hero-img" id="mainPosterWrap">
-                        <!-- Replace this src with your banner image (use high resolution) -->
                         <img id="mainPoster"
                             src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1400&q=60"
                             alt="Event banner">
                     </div>
-
-                    <!-- Right side inside hero could contain brief meta, but we use separate sidebar below; keep hero clean -->
                 </div>
 
                 <!-- Title + tags + interest -->
-                <div style="margin-top:18px">
-                    <div class="event-title">Saurabh Bhosale Specials :
-                        Kalakar</div>
+                <div class="event-details-section">
+                    <div class="event-title">Saurabh Bhosale Specials : Kalakar</div>
                     <div class="hero-details">
                         <div class="tags">
                             <span class="tag">Stand up Comedy</span>
                             <span class="tag">Comedy Shows</span>
                         </div>
 
-                        <div style="flex:1"></div>
+                        <div class="spacer"></div>
 
                         <div class="interested-row">
                             <div class="likes">👍 514 are interested</div>
-                            <button class="interested"
-                                style="background:#fff;border:1px solid rgba(0,0,0,0.06);">I'm
-                                Interested</button>
+                            <button class="interested">I'm Interested</button>
                         </div>
                     </div>
 
@@ -53,34 +34,27 @@
                     <div class="about">
                         <div class="section-title">About The Event</div>
                         <p>
-                            Saurabh Bhosale, one of the biggest names in the
-                            Marathi
+                            Saurabh Bhosale, one of the biggest names in the Marathi
                             Stand-up Comedy scene, is bringing a fresh set of
-                            laughter and stories — an evening full of wit,
-                            comedy
+                            laughter and stories — an evening full of wit, comedy
                             and real-life humour. Expect observational comedy,
                             storytelling and crowd interaction.
                         </p>
-                        <p class="muted">Duration: 2 hours 30 minutes •
-                            Language:
+                        <p class="muted">Duration: 2 hours 30 minutes • Language:
                             Marathi • Age: All age groups</p>
                     </div>
 
                     <!-- Similar shows -->
-                    <div style="margin-top:18px">
-                        <div class="section-title">More Shows You Might
-                            Like</div>
-                        <div class="grid" id="showsGrid">
-                            <!-- Static cards. Each card has data-image attribute used by JS to open the modal -->
+                    <div class="similar-shows">
+                        <div class="section-title">More Shows You Might Like</div>
+                        <div class="shows-grid" id="showsGrid">
                             <div class="mini-card"
                                 data-img="https://images.unsplash.com/photo-1526178611801-4f9d2f6d1a6c?auto=format&fit=crop&w=1000&q=60"
                                 tabindex="0">
                                 <div class="mini-poster"
                                     style="background-image:url('https://images.unsplash.com/photo-1526178611801-4f9d2f6d1a6c?auto=format&fit=crop&w=600&q=60')"></div>
-                                <div class="mini-title">Papa Yaar - Zakir Khan
-                                    Live</div>
-                                <div class="mini-sub muted">Pandit Farms
-                                    Pune</div>
+                                <div class="mini-title">Papa Yaar - Zakir Khan Live</div>
+                                <div class="mini-sub muted">Pandit Farms Pune</div>
                             </div>
 
                             <div class="mini-card"
@@ -89,8 +63,7 @@
                                 <div class="mini-poster"
                                     style="background-image:url('https://images.unsplash.com/photo-1504814532845-3f33f25f2b2d?auto=format&fit=crop&w=600&q=60')"></div>
                                 <div class="mini-title">The Stand-up Night</div>
-                                <div class="mini-sub muted">Bombay Bunts •
-                                    Juinagar</div>
+                                <div class="mini-sub muted">Bombay Bunts • Juinagar</div>
                             </div>
 
                             <div class="mini-card"
@@ -98,10 +71,8 @@
                                 tabindex="0">
                                 <div class="mini-poster"
                                     style="background-image:url('https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=60')"></div>
-                                <div class="mini-title">Evening Comedy
-                                    Fest</div>
-                                <div class="mini-sub muted">Open Air
-                                    Amphitheatre</div>
+                                <div class="mini-title">Evening Comedy Fest</div>
+                                <div class="mini-sub muted">Open Air Amphitheatre</div>
                             </div>
 
                             <div class="mini-card"
@@ -110,8 +81,7 @@
                                 <div class="mini-poster"
                                     style="background-image:url('https://images.unsplash.com/photo-1542435503-956c469947f6?auto=format&fit=crop&w=600&q=60')"></div>
                                 <div class="mini-title">Late Night Laughs</div>
-                                <div class="mini-sub muted">Rooftop:
-                                    Koregaon</div>
+                                <div class="mini-sub muted">Rooftop: Koregaon</div>
                             </div>
                         </div>
                     </div>
@@ -119,30 +89,21 @@
             </div>
 
             <!-- RIGHT: Sidebar -->
-            <aside>
-                <div class="sidebar-card" role="region"
-                    aria-label="ticket booking">
-                    <div
-                        style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-                        <div
-                            style="width:56px;height:56px;border-radius:10px;overflow:hidden">
+            <aside class="booking-sidebar">
+                <div class="sidebar-card" role="region" aria-label="ticket booking">
+                    <div class="sidebar-header">
+                        <div class="sidebar-poster">
                             <img
                                 src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=400&q=60"
-                                alt="small poster"
-                                style="width:100%;height:100%;object-fit:cover;display:block">
+                                alt="small poster">
                         </div>
-                        <div>
-                            <div
-                                style="font-weight:800;color:var(--primary)">Saurabh
-                                Bhosale Specials : Kalakar</div>
-                            <div class="muted"
-                                style="font-size:13px;margin-top:6px">Bombay
-                                Bunts
-                                Association: Juinagar</div>
+                        <div class="sidebar-info">
+                            <div class="sidebar-title">Saurabh Bhosale Specials : Kalakar</div>
+                            <div class="sidebar-location muted">Bombay Bunts Association: Juinagar</div>
                         </div>
                     </div>
 
-                    <div style="margin-top:8px">
+                    <div class="sidebar-details">
                         <div class="info-row">
                             <div class="info-icon">📅</div>
                             <div class="info-text">Sun 7 Dec 2025</div>
@@ -165,23 +126,19 @@
                         </div>
                         <div class="info-row">
                             <div class="info-icon">📍</div>
-                            <div class="info-text">Bombay Bunts Association:
-                                Juinagar</div>
+                            <div class="info-text">Bombay Bunts Association: Juinagar</div>
                         </div>
 
                         <div class="price-row">
-                            <div>
+                            <div class="price-info">
                                 <div class="price">₹200</div>
                                 <div class="fill">Filling Fast</div>
                             </div>
-                            <div>
-                                <button class="book-btn"
-                                    onclick="onBookNow()">Book
-                                    Now</button>
+                            <div class="book-action">
+                                <button class="book-btn" onclick="onBookNow()">Book Now</button>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </aside>
         </div>
@@ -189,8 +146,7 @@
 </div>
 
 <!-- Modal for image preview -->
-<div class="modal" id="imgModal" role="dialog" aria-modal="true"
-    aria-hidden="true">
+<div class="modal" id="imgModal" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-close" id="modalClose" title="Close">✕</div>
     <div class="modal-inner" role="document">
         <img id="modalImage" src alt="Preview">

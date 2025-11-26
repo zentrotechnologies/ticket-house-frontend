@@ -1,10 +1,62 @@
+<!-- layout.component.html -->
 <div class="layout">
-  <app-sidebar (toggle)="onSidebarToggle($event)"></app-sidebar>
-  <app-header [isSidebarCollapsed]="isSidebarCollapsed"></app-header>
-  
-  <main class="main-content" [class.sidebar-collapsed]="isSidebarCollapsed">
-    <div class="content-wrapper">
-      <router-outlet></router-outlet>
+  <!-- For Admin/Super Admin (role_id 1 & 2) -->
+  <ng-container *ngIf="!isAudienceUser()">
+    <app-sidebar (toggle)="onSidebarToggle($event)"></app-sidebar>
+    <app-header [isSidebarCollapsed]="isSidebarCollapsed"></app-header>
+    
+    <main class="main-content" [class.sidebar-collapsed]="isSidebarCollapsed">
+      <div class="content-wrapper">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </ng-container>
+
+  <!-- For Audience/User (role_id 3) -->
+  <ng-container *ngIf="isAudienceUser()">
+    <!-- Apply audience styles to the entire audience section -->
+    <div class="audience-page audience-body">
+      <!-- Events Header with Column Structure -->
+      <header class="audience-header">
+        <div class="container">
+          <div class="header-row">
+            <!-- Logo + Search Combined Column - 70% -->
+            <div class="header-col left-section-col">
+              <div class="left-section-content">
+                <!-- Logo -->
+                <div class="logo-wrapper">
+                  <img class="logo"
+                      src="https://zentrotechnologies.com/wp-content/uploads/2025/02/Zentro_Final-Logo-05-scaled-e1753251642526.png"
+                      alt="Zentro Logo">
+                </div>
+                
+                <!-- Search -->
+                <div class="search-wrapper">
+                  <div class="search">
+                    <input placeholder="Search for Events, Artists, Location..."
+                        aria-label="search">
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Actions Column - 30% -->
+            <div class="header-col actions-col">
+              <div class="user-actions">
+                <div class="location muted">Pune ▼</div>
+                <div class="pill">Sign In</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main content without sidebar -->
+      <main class="audience-main-content">
+        <div class="content-wrapper">
+          <router-outlet></router-outlet>
+        </div>
+      </main>
     </div>
-  </main>
+  </ng-container>
 </div>
