@@ -27,9 +27,9 @@ export class AuthService {
 
   login(loginRequest: LoginRequest): Observable<LoginResponse> {
     const url = `${this.apiUrl}api/Login/Login`;
-    
+
     return this.http.post<LoginResponse>(url, loginRequest).pipe(
-      tap(response => {
+      tap((response) => {
         if (response.response.status === 'Success') {
           this.setSession(response);
           this.setCurrentUser(response);
@@ -51,7 +51,7 @@ export class AuthService {
     // if (!environment.production) {
     //   return false;
     // }
-    
+
     const token = this.getToken();
     if (!token) return false;
 
@@ -61,6 +61,12 @@ export class AuthService {
       return new Date() < new Date(expiry);
     }
     return false;
+  }
+
+  // Add this method to your existing AuthService
+  getCurrentUserId(): string | null {
+    const user = this.currentUserSubject.value;
+    return user ? user.user_id : null;
   }
 
   // Add method to get user role
@@ -92,10 +98,8 @@ export class AuthService {
   refreshToken(): Observable<CommonResponse> {
     const refreshToken = this.getRefreshToken();
     const url = `${this.apiUrl}api/Login/RefreshToken`;
-    
-    return this.http.post<CommonResponse>(url, { refreshToken }).pipe(
-      catchError(this.handleError)
-    );
+
+    return this.http.post<CommonResponse>(url, { refreshToken }).pipe(catchError(this.handleError));
   }
 
   private setSession(authResult: LoginResponse): void {
@@ -115,7 +119,7 @@ export class AuthService {
       mobile: loginResponse.mobile,
       country_code: loginResponse.country_code,
       profile_img: loginResponse.profile_img,
-      role_id: loginResponse.role_id
+      role_id: loginResponse.role_id,
     };
     this.currentUserSubject.next(user);
   }
@@ -135,7 +139,7 @@ export class AuthService {
 
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'An unknown error occurred!';
-    
+
     if (error.error instanceof ErrorEvent) {
       // Client-side error
       errorMessage = `Error: ${error.error.message}`;
@@ -147,7 +151,7 @@ export class AuthService {
         errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
       }
     }
-    
+
     console.error('API Error:', error);
     return throwError(() => new Error(errorMessage));
   }
@@ -159,7 +163,7 @@ export class AuthService {
     localStorage.removeItem('token_expiry');
     localStorage.removeItem('refresh_token_expiry');
     sessionStorage.clear();
-    
+
     console.log('🔄 Development Mode: Cleared authentication data');
   }
 
@@ -167,18 +171,18 @@ export class AuthService {
   getMenuItems(): MenuItem[] {
     const userRole = this.getUserRole();
     if (!userRole) return [];
-    
+
     return this.filterMenuItemsByRole(MENU_ITEMS, userRole);
   }
 
   private filterMenuItemsByRole(menuItems: MenuItem[], role: number): MenuItem[] {
     return menuItems
-      .filter(item => item.roles.includes(role))
-      .map(item => ({
+      .filter((item) => item.roles.includes(role))
+      .map((item) => ({
         ...item,
-        children: item.children ? this.filterMenuItemsByRole(item.children, role) : undefined
+        children: item.children ? this.filterMenuItemsByRole(item.children, role) : undefined,
       }))
-      .filter(item => item.children ? item.children.length > 0 : true);
+      .filter((item) => (item.children ? item.children.length > 0 : true));
   }
 
   // Add method to get user display name

@@ -6,8 +6,8 @@ import { LayoutComponent } from './layout/layout.component';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'auth/login',
-    pathMatch: 'full'
+    redirectTo: 'events',
+    pathMatch: 'full',
   },
   {
     path: 'auth',
@@ -18,9 +18,22 @@ export const routes: Routes = [
       },
       {
         path: 'sign-up',
-        loadComponent: () => import('./auth/sign-up/sign-up.component').then((m) => m.SignUpComponent),
-      }
-    ]
+        loadComponent: () =>
+          import('./auth/sign-up/sign-up.component').then((m) => m.SignUpComponent),
+      },
+    ],
+  },
+  {
+    path: 'events',
+    loadComponent: () =>
+      import('./pages/user/events/events.component').then((m) => m.EventsComponent),
+  },
+  {
+    path: 'event-booking',
+    loadComponent: () =>
+      import('./pages/user/event-booking/event-booking.component').then(
+        (m) => m.EventBookingComponent
+      ),
   },
   // Protected routes with layout
   {
@@ -36,45 +49,62 @@ export const routes: Routes = [
         children: [
           {
             path: 'dashboard',
-            loadComponent: () => import('./pages/admin/admin-dashboard/admin-dashboard.component').then((m) => m.AdminDashboardComponent),
+            loadComponent: () =>
+              import('./pages/admin/admin-dashboard/admin-dashboard.component').then(
+                (m) => m.AdminDashboardComponent
+              ),
           },
           {
             path: 'events',
-            loadComponent: () => import('./pages/admin/admin-events/admin-events.component').then((m) => m.AdminEventsComponent),
+            loadComponent: () =>
+              import('./pages/admin/admin-events/admin-events.component').then(
+                (m) => m.AdminEventsComponent
+              ),
           },
           {
             path: 'event-categories',
-            loadComponent: () => import('./pages/admin/event-category/event-category.component').then((m) => m.EventCategoryComponent),
+            loadComponent: () =>
+              import('./pages/admin/event-category/event-category.component').then(
+                (m) => m.EventCategoryComponent
+              ),
           },
           {
             path: 'testimonial',
-            loadComponent: () => import('./pages/admin/testimonial/testimonial.component').then((m) => m.TestimonialComponent),
-          }
-        ]
+            loadComponent: () =>
+              import('./pages/admin/testimonial/testimonial.component').then(
+                (m) => m.TestimonialComponent
+              ),
+          },
+        ],
       },
       // User routes
-      {
-        path: 'user',
-        canActivate: [roleGuard],
-        data: { roles: [3] },
-        children: [
-          {
-            path: 'events',
-            loadComponent: () => import('./pages/user/events/events.component').then((m) => m.EventsComponent),
-          },
-          {
-            path: 'event-booking',
-            loadComponent: () => import('./pages/user/event-booking/event-booking.component').then((m) => m.EventBookingComponent),
-          }
-        ]
-      }
-    ]
+      // {
+      //   path: 'user',
+      //   canActivate: [roleGuard],
+      //   data: { roles: [3] },
+      //   children: [
+      //     {
+      //       path: 'events',
+      //       loadComponent: () =>
+      //         import('./pages/user/events/events.component').then((m) => m.EventsComponent),
+      //     },
+      //     {
+      //       path: 'event-booking',
+      //       loadComponent: () =>
+      //         import('./pages/user/event-booking/event-booking.component').then(
+      //           (m) => m.EventBookingComponent
+      //         ),
+      //     },
+      //   ],
+      // },
+    ],
   },
+  
   // Wildcard route
   {
     path: '**',
-    redirectTo: 'auth/login'
-  }
+    redirectTo: 'auth/login',
+  },
 ];
 
 // console.log('Routes configured:', routes);

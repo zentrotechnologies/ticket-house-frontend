@@ -18,13 +18,13 @@ body.sidebar-collapsed .main-content,
 }
 
 /* card wrapper style */
-.content-card .card-white {
+/* .content-card .card-white {
   background: #ffffff;
   border-radius: 12px;
   padding: 1rem;
   box-shadow: 0 6px 18px rgba(12, 35, 63, 0.06);
   border: 1px solid #eef2f6;
-}
+} */
 
 /* header row */
 .page-header {
@@ -260,4 +260,74 @@ body.sidebar-collapsed .main-content,
   .page-header { flex-direction: column; align-items: stretch; gap: .75rem; }
   .right-controls { width: 100%; }
   .col-desc { display: none; } /* hide long desc on tiny screens */
+}
+
+
+/* Add these to your existing CSS */
+
+/* Alert styles */
+.alert {
+  border-radius: 8px;
+  border: none;
+  margin-bottom: 1rem;
+}
+
+.alert-success {
+  background-color: #f0f9ff;
+  color: #0369a1;
+  border-left: 4px solid #0ea5e9;
+}
+
+.alert-danger {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border-left: 4px solid #ef4444;
+}
+
+/* Spinner styles */
+.spinner-border {
+  width: 2rem;
+  height: 2rem;
+}
+
+/* Disabled button styles */
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Empty state styles */
+.text-muted i {
+  opacity: 0.5;
+}
+
+/* Modal button styles */
+.btn-secondary {
+  background: #6b7280;
+  border: none;
+}
+
+.btn-secondary:hover {
+  background: #4b5563;
+}
+
+/* Form validation styles */
+.form-control.ng-invalid.ng-touched {
+  border-color: #dc2626;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .table-controls {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .left-controls, .right-controls {
+    width: 100%;
+  }
+  
+  .right-controls input {
+    width: 100%;
+  }
 }

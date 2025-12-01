@@ -1,3 +1,40 @@
+<div class="audience-page audience-body">
+  <!-- Events Header with Column Structure -->
+  <header class="audience-header">
+    <div class="container">
+      <div class="header-row">
+        <!-- Logo + Search Combined Column - 70% -->
+        <div class="header-col left-section-col">
+          <div class="left-section-content">
+            <!-- Logo -->
+            <div class="logo-wrapper">
+              <img
+                class="logo"
+                src="https://zentrotechnologies.com/wp-content/uploads/2025/02/Zentro_Final-Logo-05-scaled-e1753251642526.png"
+                alt="Zentro Logo"
+              />
+            </div>
+
+            <!-- Search -->
+            <div class="search-wrapper">
+              <div class="search">
+                <input placeholder="Search for Events, Artists, Location..." aria-label="search" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions Column - 30% -->
+        <div class="header-col actions-col">
+          <div class="user-actions">
+            <div class="location muted">Pune ▼</div>
+            <div class="pill" (click)="onSignIn()">Sign In</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
 <!-- booking-page.component.html -->
 <div class="booking-page">
     <main class="booking-container">
@@ -142,7 +179,32 @@
                 </div>
             </aside>
         </div>
+
+        <!-- CTA -->
+        <section class="cta-section">
+            <div class="cta">
+                <p class="cta-text">List Your Show — It's Free!</p>
+                <button class="cta-btn">Contact Us</button>
+            </div>
+        </section>
     </main>
+    <footer class="events-footer">
+        <div class="events-container">
+            <div class="footer-content">
+                <img src="https://zentrotechnologies.com/wp-content/uploads/2025/02/Zentro_Final-Logo-05-scaled-e1753251642526.png" class="footer-logo" alt="Zentro Logo">
+                <div class="footer-links">
+                    <span>List Your Event</span>
+                    <span>|</span>
+                    <span>Help & Support</span>
+                    <span>|</span>
+                    <span>Terms & Conditions</span>
+                    <span>|</span>
+                    <span>Privacy Policy</span>
+                </div>
+                <p class="copy">© 2025 Ticket House – All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
 </div>
 
 <!-- Modal for image preview -->

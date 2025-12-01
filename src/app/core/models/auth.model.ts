@@ -113,3 +113,83 @@ export interface ResendOTPResponse {
   response: CommonResponse;
   new_otp_id: number;
 }
+
+//----- Event Category Models -----
+export interface EventCategoryModel {
+  event_category_id: number;
+  event_category_name: string;
+  event_category_desc: string;
+  created_by: string;
+  created_on: string;
+  updated_by: string;
+  updated_on: string;
+  active: number;
+}
+
+export interface EventCategoryRequest {
+  event_category_name: string;
+  event_category_desc: string;
+  created_by?: string;
+  updated_by?: string;
+}
+
+export interface UpdateEventCategoryStatusRequest {
+  event_category_id: number;
+  active: number;
+  updated_by: string;
+}
+
+export interface CommonResponseModel<T> {
+  status: string;
+  message: string;
+  errorCode: string;
+  data: T;
+}
+
+export interface PagedResponse<T> {
+  status: string;
+  message: string;
+  errorCode: string;
+  data: T;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+}
+
+export interface UserIdRequest {
+  user_id: string;
+  pageNumber: number;
+  pageSize: number;
+  filterText?: string;
+  filterType?: string;
+}
+
+// Testimonial Models
+export interface TestimonialModel {
+  testimonial_id: number;
+  name: string;
+  designation: string;
+  profile_img: string;
+  description: string;
+  active: number;
+  created_by: string;
+  created_on: string;
+  updated_by: string;
+  updated_on: string;
+}
+
+export interface TestimonialRequest {
+  name: string;
+  designation: string;
+  description: string;
+  active: number;
+  created_by: string;
+  updated_by: string;
+  profile_image?: File;
+}
+
+export interface UpdateTestimonialStatusRequest {
+  testimonial_id: number;
+  active: number;
+  updated_by: string;
+}

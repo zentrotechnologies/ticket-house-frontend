@@ -139,3 +139,31 @@
   z-index: 998;
   background: transparent;
 }
+
+/* admin side header */
+
+.header {
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  position: fixed;
+  top: 0;
+  left: 250px;
+  right: 0;
+  height: 60px;
+  z-index: 999;
+  transition: left 0.3s ease;
+}
+
+.header.sidebar-collapsed {
+  left: 60px;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+  padding: 0 2rem;
+  max-width: 1240px;
+  margin: 0 auto;
+}

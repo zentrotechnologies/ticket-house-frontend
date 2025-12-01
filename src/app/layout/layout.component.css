@@ -281,3 +281,47 @@ body {
 booking-page {
   margin: 0px 65px 0px 65px;
 }
+
+/* admin side layout */
+
+.layout {
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 250px;
+  margin-top: 60px;
+  transition: margin-left 0.3s ease;
+  background-color: #f8f9fa;
+  min-height: calc(100vh - 60px);
+  padding: 20px;
+}
+
+.main-content.sidebar-collapsed {
+  margin-left: 60px;
+}
+
+.content-wrapper {
+  max-width: 1240px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Fix for event category component to use container properly */
+.main-content .content-card {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0 !important;
+    padding: 15px;
+  }
+  
+  .main-content.sidebar-collapsed {
+    margin-left: 0 !important;
+  }
+}
