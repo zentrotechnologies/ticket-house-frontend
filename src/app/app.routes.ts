@@ -77,26 +77,20 @@ export const routes: Routes = [
           },
         ],
       },
-      // User routes
-      // {
-      //   path: 'user',
-      //   canActivate: [roleGuard],
-      //   data: { roles: [3] },
-      //   children: [
-      //     {
-      //       path: 'events',
-      //       loadComponent: () =>
-      //         import('./pages/user/events/events.component').then((m) => m.EventsComponent),
-      //     },
-      //     {
-      //       path: 'event-booking',
-      //       loadComponent: () =>
-      //         import('./pages/user/event-booking/event-booking.component').then(
-      //           (m) => m.EventBookingComponent
-      //         ),
-      //     },
-      //   ],
-      // },
+      {
+        path: 'admin',
+        canActivate: [roleGuard],
+        data: { roles: [1] },
+        children: [
+          {
+            path: 'event-organizer',
+            loadComponent: () =>
+              import('./pages/admin/organizer-management/event-organizer/event-organizer.component').then(
+                (m) => m.EventOrganizerComponent
+              ),
+          },
+        ]
+      }
     ],
   },
   

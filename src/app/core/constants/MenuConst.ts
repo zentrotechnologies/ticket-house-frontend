@@ -36,6 +36,18 @@ export const MENU_ITEMS: MenuItem[] = [
     route: '/admin/testimonial',
     roles: [1, 2] // Role 1 and 2 can access
   },
+  {
+    title: 'Organizer Management',
+    icon: '',
+    roles: [1],
+    children: [
+      {
+        title: 'Event Organizer',
+        route: '/admin/event-organizer',
+        roles: [1]
+      }
+    ]
+  }
 //   {
 //     title: 'User Management',
 //     icon: 'people',

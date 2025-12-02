@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { CommonResponse, CommonResponseModel, EventCategoryModel, EventCategoryRequest, GenerateOTPRequest, OTPResponse, PagedResponse, ResendOTPRequest, ResendOTPResponse, SignUpRequest, SignUpResponse, TestimonialModel, UpdateEventCategoryStatusRequest, UpdateTestimonialStatusRequest, UserIdRequest, VerifyOTPRequest } from '../models/auth.model';
+import { CommonResponse, CommonResponseModel, EventCategoryModel, EventCategoryRequest, GenerateOTPRequest, OrganizerModel, OrganizerPagedResponse, OrganizerRequest, OTPResponse, PagedResponse, PaginationRequest, ResendOTPRequest, ResendOTPResponse, SignUpRequest, SignUpResponse, TestimonialModel, UpdateEventCategoryStatusRequest, UpdateOrganizerStatusRequest, UpdateTestimonialStatusRequest, UserIdRequest, VerifyOTPRequest } from '../models/auth.model';
 
 @Injectable({
   providedIn: 'root',
@@ -123,5 +123,43 @@ export class ApiService {
   updateTestimonialStatus(request: UpdateTestimonialStatusRequest): Observable<CommonResponseModel<boolean>> {
     const url = `${this.ThApi}api/Testimonial/UpdateTestimonialStatus`;
     return this.httpClient.post<CommonResponseModel<boolean>>(url, request);
+  }
+
+  // ===== ORGANIZER APIS =====
+
+  // Get paginated organizers
+  getPaginatedOrganizers(request: PaginationRequest): Observable<OrganizerPagedResponse> {
+    const url = `${this.ThApi}api/User/GetPaginatedOrganizers`;
+    return this.httpClient.post<OrganizerPagedResponse>(url, request);
+  }
+
+  // Get organizer by ID
+  getOrganizerById(organizerId: string): Observable<CommonResponseModel<OrganizerModel>> {
+    const url = `${this.ThApi}api/User/GetOrganizerById/${organizerId}`;
+    return this.httpClient.get<CommonResponseModel<OrganizerModel>>(url);
+  }
+
+  // Add organizer
+  addOrganizer(organizer: OrganizerRequest): Observable<CommonResponseModel<OrganizerModel>> {
+    const url = `${this.ThApi}api/User/AddOrganizer`;
+    return this.httpClient.post<CommonResponseModel<OrganizerModel>>(url, organizer);
+  }
+
+  // Update organizer
+  updateOrganizer(organizerId: string, organizer: OrganizerRequest): Observable<CommonResponseModel<OrganizerModel>> {
+    const url = `${this.ThApi}api/User/UpdateOrganizer/${organizerId}`;
+    return this.httpClient.post<CommonResponseModel<OrganizerModel>>(url, organizer);
+  }
+
+  // Delete organizer
+  deleteOrganizer(organizerId: string): Observable<CommonResponseModel<boolean>> {
+    const url = `${this.ThApi}api/User/DeleteOrganizer/${organizerId}`;
+    return this.httpClient.post<CommonResponseModel<boolean>>(url, {});
+  }
+
+  // Update organizer status
+  updateOrganizerStatus(request: UpdateOrganizerStatusRequest): Observable<CommonResponseModel<boolean>> {
+    const url = `${this.ThApi}api/User/UpdateOrganizerStatus/${request.organizer_id}`;
+    return this.httpClient.post<CommonResponseModel<boolean>>(url, { status: request.status });
   }
 }

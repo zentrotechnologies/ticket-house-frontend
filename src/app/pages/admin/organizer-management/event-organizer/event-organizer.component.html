@@ -1,0 +1,580 @@
+<!-- MAIN CONTENT: Organizer Listing -->
+<div class="main-content content-card">
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="text-center py-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2 text-muted">Loading organizers...</p>
+  </div>
+
+  <!-- top row: title + add button -->
+  <div class="page-header">
+    <h2 class="page-title">Event Organizer Management</h2>
+    <div class="header-actions">
+      <button class="btn btn-primary btn-add" data-bs-toggle="modal" data-bs-target="#addOrganizerModal"
+        (click)="prepareForAdd()" [disabled]="!canAdd()">
+        <i class="fa fa-plus"></i>&nbsp; Add Organizer
+      </button>
+    </div>
+  </div>
+
+  <!-- container card -->
+  <div class="card card-white" *ngIf="!isLoading">
+    <!-- search / controls row -->
+    <div class="table-controls">
+      <div class="left-controls">
+        <label class="show-label">Show</label>
+        <select class="per-page-select" [(ngModel)]="itemsPerPage" (change)="onItemsPerPageChange()">
+          <option [value]="10">10</option>
+          <option [value]="25">25</option>
+          <option [value]="50">50</option>
+        </select>
+        <span class="ms-2 text-muted">
+          Total: {{ totalCount }} organizers
+        </span>
+      </div>
+      <div class="right-controls">
+        <div class="input-group">
+          <input class="form-control search-input" placeholder="Search by name, email, or organization..." 
+                 [(ngModel)]="searchText" (keyup.enter)="onSearch()" />
+          <button class="btn btn-outline-secondary" type="button" (click)="onSearch()">
+            <i class="fa fa-search"></i>
+          </button>
+          <button *ngIf="searchText" class="btn btn-outline-secondary" type="button" (click)="clearSearch()">
+            <i class="fa fa-times"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- paginated listing table -->
+    <div class="table-responsive">
+      <table class="table list-table table-hover">
+        <thead class="table-light">
+          <tr>
+            <th class="col-sr">Sr. No</th>
+            <th class="col-name">Organizer Name</th>
+            <th class="col-email">Email</th>
+            <th class="col-org">Organization</th>
+            <th class="col-status">Status</th>
+            <th class="col-date">Registered Date</th>
+            <th class="col-action text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let organizer of filteredOrganizers; let i = index">
+            <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+            <td>
+              <strong>{{ organizer.first_name }} {{ organizer.last_name }}</strong>
+            </td>
+            <td>
+              <a href="mailto:{{ organizer.email }}" class="text-primary">
+                {{ organizer.email }}
+              </a>
+            </td>
+            <td>{{ organizer.org_name }}</td>
+            <td>
+              <span [class]="getStatusClass(organizer.verification_status)" class="badge">
+                {{ getStatusText(organizer.verification_status) }}
+              </span>
+            </td>
+            <td>{{ organizer.created_on | date:'mediumDate' }}</td>
+            <td class="text-center">
+              <div class="btn-group" role="group">
+                <!-- View button -->
+                <button class="btn btn-sm btn-outline-info" title="View Details" 
+                        data-bs-toggle="modal" data-bs-target="#viewOrganizerModal"
+                        (click)="viewOrganizer(organizer)">
+                  <i class="fa fa-eye"></i>
+                </button>
+                
+                <!-- Edit button (Admin only) -->
+                <button *ngIf="canEdit()" class="btn btn-sm btn-outline-primary" title="Edit" 
+                        data-bs-toggle="modal" data-bs-target="#editOrganizerModal"
+                        (click)="editOrganizer(organizer)">
+                  <i class="fa fa-edit"></i>
+                </button>
+                
+                <!-- Delete button (Super Admin only) -->
+                <button *ngIf="canDelete()" class="btn btn-sm btn-outline-danger" title="Delete" 
+                        data-bs-toggle="modal" data-bs-target="#deleteOrganizerModal" 
+                        (click)="prepareForDelete(organizer)">
+                  <i class="fa fa-trash"></i>
+                </button>
+                
+                <!-- Status buttons (Admin only) -->
+                <div class="btn-group" *ngIf="canApproveReject()">
+                  <button *ngIf="organizer.verification_status === 'pending'" 
+                          class="btn btn-sm btn-outline-success" title="Approve"
+                          (click)="updateOrganizerStatus(organizer.organizer_id!, 1)">
+                    <i class="fa fa-check"></i>
+                  </button>
+                  <button *ngIf="organizer.verification_status === 'pending'" 
+                          class="btn btn-sm btn-outline-warning" title="Reject"
+                          (click)="updateOrganizerStatus(organizer.organizer_id!, 0)">
+                    <i class="fa fa-times"></i>
+                  </button>
+                </div>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Empty state -->
+          <tr *ngIf="filteredOrganizers.length === 0">
+            <td colspan="7" class="text-center py-5">
+              <div class="text-muted">
+                <i class="fa fa-users fa-3x mb-3 opacity-50"></i>
+                <p class="h5">No organizers found</p>
+                <p *ngIf="searchText" class="mt-2">
+                  No results for "{{ searchText }}". <a href="javascript:void(0)" (click)="clearSearch()">Clear search</a>
+                </p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- pagination footer -->
+    <div class="table-footer" *ngIf="totalPages > 1">
+      <div class="rows-info">
+        Showing {{ getDisplayRange().start }} to {{ getDisplayRange().end }} of
+        {{ getDisplayRange().total }} entries
+      </div>
+      <nav aria-label="Page navigation">
+        <ul class="pagination mb-0">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <a class="page-link" href="javascript:void(0)" (click)="goToPage(currentPage - 1)">
+              <i class="fa fa-chevron-left"></i>
+            </a>
+          </li>
+          <li class="page-item" [class.active]="page === currentPage" *ngFor="let page of getPageNumbers()">
+            <a class="page-link" href="javascript:void(0)" (click)="goToPage(page)">{{ page }}</a>
+          </li>
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <a class="page-link" href="javascript:void(0)" (click)="goToPage(currentPage + 1)">
+              <i class="fa fa-chevron-right"></i>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<!-- ADD ORGANIZER MODAL -->
+<div class="modal fade" id="addOrganizerModal" tabindex="-1" aria-labelledby="addOrganizerLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="addOrganizerLabel">
+          <i class="fa fa-user-plus me-2"></i>Add Event Organizer
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" 
+                aria-label="Close" (click)="resetForm()"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Error/Success Messages -->
+        <div *ngIf="!isOrganizerFormValid()" class="alert alert-warning">
+          <i class="fa fa-exclamation-triangle me-2"></i>
+          Please fill all required fields marked with *
+        </div>
+
+        <form class="row g-3">
+          <!-- Personal Information -->
+          <div class="col-md-6">
+            <h6 class="border-bottom pb-2 mb-3">
+              <i class="fa fa-user me-2"></i>Personal Information
+            </h6>
+            
+            <div class="mb-3">
+              <label class="form-label">First Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" placeholder="Enter first name"
+                [(ngModel)]="currentOrganizer.first_name" name="firstName" required />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Last Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" placeholder="Enter last name"
+                [(ngModel)]="currentOrganizer.last_name" name="lastName" required />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Email <span class="text-danger">*</span></label>
+              <input type="email" class="form-control" placeholder="Enter email"
+                [(ngModel)]="currentOrganizer.email" name="email" required />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
+              <input type="tel" class="form-control" placeholder="Enter mobile number"
+                [(ngModel)]="currentOrganizer.mobile" name="mobile" required />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Password <span class="text-danger">*</span></label>
+              <input type="password" class="form-control" placeholder="Enter password"
+                [(ngModel)]="currentOrganizer.password" name="password" required />
+              <small class="form-text text-muted">Default: Default@123</small>
+            </div>
+          </div>
+
+          <!-- Organization Information -->
+          <div class="col-md-6">
+            <h6 class="border-bottom pb-2 mb-3">
+              <i class="fa fa-building me-2"></i>Organization Information
+            </h6>
+            
+            <div class="mb-3">
+              <label class="form-label">Organization Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" placeholder="Enter organization name"
+                [(ngModel)]="currentOrganizer.org_name" name="orgName" required />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Organization Start Date</label>
+              <input type="date" class="form-control"
+                [(ngModel)]="currentOrganizer.org_start_date" name="orgStartDate" />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">GST Number</label>
+              <input type="text" class="form-control" placeholder="Enter GST number"
+                [(ngModel)]="currentOrganizer.gst_number" name="gstNumber" />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Aadhar Number</label>
+              <input type="text" class="form-control" placeholder="Enter Aadhar number"
+                [(ngModel)]="currentOrganizer.aadhar_number" name="aadharNumber" />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">PAN Card Number</label>
+              <input type="text" class="form-control" placeholder="Enter PAN card number"
+                [(ngModel)]="currentOrganizer.pancard_number" name="pancardNumber" />
+            </div>
+          </div>
+
+          <!-- Bank Details -->
+          <div class="col-12">
+            <h6 class="border-bottom pb-2 mb-3">
+              <i class="fa fa-university me-2"></i>Bank Details
+            </h6>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Bank Name</label>
+                <input type="text" class="form-control" placeholder="Enter bank name"
+                  [(ngModel)]="currentOrganizer.bank_name" name="bankName" />
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Account Number</label>
+                <input type="text" class="form-control" placeholder="Enter account number"
+                  [(ngModel)]="currentOrganizer.bank_account_no" name="accountNo" />
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">IFSC Code</label>
+                <input type="text" class="form-control" placeholder="Enter IFSC code"
+                  [(ngModel)]="currentOrganizer.bank_ifsc" name="ifscCode" />
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Beneficiary Name</label>
+                <input type="text" class="form-control" placeholder="Enter beneficiary name"
+                  [(ngModel)]="currentOrganizer.beneficiary_name" name="beneficiaryName" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Address Information -->
+          <div class="col-12">
+            <h6 class="border-bottom pb-2 mb-3">
+              <i class="fa fa-map-marker-alt me-2"></i>Address Information
+            </h6>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Country</label>
+                <input type="text" class="form-control" placeholder="Enter country"
+                  [(ngModel)]="currentOrganizer.country" name="country" />
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">State</label>
+                <input type="text" class="form-control" placeholder="Enter state"
+                  [(ngModel)]="currentOrganizer.state" name="state" />
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">City</label>
+                <input type="text" class="form-control" placeholder="Enter city"
+                  [(ngModel)]="currentOrganizer.city" name="city" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Social Media Links -->
+          <div class="col-12">
+            <h6 class="border-bottom pb-2 mb-3">
+              <i class="fa fa-share-alt me-2"></i>Social Media Links
+            </h6>
+            <div class="row">
+              <div class="col-md-3 mb-3">
+                <label class="form-label">
+                  <i class="fa fa-instagram text-danger me-1"></i> Instagram
+                </label>
+                <input type="url" class="form-control" placeholder="https://instagram.com/username"
+                  [(ngModel)]="currentOrganizer.instagram_link" name="instagram" />
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">
+                  <i class="fa fa-facebook text-primary me-1"></i> Facebook
+                </label>
+                <input type="url" class="form-control" placeholder="https://facebook.com/username"
+                  [(ngModel)]="currentOrganizer.facebook_link" name="facebook" />
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">
+                  <i class="fa fa-twitter text-info me-1"></i> Twitter
+                </label>
+                <input type="url" class="form-control" placeholder="https://twitter.com/username"
+                  [(ngModel)]="currentOrganizer.twitter_link" name="twitter" />
+              </div>
+              <div class="col-md-3 mb-3">
+                <label class="form-label">
+                  <i class="fa fa-youtube text-danger me-1"></i> YouTube
+                </label>
+                <input type="url" class="form-control" placeholder="https://youtube.com/channel"
+                  [(ngModel)]="currentOrganizer.youtube_link" name="youtube" />
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="resetForm()">
+          <i class="fa fa-times me-1"></i> Cancel
+        </button>
+        <button type="button" class="btn btn-primary" (click)="addOrganizer()"
+          [disabled]="!isOrganizerFormValid() || isLoading">
+          <span *ngIf="!isLoading">
+            <i class="fa fa-plus me-1"></i> Add Organizer
+          </span>
+          <span *ngIf="isLoading">
+            <span class="spinner-border spinner-border-sm me-1"></span> Adding...
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW ORGANIZER MODAL -->
+<div class="modal fade" id="viewOrganizerModal" tabindex="-1" aria-labelledby="viewOrganizerLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title" id="viewOrganizerLabel">
+          <i class="fa fa-eye me-2"></i>Organizer Details
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <div *ngIf="selectedOrganizer" class="organizer-details">
+          <!-- Header with status -->
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h4 class="mb-0">{{ selectedOrganizer.first_name }} {{ selectedOrganizer.last_name }}</h4>
+              <p class="text-muted mb-0">{{ selectedOrganizer.email }}</p>
+            </div>
+            <span [class]="getStatusClass(selectedOrganizer.verification_status)" class="badge fs-6">
+              {{ getStatusText(selectedOrganizer.verification_status) }}
+            </span>
+          </div>
+
+          <div class="row">
+            <!-- Personal Information -->
+            <div class="col-md-6">
+              <div class="card mb-3">
+                <div class="card-header bg-light">
+                  <h6 class="mb-0"><i class="fa fa-user me-2"></i>Personal Information</h6>
+                </div>
+                <div class="card-body">
+                  <table class="table table-sm table-borderless mb-0">
+                    <tr>
+                      <td width="40%"><strong>Name:</strong></td>
+                      <td>{{ selectedOrganizer.first_name }} {{ selectedOrganizer.last_name }}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Email:</strong></td>
+                      <td><a href="mailto:{{ selectedOrganizer.email }}">{{ selectedOrganizer.email }}</a></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Mobile:</strong></td>
+                      <td>{{ selectedOrganizer.mobile }}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Role:</strong></td>
+                      <td>{{ selectedOrganizer.role_name || 'Organizer' }}</td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Organization Information -->
+            <div class="col-md-6">
+              <div class="card mb-3">
+                <div class="card-header bg-light">
+                  <h6 class="mb-0"><i class="fa fa-building me-2"></i>Organization Information</h6>
+                </div>
+                <div class="card-body">
+                  <table class="table table-sm table-borderless mb-0">
+                    <tr>
+                      <td width="40%"><strong>Organization:</strong></td>
+                      <td>{{ selectedOrganizer.org_name }}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Start Date:</strong></td>
+                      <td>{{ selectedOrganizer.org_start_date | date:'longDate' }}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>GST Number:</strong></td>
+                      <td>{{ selectedOrganizer.gst_number || 'N/A' }}</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Registered:</strong></td>
+                      <td>{{ selectedOrganizer.created_on | date:'medium' }}</td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bank Details -->
+          <div class="card mb-3">
+            <div class="card-header bg-light">
+              <h6 class="mb-0"><i class="fa fa-university me-2"></i>Bank Details</h6>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-4">
+                  <p class="mb-1"><strong>Bank Name:</strong></p>
+                  <p class="text-muted">{{ selectedOrganizer.bank_name || 'N/A' }}</p>
+                </div>
+                <div class="col-md-4">
+                  <p class="mb-1"><strong>Account No:</strong></p>
+                  <p class="text-muted">{{ selectedOrganizer.bank_account_no || 'N/A' }}</p>
+                </div>
+                <div class="col-md-4">
+                  <p class="mb-1"><strong>Beneficiary:</strong></p>
+                  <p class="text-muted">{{ selectedOrganizer.beneficiary_name || 'N/A' }}</p>
+                </div>
+                <div class="col-md-4" *ngIf="selectedOrganizer.bank_ifsc">
+                  <p class="mb-1"><strong>IFSC Code:</strong></p>
+                  <p class="text-muted">{{ selectedOrganizer.bank_ifsc }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Address & Social Media -->
+          <div class="row">
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header bg-light">
+                  <h6 class="mb-0"><i class="fa fa-map-marker-alt me-2"></i>Address</h6>
+                </div>
+                <div class="card-body">
+                  <p class="mb-1">{{ selectedOrganizer.city || 'N/A' }}</p>
+                  <p class="mb-1">{{ selectedOrganizer.state || 'N/A' }}</p>
+                  <p class="mb-0">{{ selectedOrganizer.country || 'N/A' }}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header bg-light">
+                  <h6 class="mb-0"><i class="fa fa-share-alt me-2"></i>Social Media</h6>
+                </div>
+                <div class="card-body">
+                  <div class="d-flex gap-2">
+                    <a *ngIf="selectedOrganizer.instagram_link" [href]="selectedOrganizer.instagram_link" 
+                       target="_blank" class="btn btn-outline-danger btn-sm">
+                      <i class="fa fa-instagram"></i>
+                    </a>
+                    <a *ngIf="selectedOrganizer.facebook_link" [href]="selectedOrganizer.facebook_link" 
+                       target="_blank" class="btn btn-outline-primary btn-sm">
+                      <i class="fa fa-facebook"></i>
+                    </a>
+                    <a *ngIf="selectedOrganizer.twitter_link" [href]="selectedOrganizer.twitter_link" 
+                       target="_blank" class="btn btn-outline-info btn-sm">
+                      <i class="fa fa-twitter"></i>
+                    </a>
+                    <a *ngIf="selectedOrganizer.youtube_link" [href]="selectedOrganizer.youtube_link" 
+                       target="_blank" class="btn btn-outline-danger btn-sm">
+                      <i class="fa fa-youtube"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fa fa-times me-1"></i> Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRMATION MODAL -->
+<div class="modal fade" id="deleteOrganizerModal" tabindex="-1" aria-labelledby="deleteOrganizerLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteOrganizerLabel">
+          <i class="fa fa-trash me-2"></i>Delete Organizer
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="text-center">
+          <div class="mb-3">
+            <i class="fa fa-exclamation-triangle text-danger fa-3x"></i>
+          </div>
+          <h6 class="mb-3">Are you sure you want to delete this organizer?</h6>
+          <p *ngIf="organizerToDelete" class="text-muted">
+            <strong>{{ organizerToDelete.first_name }} {{ organizerToDelete.last_name }}</strong><br>
+            <small>{{ organizerToDelete.org_name }} • {{ organizerToDelete.email }}</small>
+          </p>
+          <p class="text-danger small">
+            <i class="fa fa-exclamation-circle me-1"></i>
+            This action cannot be undone. All associated data will be permanently removed.
+          </p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" [disabled]="isLoading">
+          <i class="fa fa-times me-1"></i> Cancel
+        </button>
+        <button type="button" class="btn btn-danger" (click)="confirmDelete()" [disabled]="isLoading">
+          <span *ngIf="!isLoading">
+            <i class="fa fa-trash me-1"></i> Delete
+          </span>
+          <span *ngIf="isLoading">
+            <span class="spinner-border spinner-border-sm me-1"></span> Deleting...
+          </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -146,14 +146,27 @@ export interface CommonResponseModel<T> {
   data: T;
 }
 
+// export interface PagedResponse<T> {
+//   status: string;
+//   message: string;
+//   errorCode: string;
+//   data: T;
+//   totalPages: number;
+//   currentPage: number;
+//   pageSize: number;
+// }
+
+// Update PagedResponse interface
 export interface PagedResponse<T> {
   status: string;
   message: string;
   errorCode: string;
-  data: T;
+  data?: T;
+  totalCount?: number;
   totalPages: number;
   currentPage: number;
   pageSize: number;
+  success?: boolean;
 }
 
 export interface UserIdRequest {
@@ -193,3 +206,87 @@ export interface UpdateTestimonialStatusRequest {
   active: number;
   updated_by: string;
 }
+
+// Organizer Model
+export interface OrganizerModel {
+  user_id?: string;
+  organizer_id?: string;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  mobile?: string;
+  role_id?: number;
+  role_name?: string;
+  org_name?: string;
+  org_start_date?: string | Date;
+  bank_account_no?: string;
+  bank_ifsc?: string;
+  bank_name?: string;
+  beneficiary_name?: string;
+  aadhar_number?: string;
+  pancard_number?: string;
+  owner_personal_email?: string;
+  owner_mobile?: string;
+  state?: string;
+  city?: string;
+  country?: string;
+  gst_number?: string;
+  instagram_link?: string;
+  youtube_link?: string;
+  facebook_link?: string;
+  twitter_link?: string;
+  verification_status?: string;
+  active?: number;
+  created_on?: string;
+}
+
+// Update OrganizerRequest interface
+export interface OrganizerRequest {
+  first_name?: string;
+  last_name?: string;
+  email: string;
+  country_code?: string;
+  mobile?: string;
+  password: string;
+  role_id: number;
+  org_name?: string;
+  org_start_date?: Date;
+  bank_account_no?: string;
+  bank_ifsc?: string;
+  bank_name?: string;
+  beneficiary_name?: string;
+  aadhar_number?: string;
+  pancard_number?: string;
+  owner_personal_email?: string;
+  owner_mobile?: string;
+  state?: string;
+  city?: string;
+  country?: string;
+  gst_number?: string;
+  instagram_link?: string;
+  youtube_link?: string;
+  facebook_link?: string;
+  twitter_link?: string;
+  created_by: string;
+  updated_by: string;
+}
+
+// Update UpdateOrganizerStatusRequest interface
+export interface UpdateOrganizerStatusRequest {
+  organizer_id: string;
+  status: number; // 1 for approve, 0 for reject
+  updated_by: string;
+}
+
+// Update PaginationRequest interface
+export interface PaginationRequest {
+  pageNumber: number;
+  pageSize: number;
+  filterText?: string;
+  filterType?: string;
+  filterFlag?: boolean;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
+}
+
+export interface OrganizerPagedResponse extends PagedResponse<OrganizerModel[]> {}
