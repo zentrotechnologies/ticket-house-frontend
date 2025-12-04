@@ -12,6 +12,7 @@ import {
 } from '../../../../core/models/auth.model';
 import { ApiService } from '../../../../core/services/api.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { Modal } from 'bootstrap';
 
 @Component({
   selector: 'app-event-organizer',
@@ -25,7 +26,7 @@ export class EventOrganizerComponent implements OnInit {
   filteredOrganizers: OrganizerModel[] = [];
 
   // Properties for form handling
-  currentOrganizer!: OrganizerRequest; // Remove initialization here
+  currentOrganizer!: OrganizerRequest;
   selectedOrganizer: OrganizerModel | null = null;
   organizerToDelete: OrganizerModel | null = null;
   isEditMode: boolean = false;
@@ -43,7 +44,6 @@ export class EventOrganizerComponent implements OnInit {
     public authService: AuthService,
     private toastr: ToastrService
   ) {
-    // Initialize in constructor instead
     this.currentOrganizer = this.initializeOrganizer();
   }
 
@@ -51,9 +51,8 @@ export class EventOrganizerComponent implements OnInit {
     this.loadOrganizers();
   }
 
-  // Initialize empty organizer - FIXED
+  // Initialize empty organizer
   private initializeOrganizer(): OrganizerRequest {
-    // Check if authService is available
     let userId = 'system';
     if (this.authService && this.authService.getCurrentUserId) {
       userId = this.authService.getCurrentUserId() || 'system';
@@ -176,9 +175,15 @@ export class EventOrganizerComponent implements OnInit {
     };
   }
 
+  // Prepare for add - opens modal in add mode
+  prepareForAdd(): void {
+    this.isEditMode = false;
+    this.resetForm();
+  }
+
   // Add new organizer
   addOrganizer(): void {
-    if (!this.isOrganizerFormValid()) {
+    if (!this.isOrganizerFormValid(false)) {
       this.toastr.error('Please fill all required fields', 'Error');
       return;
     }
@@ -199,7 +204,7 @@ export class EventOrganizerComponent implements OnInit {
         this.isLoading = false;
         if (response.status === 'Success' && response.data) {
           this.toastr.success(response.message || 'Organizer added successfully', 'Success');
-          this.closeModal('addOrganizerModal');
+          this.closeModal('organizerModal');
           this.loadOrganizers();
           this.resetForm();
         } else {
@@ -214,7 +219,7 @@ export class EventOrganizerComponent implements OnInit {
     });
   }
 
-  // Edit organizer
+  // Edit organizer - opens modal in edit mode
   editOrganizer(organizer: OrganizerModel): void {
     this.isEditMode = true;
     this.selectedOrganizer = organizer;
@@ -250,7 +255,7 @@ export class EventOrganizerComponent implements OnInit {
     };
   }
 
-  // Update organizer
+  // Update organizer - FIXED VERSION
   updateOrganizer(): void {
     if (!this.selectedOrganizer?.organizer_id) {
       this.toastr.error('Organizer ID not found', 'Error');
@@ -270,22 +275,103 @@ export class EventOrganizerComponent implements OnInit {
 
     this.currentOrganizer.updated_by = userId;
 
-    // If password is empty in edit mode, create new object without password
-    if (!this.currentOrganizer.password.trim()) {
-      const { password, ...organizerWithoutPassword } = this.currentOrganizer;
-      this.currentOrganizer = organizerWithoutPassword as OrganizerRequest;
+    // Create a new object without password if it's empty
+    let requestData: any = { ...this.currentOrganizer };
+    
+    // If password is empty in edit mode, create a copy without the password property
+    if (!requestData.password?.trim()) {
+      const { password, ...rest } = requestData;
+      requestData = rest;
     }
 
     this.isLoading = true;
 
     this.apiService
-      .updateOrganizer(this.selectedOrganizer.organizer_id!, this.currentOrganizer)
+      .updateOrganizer(this.selectedOrganizer.organizer_id, requestData)
       .subscribe({
         next: (response: CommonResponseModel<OrganizerModel>) => {
           this.isLoading = false;
           if (response.status === 'Success' && response.data) {
             this.toastr.success(response.message || 'Organizer updated successfully', 'Success');
-            this.closeModal('editOrganizerModal');
+            this.closeModal('organizerModal');
+            this.loadOrganizers();
+            this.resetForm();
+          } else {
+            this.toastr.error(response.message || 'Failed to update organizer', 'Error');
+          }
+        },
+        error: (error) => {
+          this.isLoading = false;
+          this.toastr.error('Error updating organizer: ' + error.message, 'Error');
+          console.error('Error updating organizer:', error);
+        },
+      });
+  }
+
+  // Alternative updateOrganizer method - Option 2 (using type assertion)
+  updateOrganizerAlternative(): void {
+    if (!this.selectedOrganizer?.organizer_id) {
+      this.toastr.error('Organizer ID not found', 'Error');
+      return;
+    }
+
+    if (!this.isOrganizerFormValid(true)) {
+      this.toastr.error('Please fill all required fields', 'Error');
+      return;
+    }
+
+    const userId = this.authService.getCurrentUserId();
+    if (!userId) {
+      this.toastr.error('User not authenticated', 'Error');
+      return;
+    }
+
+    this.currentOrganizer.updated_by = userId;
+
+    // Create request data without using delete operator
+    const requestData: Partial<OrganizerRequest> = {
+      first_name: this.currentOrganizer.first_name,
+      last_name: this.currentOrganizer.last_name,
+      email: this.currentOrganizer.email,
+      mobile: this.currentOrganizer.mobile,
+      role_id: this.currentOrganizer.role_id,
+      org_name: this.currentOrganizer.org_name,
+      org_start_date: this.currentOrganizer.org_start_date,
+      bank_account_no: this.currentOrganizer.bank_account_no,
+      bank_ifsc: this.currentOrganizer.bank_ifsc,
+      bank_name: this.currentOrganizer.bank_name,
+      beneficiary_name: this.currentOrganizer.beneficiary_name,
+      aadhar_number: this.currentOrganizer.aadhar_number,
+      pancard_number: this.currentOrganizer.pancard_number,
+      owner_personal_email: this.currentOrganizer.owner_personal_email,
+      owner_mobile: this.currentOrganizer.owner_mobile,
+      state: this.currentOrganizer.state,
+      city: this.currentOrganizer.city,
+      country: this.currentOrganizer.country,
+      gst_number: this.currentOrganizer.gst_number,
+      instagram_link: this.currentOrganizer.instagram_link,
+      youtube_link: this.currentOrganizer.youtube_link,
+      facebook_link: this.currentOrganizer.facebook_link,
+      twitter_link: this.currentOrganizer.twitter_link,
+      created_by: this.currentOrganizer.created_by,
+      updated_by: this.currentOrganizer.updated_by,
+    };
+
+    // Only include password if it's not empty
+    if (this.currentOrganizer.password?.trim()) {
+      (requestData as any).password = this.currentOrganizer.password;
+    }
+
+    this.isLoading = true;
+
+    this.apiService
+      .updateOrganizer(this.selectedOrganizer.organizer_id, requestData as OrganizerRequest)
+      .subscribe({
+        next: (response: CommonResponseModel<OrganizerModel>) => {
+          this.isLoading = false;
+          if (response.status === 'Success' && response.data) {
+            this.toastr.success(response.message || 'Organizer updated successfully', 'Success');
+            this.closeModal('organizerModal');
             this.loadOrganizers();
             this.resetForm();
           } else {
@@ -319,7 +405,7 @@ export class EventOrganizerComponent implements OnInit {
 
     this.isLoading = true;
 
-    this.apiService.deleteOrganizer(this.organizerToDelete.organizer_id!).subscribe({
+    this.apiService.deleteOrganizer(this.organizerToDelete.organizer_id).subscribe({
       next: (response: CommonResponseModel<boolean>) => {
         this.isLoading = false;
         if (response.status === 'Success' && response.data) {
@@ -404,37 +490,43 @@ export class EventOrganizerComponent implements OnInit {
     this.isEditMode = false;
   }
 
-  // Prepare for add
-  prepareForAdd(): void {
-    this.resetForm();
-    this.isEditMode = false;
-  }
-
-  // Close modal
+  // Close modal properly - UPDATED VERSION
   closeModal(modalId: string): void {
     const modalElement = document.getElementById(modalId);
+    
     if (modalElement) {
-      // Use Bootstrap's modal methods if available
-      const bootstrap = (window as any).bootstrap;
-      if (bootstrap && bootstrap.Modal) {
-        const modal = bootstrap.Modal.getInstance(modalElement);
-        if (modal) {
-          modal.hide();
-        } else {
-          new bootstrap.Modal(modalElement).hide();
-        }
-      } else {
-        // Fallback: just hide the modal
-        modalElement.style.display = 'none';
-        modalElement.classList.remove('show');
-        document.body.classList.remove('modal-open');
-        const backdrop = document.querySelector('.modal-backdrop');
-        if (backdrop) {
-          backdrop.remove();
-        }
-      }
+      // Get the modal instance
+      const modal = Modal.getInstance(modalElement) || new Modal(modalElement);
+      
+      // Hide the modal
+      modal.hide();
+      
+      // Manually remove backdrop if exists
+      this.removeModalBackdrop();
+      
+      // Reset form after modal is closed
+      setTimeout(() => {
+        this.resetForm();
+      }, 300);
     }
-    this.resetForm();
+  }
+
+  // Method to manually remove backdrop
+  removeModalBackdrop(): void {
+    // Get all modal backdrops
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+    
+    // Remove each backdrop
+    backdrops.forEach(backdrop => {
+      backdrop.remove();
+    });
+    
+    // Remove modal-open class from body
+    document.body.classList.remove('modal-open');
+    
+    // Reset body style
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
   }
 
   // Get status text

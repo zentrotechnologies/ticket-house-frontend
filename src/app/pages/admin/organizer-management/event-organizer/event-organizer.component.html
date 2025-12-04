@@ -12,7 +12,7 @@
   <div class="page-header">
     <h2 class="page-title">Event Organizer Management</h2>
     <div class="header-actions">
-      <button class="btn btn-primary btn-add" data-bs-toggle="modal" data-bs-target="#addOrganizerModal"
+      <button class="btn btn-primary btn-add" data-bs-toggle="modal" data-bs-target="#organizerModal"
         (click)="prepareForAdd()" [disabled]="!canAdd()">
         <i class="fa fa-plus"></i>&nbsp; Add Organizer
       </button>
@@ -91,7 +91,7 @@
                 
                 <!-- Edit button (Admin only) -->
                 <button *ngIf="canEdit()" class="btn btn-sm btn-outline-primary" title="Edit" 
-                        data-bs-toggle="modal" data-bs-target="#editOrganizerModal"
+                        data-bs-toggle="modal" data-bs-target="#organizerModal"
                         (click)="editOrganizer(organizer)">
                   <i class="fa fa-edit"></i>
                 </button>
@@ -164,12 +164,14 @@
 </div>
 
 <!-- ADD ORGANIZER MODAL -->
-<div class="modal fade" id="addOrganizerModal" tabindex="-1" aria-labelledby="addOrganizerLabel" aria-hidden="true">
+<!-- ADD/EDIT ORGANIZER MODAL (Combined) -->
+<div class="modal fade" id="organizerModal" tabindex="-1" aria-labelledby="organizerModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title" id="addOrganizerLabel">
-          <i class="fa fa-user-plus me-2"></i>Add Event Organizer
+      <div class="modal-header" [ngClass]="isEditMode ? 'bg-warning text-white' : 'bg-primary text-white'">
+        <h5 class="modal-title" id="organizerModalLabel">
+          <i class="fa" [ngClass]="isEditMode ? 'fa-edit' : 'fa-user-plus'"></i>
+          {{ isEditMode ? 'Edit' : 'Add' }} Event Organizer
         </h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" 
                 aria-label="Close" (click)="resetForm()"></button>
@@ -177,9 +179,15 @@
 
       <div class="modal-body">
         <!-- Error/Success Messages -->
-        <div *ngIf="!isOrganizerFormValid()" class="alert alert-warning">
+        <div *ngIf="!isOrganizerFormValid(isEditMode)" class="alert alert-warning">
           <i class="fa fa-exclamation-triangle me-2"></i>
           Please fill all required fields marked with *
+        </div>
+
+        <!-- Warning for empty password in edit mode -->
+        <div *ngIf="isEditMode && !currentOrganizer.password?.trim()" class="alert alert-info">
+          <i class="fa fa-info-circle me-2"></i>
+          Leave password empty to keep current password. Fill only if you want to change it.
         </div>
 
         <form class="row g-3">
@@ -192,32 +200,38 @@
             <div class="mb-3">
               <label class="form-label">First Name <span class="text-danger">*</span></label>
               <input type="text" class="form-control" placeholder="Enter first name"
-                [(ngModel)]="currentOrganizer.first_name" name="firstName" required />
+                [(ngModel)]="currentOrganizer.first_name" name="firstName" required 
+                [disabled]="isEditMode">
             </div>
 
             <div class="mb-3">
               <label class="form-label">Last Name <span class="text-danger">*</span></label>
               <input type="text" class="form-control" placeholder="Enter last name"
-                [(ngModel)]="currentOrganizer.last_name" name="lastName" required />
+                [(ngModel)]="currentOrganizer.last_name" name="lastName" required 
+                [disabled]="isEditMode">
             </div>
 
             <div class="mb-3">
               <label class="form-label">Email <span class="text-danger">*</span></label>
               <input type="email" class="form-control" placeholder="Enter email"
-                [(ngModel)]="currentOrganizer.email" name="email" required />
+                [(ngModel)]="currentOrganizer.email" name="email" required 
+                [disabled]="isEditMode">
             </div>
 
             <div class="mb-3">
               <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
               <input type="tel" class="form-control" placeholder="Enter mobile number"
-                [(ngModel)]="currentOrganizer.mobile" name="mobile" required />
+                [(ngModel)]="currentOrganizer.mobile" name="mobile" required>
             </div>
 
             <div class="mb-3">
-              <label class="form-label">Password <span class="text-danger">*</span></label>
+              <label class="form-label">Password <span class="text-danger" *ngIf="!isEditMode">*</span></label>
               <input type="password" class="form-control" placeholder="Enter password"
-                [(ngModel)]="currentOrganizer.password" name="password" required />
-              <small class="form-text text-muted">Default: Default@123</small>
+                [(ngModel)]="currentOrganizer.password" name="password" 
+                [required]="!isEditMode">
+              <small class="form-text text-muted">
+                {{ isEditMode ? 'Leave empty to keep current password' : 'Default: Default@123' }}
+              </small>
             </div>
           </div>
 
@@ -230,31 +244,31 @@
             <div class="mb-3">
               <label class="form-label">Organization Name <span class="text-danger">*</span></label>
               <input type="text" class="form-control" placeholder="Enter organization name"
-                [(ngModel)]="currentOrganizer.org_name" name="orgName" required />
+                [(ngModel)]="currentOrganizer.org_name" name="orgName" required>
             </div>
 
             <div class="mb-3">
               <label class="form-label">Organization Start Date</label>
               <input type="date" class="form-control"
-                [(ngModel)]="currentOrganizer.org_start_date" name="orgStartDate" />
+                [(ngModel)]="currentOrganizer.org_start_date" name="orgStartDate">
             </div>
 
             <div class="mb-3">
               <label class="form-label">GST Number</label>
               <input type="text" class="form-control" placeholder="Enter GST number"
-                [(ngModel)]="currentOrganizer.gst_number" name="gstNumber" />
+                [(ngModel)]="currentOrganizer.gst_number" name="gstNumber">
             </div>
 
             <div class="mb-3">
               <label class="form-label">Aadhar Number</label>
               <input type="text" class="form-control" placeholder="Enter Aadhar number"
-                [(ngModel)]="currentOrganizer.aadhar_number" name="aadharNumber" />
+                [(ngModel)]="currentOrganizer.aadhar_number" name="aadharNumber">
             </div>
 
             <div class="mb-3">
               <label class="form-label">PAN Card Number</label>
               <input type="text" class="form-control" placeholder="Enter PAN card number"
-                [(ngModel)]="currentOrganizer.pancard_number" name="pancardNumber" />
+                [(ngModel)]="currentOrganizer.pancard_number" name="pancardNumber">
             </div>
           </div>
 
@@ -267,22 +281,22 @@
               <div class="col-md-6 mb-3">
                 <label class="form-label">Bank Name</label>
                 <input type="text" class="form-control" placeholder="Enter bank name"
-                  [(ngModel)]="currentOrganizer.bank_name" name="bankName" />
+                  [(ngModel)]="currentOrganizer.bank_name" name="bankName">
               </div>
               <div class="col-md-6 mb-3">
                 <label class="form-label">Account Number</label>
                 <input type="text" class="form-control" placeholder="Enter account number"
-                  [(ngModel)]="currentOrganizer.bank_account_no" name="accountNo" />
+                  [(ngModel)]="currentOrganizer.bank_account_no" name="accountNo">
               </div>
               <div class="col-md-6 mb-3">
                 <label class="form-label">IFSC Code</label>
                 <input type="text" class="form-control" placeholder="Enter IFSC code"
-                  [(ngModel)]="currentOrganizer.bank_ifsc" name="ifscCode" />
+                  [(ngModel)]="currentOrganizer.bank_ifsc" name="ifscCode">
               </div>
               <div class="col-md-6 mb-3">
                 <label class="form-label">Beneficiary Name</label>
                 <input type="text" class="form-control" placeholder="Enter beneficiary name"
-                  [(ngModel)]="currentOrganizer.beneficiary_name" name="beneficiaryName" />
+                  [(ngModel)]="currentOrganizer.beneficiary_name" name="beneficiaryName">
               </div>
             </div>
           </div>
@@ -296,17 +310,17 @@
               <div class="col-md-4 mb-3">
                 <label class="form-label">Country</label>
                 <input type="text" class="form-control" placeholder="Enter country"
-                  [(ngModel)]="currentOrganizer.country" name="country" />
+                  [(ngModel)]="currentOrganizer.country" name="country">
               </div>
               <div class="col-md-4 mb-3">
                 <label class="form-label">State</label>
                 <input type="text" class="form-control" placeholder="Enter state"
-                  [(ngModel)]="currentOrganizer.state" name="state" />
+                  [(ngModel)]="currentOrganizer.state" name="state">
               </div>
               <div class="col-md-4 mb-3">
                 <label class="form-label">City</label>
                 <input type="text" class="form-control" placeholder="Enter city"
-                  [(ngModel)]="currentOrganizer.city" name="city" />
+                  [(ngModel)]="currentOrganizer.city" name="city">
               </div>
             </div>
           </div>
@@ -322,28 +336,28 @@
                   <i class="fa fa-instagram text-danger me-1"></i> Instagram
                 </label>
                 <input type="url" class="form-control" placeholder="https://instagram.com/username"
-                  [(ngModel)]="currentOrganizer.instagram_link" name="instagram" />
+                  [(ngModel)]="currentOrganizer.instagram_link" name="instagram">
               </div>
               <div class="col-md-3 mb-3">
                 <label class="form-label">
                   <i class="fa fa-facebook text-primary me-1"></i> Facebook
                 </label>
                 <input type="url" class="form-control" placeholder="https://facebook.com/username"
-                  [(ngModel)]="currentOrganizer.facebook_link" name="facebook" />
+                  [(ngModel)]="currentOrganizer.facebook_link" name="facebook">
               </div>
               <div class="col-md-3 mb-3">
                 <label class="form-label">
                   <i class="fa fa-twitter text-info me-1"></i> Twitter
                 </label>
                 <input type="url" class="form-control" placeholder="https://twitter.com/username"
-                  [(ngModel)]="currentOrganizer.twitter_link" name="twitter" />
+                  [(ngModel)]="currentOrganizer.twitter_link" name="twitter">
               </div>
               <div class="col-md-3 mb-3">
                 <label class="form-label">
                   <i class="fa fa-youtube text-danger me-1"></i> YouTube
                 </label>
                 <input type="url" class="form-control" placeholder="https://youtube.com/channel"
-                  [(ngModel)]="currentOrganizer.youtube_link" name="youtube" />
+                  [(ngModel)]="currentOrganizer.youtube_link" name="youtube">
               </div>
             </div>
           </div>
@@ -354,13 +368,17 @@
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="resetForm()">
           <i class="fa fa-times me-1"></i> Cancel
         </button>
-        <button type="button" class="btn btn-primary" (click)="addOrganizer()"
-          [disabled]="!isOrganizerFormValid() || isLoading">
+        <button type="button" class="btn" 
+                [ngClass]="isEditMode ? 'btn-warning' : 'btn-primary'"
+                (click)="isEditMode ? updateOrganizer() : addOrganizer()"
+                [disabled]="!isOrganizerFormValid(isEditMode) || isLoading">
           <span *ngIf="!isLoading">
-            <i class="fa fa-plus me-1"></i> Add Organizer
+            <i class="fa" [ngClass]="isEditMode ? 'fa-save' : 'fa-plus'"></i>
+            {{ isEditMode ? 'Update' : 'Add' }} Organizer
           </span>
           <span *ngIf="isLoading">
-            <span class="spinner-border spinner-border-sm me-1"></span> Adding...
+            <span class="spinner-border spinner-border-sm me-1"></span>
+            {{ isEditMode ? 'Updating...' : 'Adding...' }}
           </span>
         </button>
       </div>

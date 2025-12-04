@@ -1,3 +1,6 @@
+/* In styles.css */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
 /* Global Styles */
 * {
   margin: 0;
