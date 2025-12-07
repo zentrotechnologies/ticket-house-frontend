@@ -63,7 +63,7 @@ export class EventOrganizerComponent implements OnInit {
       last_name: '',
       email: '',
       mobile: '',
-      password: 'Default@123',
+      password: '',
       role_id: 2,
       org_name: '',
       org_start_date: undefined,

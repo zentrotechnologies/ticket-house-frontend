@@ -80,7 +80,7 @@
               </span>
             </td>
             <td>{{ organizer.created_on | date:'mediumDate' }}</td>
-            <td class="text-center">
+            <td class="text-start">
               <div class="btn-group" role="group">
                 <!-- View button -->
                 <button class="btn btn-sm btn-outline-info" title="View Details" 
@@ -126,9 +126,9 @@
               <div class="text-muted">
                 <i class="fa fa-users fa-3x mb-3 opacity-50"></i>
                 <p class="h5">No organizers found</p>
-                <p *ngIf="searchText" class="mt-2">
+                <!-- <p *ngIf="searchText" class="mt-2">
                   No results for "{{ searchText }}". <a href="javascript:void(0)" (click)="clearSearch()">Clear search</a>
-                </p>
+                </p> -->
               </div>
             </td>
           </tr>
@@ -168,9 +168,9 @@
 <div class="modal fade" id="organizerModal" tabindex="-1" aria-labelledby="organizerModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <div class="modal-header" [ngClass]="isEditMode ? 'bg-warning text-white' : 'bg-primary text-white'">
+      <div class="modal-header bg-primary text-white">
         <h5 class="modal-title" id="organizerModalLabel">
-          <i class="fa" [ngClass]="isEditMode ? 'fa-edit' : 'fa-user-plus'"></i>
+          <!-- <i class="fa" [ngClass]="isEditMode ? 'fa-edit' : 'fa-user-plus'"></i> -->
           {{ isEditMode ? 'Edit' : 'Add' }} Event Organizer
         </h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" 
@@ -179,185 +179,217 @@
 
       <div class="modal-body">
         <!-- Error/Success Messages -->
-        <div *ngIf="!isOrganizerFormValid(isEditMode)" class="alert alert-warning">
+        <!-- <div *ngIf="!isOrganizerFormValid(isEditMode)" class="alert alert-warning">
           <i class="fa fa-exclamation-triangle me-2"></i>
           Please fill all required fields marked with *
-        </div>
+        </div> -->
 
         <!-- Warning for empty password in edit mode -->
-        <div *ngIf="isEditMode && !currentOrganizer.password?.trim()" class="alert alert-info">
+        <!-- <div *ngIf="isEditMode && !currentOrganizer.password?.trim()" class="alert alert-info">
           <i class="fa fa-info-circle me-2"></i>
           Leave password empty to keep current password. Fill only if you want to change it.
-        </div>
+        </div> -->
 
         <form class="row g-3">
-          <!-- Personal Information -->
-          <div class="col-md-6">
-            <h6 class="border-bottom pb-2 mb-3">
-              <i class="fa fa-user me-2"></i>Personal Information
-            </h6>
-            
-            <div class="mb-3">
-              <label class="form-label">First Name <span class="text-danger">*</span></label>
-              <input type="text" class="form-control" placeholder="Enter first name"
-                [(ngModel)]="currentOrganizer.first_name" name="firstName" required 
-                [disabled]="isEditMode">
-            </div>
+          <!-- Personal Information - FULL ROW -->
+          <div class="col-12">
+            <div class="card mb-4">
+              <div class="card-header bg-light">
+                <h6 class="mb-0">
+                  <i class="fa fa-user me-2"></i>Personal Information
+                </h6>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label">First Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" placeholder="Enter first name"
+                      [(ngModel)]="currentOrganizer.first_name" name="firstName" required 
+                      [disabled]="isEditMode">
+                  </div>
 
-            <div class="mb-3">
-              <label class="form-label">Last Name <span class="text-danger">*</span></label>
-              <input type="text" class="form-control" placeholder="Enter last name"
-                [(ngModel)]="currentOrganizer.last_name" name="lastName" required 
-                [disabled]="isEditMode">
-            </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" placeholder="Enter last name"
+                      [(ngModel)]="currentOrganizer.last_name" name="lastName" required 
+                      [disabled]="isEditMode">
+                  </div>
 
-            <div class="mb-3">
-              <label class="form-label">Email <span class="text-danger">*</span></label>
-              <input type="email" class="form-control" placeholder="Enter email"
-                [(ngModel)]="currentOrganizer.email" name="email" required 
-                [disabled]="isEditMode">
-            </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label">Email <span class="text-danger">*</span></label>
+                    <input type="email" class="form-control" placeholder="Enter email"
+                      [(ngModel)]="currentOrganizer.email" name="email" required 
+                      [disabled]="isEditMode">
+                  </div>
 
-            <div class="mb-3">
-              <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
-              <input type="tel" class="form-control" placeholder="Enter mobile number"
-                [(ngModel)]="currentOrganizer.mobile" name="mobile" required>
-            </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label">Mobile Number <span class="text-danger">*</span></label>
+                    <input type="tel" class="form-control" placeholder="Enter mobile number"
+                      [(ngModel)]="currentOrganizer.mobile" name="mobile" required>
+                  </div>
 
-            <div class="mb-3">
-              <label class="form-label">Password <span class="text-danger" *ngIf="!isEditMode">*</span></label>
-              <input type="password" class="form-control" placeholder="Enter password"
-                [(ngModel)]="currentOrganizer.password" name="password" 
-                [required]="!isEditMode">
-              <small class="form-text text-muted">
-                {{ isEditMode ? 'Leave empty to keep current password' : 'Default: Default@123' }}
-              </small>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label">Password <span class="text-danger" *ngIf="!isEditMode">*</span></label>
+                    <input type="password" class="form-control" placeholder="Enter password"
+                      [(ngModel)]="currentOrganizer.password" name="password" 
+                      [required]="!isEditMode">
+                    <small class="form-text text-muted">
+                      {{ isEditMode ? 'Leave empty to keep current password' : '' }}
+                    </small>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- Organization Information -->
-          <div class="col-md-6">
-            <h6 class="border-bottom pb-2 mb-3">
-              <i class="fa fa-building me-2"></i>Organization Information
-            </h6>
-            
-            <div class="mb-3">
-              <label class="form-label">Organization Name <span class="text-danger">*</span></label>
-              <input type="text" class="form-control" placeholder="Enter organization name"
-                [(ngModel)]="currentOrganizer.org_name" name="orgName" required>
-            </div>
+          <!-- Organization Information - FULL ROW -->
+          <div class="col-12">
+            <div class="card mb-4">
+              <div class="card-header bg-light">
+                <h6 class="mb-0">
+                  <i class="fa fa-building me-2"></i>Organization Information
+                </h6>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label">Organization Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" placeholder="Enter organization name"
+                      [(ngModel)]="currentOrganizer.org_name" name="orgName" required>
+                  </div>
 
-            <div class="mb-3">
-              <label class="form-label">Organization Start Date</label>
-              <input type="date" class="form-control"
-                [(ngModel)]="currentOrganizer.org_start_date" name="orgStartDate">
-            </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label">Organization Start Date</label>
+                    <input type="date" class="form-control"
+                      [(ngModel)]="currentOrganizer.org_start_date" name="orgStartDate">
+                  </div>
 
-            <div class="mb-3">
-              <label class="form-label">GST Number</label>
-              <input type="text" class="form-control" placeholder="Enter GST number"
-                [(ngModel)]="currentOrganizer.gst_number" name="gstNumber">
-            </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label">GST Number</label>
+                    <input type="text" class="form-control" placeholder="Enter GST number"
+                      [(ngModel)]="currentOrganizer.gst_number" name="gstNumber">
+                  </div>
 
-            <div class="mb-3">
-              <label class="form-label">Aadhar Number</label>
-              <input type="text" class="form-control" placeholder="Enter Aadhar number"
-                [(ngModel)]="currentOrganizer.aadhar_number" name="aadharNumber">
-            </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label">Aadhar Number</label>
+                    <input type="text" class="form-control" placeholder="Enter Aadhar number"
+                      [(ngModel)]="currentOrganizer.aadhar_number" name="aadharNumber">
+                  </div>
 
-            <div class="mb-3">
-              <label class="form-label">PAN Card Number</label>
-              <input type="text" class="form-control" placeholder="Enter PAN card number"
-                [(ngModel)]="currentOrganizer.pancard_number" name="pancardNumber">
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label">PAN Card Number</label>
+                    <input type="text" class="form-control" placeholder="Enter PAN card number"
+                      [(ngModel)]="currentOrganizer.pancard_number" name="pancardNumber">
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
           <!-- Bank Details -->
           <div class="col-12">
-            <h6 class="border-bottom pb-2 mb-3">
-              <i class="fa fa-university me-2"></i>Bank Details
-            </h6>
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Bank Name</label>
-                <input type="text" class="form-control" placeholder="Enter bank name"
-                  [(ngModel)]="currentOrganizer.bank_name" name="bankName">
+            <div class="card mb-4">
+              <div class="card-header bg-light">
+                <h6 class="mb-0">
+                  <i class="fa fa-university me-2"></i>Bank Details
+                </h6>
               </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Account Number</label>
-                <input type="text" class="form-control" placeholder="Enter account number"
-                  [(ngModel)]="currentOrganizer.bank_account_no" name="accountNo">
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">IFSC Code</label>
-                <input type="text" class="form-control" placeholder="Enter IFSC code"
-                  [(ngModel)]="currentOrganizer.bank_ifsc" name="ifscCode">
-              </div>
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Beneficiary Name</label>
-                <input type="text" class="form-control" placeholder="Enter beneficiary name"
-                  [(ngModel)]="currentOrganizer.beneficiary_name" name="beneficiaryName">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label">Bank Name</label>
+                    <input type="text" class="form-control" placeholder="Enter bank name"
+                      [(ngModel)]="currentOrganizer.bank_name" name="bankName">
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label">Account Number</label>
+                    <input type="text" class="form-control" placeholder="Enter account number"
+                      [(ngModel)]="currentOrganizer.bank_account_no" name="accountNo">
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label">IFSC Code</label>
+                    <input type="text" class="form-control" placeholder="Enter IFSC code"
+                      [(ngModel)]="currentOrganizer.bank_ifsc" name="ifscCode">
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label">Beneficiary Name</label>
+                    <input type="text" class="form-control" placeholder="Enter beneficiary name"
+                      [(ngModel)]="currentOrganizer.beneficiary_name" name="beneficiaryName">
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- Address Information -->
           <div class="col-12">
-            <h6 class="border-bottom pb-2 mb-3">
-              <i class="fa fa-map-marker-alt me-2"></i>Address Information
-            </h6>
-            <div class="row">
-              <div class="col-md-4 mb-3">
-                <label class="form-label">Country</label>
-                <input type="text" class="form-control" placeholder="Enter country"
-                  [(ngModel)]="currentOrganizer.country" name="country">
+            <div class="card mb-4">
+              <div class="card-header bg-light">
+                <h6 class="mb-0">
+                  <i class="fa fa-map-marker-alt me-2"></i>Address Information
+                </h6>
               </div>
-              <div class="col-md-4 mb-3">
-                <label class="form-label">State</label>
-                <input type="text" class="form-control" placeholder="Enter state"
-                  [(ngModel)]="currentOrganizer.state" name="state">
-              </div>
-              <div class="col-md-4 mb-3">
-                <label class="form-label">City</label>
-                <input type="text" class="form-control" placeholder="Enter city"
-                  [(ngModel)]="currentOrganizer.city" name="city">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label">Country</label>
+                    <input type="text" class="form-control" placeholder="Enter country"
+                      [(ngModel)]="currentOrganizer.country" name="country">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label">State</label>
+                    <input type="text" class="form-control" placeholder="Enter state"
+                      [(ngModel)]="currentOrganizer.state" name="state">
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label">City</label>
+                    <input type="text" class="form-control" placeholder="Enter city"
+                      [(ngModel)]="currentOrganizer.city" name="city">
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- Social Media Links -->
           <div class="col-12">
-            <h6 class="border-bottom pb-2 mb-3">
-              <i class="fa fa-share-alt me-2"></i>Social Media Links
-            </h6>
-            <div class="row">
-              <div class="col-md-3 mb-3">
-                <label class="form-label">
-                  <i class="fa fa-instagram text-danger me-1"></i> Instagram
-                </label>
-                <input type="url" class="form-control" placeholder="https://instagram.com/username"
-                  [(ngModel)]="currentOrganizer.instagram_link" name="instagram">
+            <div class="card mb-4">
+              <div class="card-header bg-light">
+                <h6 class="mb-0">
+                  <i class="fa fa-share-alt me-2"></i>Social Media Links
+                </h6>
               </div>
-              <div class="col-md-3 mb-3">
-                <label class="form-label">
-                  <i class="fa fa-facebook text-primary me-1"></i> Facebook
-                </label>
-                <input type="url" class="form-control" placeholder="https://facebook.com/username"
-                  [(ngModel)]="currentOrganizer.facebook_link" name="facebook">
-              </div>
-              <div class="col-md-3 mb-3">
-                <label class="form-label">
-                  <i class="fa fa-twitter text-info me-1"></i> Twitter
-                </label>
-                <input type="url" class="form-control" placeholder="https://twitter.com/username"
-                  [(ngModel)]="currentOrganizer.twitter_link" name="twitter">
-              </div>
-              <div class="col-md-3 mb-3">
-                <label class="form-label">
-                  <i class="fa fa-youtube text-danger me-1"></i> YouTube
-                </label>
-                <input type="url" class="form-control" placeholder="https://youtube.com/channel"
-                  [(ngModel)]="currentOrganizer.youtube_link" name="youtube">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label">
+                      <i class="fa fa-instagram text-danger me-1"></i> Instagram
+                    </label>
+                    <input type="url" class="form-control" placeholder="https://instagram.com/username"
+                      [(ngModel)]="currentOrganizer.instagram_link" name="instagram">
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label">
+                      <i class="fa fa-facebook text-primary me-1"></i> Facebook
+                    </label>
+                    <input type="url" class="form-control" placeholder="https://facebook.com/username"
+                      [(ngModel)]="currentOrganizer.facebook_link" name="facebook">
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label">
+                      <i class="fa fa-twitter text-info me-1"></i> Twitter
+                    </label>
+                    <input type="url" class="form-control" placeholder="https://twitter.com/username"
+                      [(ngModel)]="currentOrganizer.twitter_link" name="twitter">
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label">
+                      <i class="fa fa-youtube text-danger me-1"></i> YouTube
+                    </label>
+                    <input type="url" class="form-control" placeholder="https://youtube.com/channel"
+                      [(ngModel)]="currentOrganizer.youtube_link" name="youtube">
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -366,14 +398,14 @@
 
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="resetForm()">
-          <i class="fa fa-times me-1"></i> Cancel
+          <!-- <i class="fa fa-times me-1"></i>  -->
+          Cancel
         </button>
-        <button type="button" class="btn" 
-                [ngClass]="isEditMode ? 'btn-warning' : 'btn-primary'"
+        <button type="button" class="btn btn-primary"
                 (click)="isEditMode ? updateOrganizer() : addOrganizer()"
                 [disabled]="!isOrganizerFormValid(isEditMode) || isLoading">
           <span *ngIf="!isLoading">
-            <i class="fa" [ngClass]="isEditMode ? 'fa-save' : 'fa-plus'"></i>
+            <!-- <i class="fa" [ngClass]="isEditMode ? 'fa-save' : 'fa-plus'"></i> -->
             {{ isEditMode ? 'Update' : 'Add' }} Organizer
           </span>
           <span *ngIf="isLoading">
@@ -392,7 +424,8 @@
     <div class="modal-content">
       <div class="modal-header bg-info text-white">
         <h5 class="modal-title" id="viewOrganizerLabel">
-          <i class="fa fa-eye me-2"></i>Organizer Details
+          <!-- <i class="fa fa-eye me-2"></i> -->
+          Organizer Details
         </h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -410,131 +443,236 @@
             </span>
           </div>
 
-          <div class="row">
-            <!-- Personal Information -->
-            <div class="col-md-6">
-              <div class="card mb-3">
-                <div class="card-header bg-light">
-                  <h6 class="mb-0"><i class="fa fa-user me-2"></i>Personal Information</h6>
-                </div>
-                <div class="card-body">
-                  <table class="table table-sm table-borderless mb-0">
-                    <tr>
-                      <td width="40%"><strong>Name:</strong></td>
-                      <td>{{ selectedOrganizer.first_name }} {{ selectedOrganizer.last_name }}</td>
-                    </tr>
-                    <tr>
-                      <td><strong>Email:</strong></td>
-                      <td><a href="mailto:{{ selectedOrganizer.email }}">{{ selectedOrganizer.email }}</a></td>
-                    </tr>
-                    <tr>
-                      <td><strong>Mobile:</strong></td>
-                      <td>{{ selectedOrganizer.mobile }}</td>
-                    </tr>
-                    <tr>
-                      <td><strong>Role:</strong></td>
-                      <td>{{ selectedOrganizer.role_name || 'Organizer' }}</td>
-                    </tr>
-                  </table>
-                </div>
+          <!-- Personal Information - FULL ROW (matches add/edit layout) -->
+          <div class="col-12 mb-4">
+            <div class="card">
+              <div class="card-header bg-light">
+                <h6 class="mb-0">
+                  <i class="fa fa-user me-2"></i>Personal Information
+                </h6>
               </div>
-            </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label text-muted">First Name</label>
+                    <p class="mb-0 fs-6">{{ selectedOrganizer.first_name }}</p>
+                  </div>
 
-            <!-- Organization Information -->
-            <div class="col-md-6">
-              <div class="card mb-3">
-                <div class="card-header bg-light">
-                  <h6 class="mb-0"><i class="fa fa-building me-2"></i>Organization Information</h6>
-                </div>
-                <div class="card-body">
-                  <table class="table table-sm table-borderless mb-0">
-                    <tr>
-                      <td width="40%"><strong>Organization:</strong></td>
-                      <td>{{ selectedOrganizer.org_name }}</td>
-                    </tr>
-                    <tr>
-                      <td><strong>Start Date:</strong></td>
-                      <td>{{ selectedOrganizer.org_start_date | date:'longDate' }}</td>
-                    </tr>
-                    <tr>
-                      <td><strong>GST Number:</strong></td>
-                      <td>{{ selectedOrganizer.gst_number || 'N/A' }}</td>
-                    </tr>
-                    <tr>
-                      <td><strong>Registered:</strong></td>
-                      <td>{{ selectedOrganizer.created_on | date:'medium' }}</td>
-                    </tr>
-                  </table>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label text-muted">Last Name</label>
+                    <p class="mb-0 fs-6">{{ selectedOrganizer.last_name }}</p>
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label text-muted">Email</label>
+                    <p class="mb-0 fs-6">
+                      <a href="mailto:{{ selectedOrganizer.email }}" class="text-primary">
+                        {{ selectedOrganizer.email }}
+                      </a>
+                    </p>
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label text-muted">Mobile Number</label>
+                    <p class="mb-0 fs-6">{{ selectedOrganizer.mobile || 'N/A' }}</p>
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label text-muted">Role</label>
+                    <p class="mb-0 fs-6">{{ selectedOrganizer.role_name || 'Organizer' }}</p>
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label text-muted">Registration Date</label>
+                    <p class="mb-0 fs-6">{{ selectedOrganizer.created_on | date:'mediumDate' }}</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Bank Details -->
-          <div class="card mb-3">
-            <div class="card-header bg-light">
-              <h6 class="mb-0"><i class="fa fa-university me-2"></i>Bank Details</h6>
-            </div>
-            <div class="card-body">
-              <div class="row">
-                <div class="col-md-4">
-                  <p class="mb-1"><strong>Bank Name:</strong></p>
-                  <p class="text-muted">{{ selectedOrganizer.bank_name || 'N/A' }}</p>
-                </div>
-                <div class="col-md-4">
-                  <p class="mb-1"><strong>Account No:</strong></p>
-                  <p class="text-muted">{{ selectedOrganizer.bank_account_no || 'N/A' }}</p>
-                </div>
-                <div class="col-md-4">
-                  <p class="mb-1"><strong>Beneficiary:</strong></p>
-                  <p class="text-muted">{{ selectedOrganizer.beneficiary_name || 'N/A' }}</p>
-                </div>
-                <div class="col-md-4" *ngIf="selectedOrganizer.bank_ifsc">
-                  <p class="mb-1"><strong>IFSC Code:</strong></p>
-                  <p class="text-muted">{{ selectedOrganizer.bank_ifsc }}</p>
+          <!-- Organization Information - FULL ROW (matches add/edit layout) -->
+          <div class="col-12 mb-4">
+            <div class="card">
+              <div class="card-header bg-light">
+                <h6 class="mb-0">
+                  <i class="fa fa-building me-2"></i>Organization Information
+                </h6>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label text-muted">Organization Name</label>
+                    <p class="mb-0 fs-6">{{ selectedOrganizer.org_name }}</p>
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label text-muted">Organization Start Date</label>
+                    <p class="mb-0 fs-6">{{ selectedOrganizer.org_start_date | date:'longDate' }}</p>
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label text-muted">GST Number</label>
+                    <p class="mb-0 fs-6">{{ selectedOrganizer.gst_number || 'N/A' }}</p>
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label text-muted">Aadhar Number</label>
+                    <p class="mb-0 fs-6">{{ selectedOrganizer.aadhar_number || 'N/A' }}</p>
+                  </div>
+
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label text-muted">PAN Card Number</label>
+                    <p class="mb-0 fs-6">{{ selectedOrganizer.pancard_number || 'N/A' }}</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Address & Social Media -->
-          <div class="row">
-            <div class="col-md-6">
-              <div class="card">
-                <div class="card-header bg-light">
-                  <h6 class="mb-0"><i class="fa fa-map-marker-alt me-2"></i>Address</h6>
-                </div>
-                <div class="card-body">
-                  <p class="mb-1">{{ selectedOrganizer.city || 'N/A' }}</p>
-                  <p class="mb-1">{{ selectedOrganizer.state || 'N/A' }}</p>
-                  <p class="mb-0">{{ selectedOrganizer.country || 'N/A' }}</p>
+          <!-- Bank Details - FULL ROW (matches add/edit layout) -->
+          <div class="col-12 mb-4">
+            <div class="card">
+              <div class="card-header bg-light">
+                <h6 class="mb-0">
+                  <i class="fa fa-university me-2"></i>Bank Details
+                </h6>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label text-muted">Bank Name</label>
+                    <p class="mb-0 fs-6">{{ selectedOrganizer.bank_name || 'N/A' }}</p>
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label text-muted">Account Number</label>
+                    <p class="mb-0 fs-6">{{ selectedOrganizer.bank_account_no || 'N/A' }}</p>
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label text-muted">IFSC Code</label>
+                    <p class="mb-0 fs-6">{{ selectedOrganizer.bank_ifsc || 'N/A' }}</p>
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label text-muted">Beneficiary Name</label>
+                    <p class="mb-0 fs-6">{{ selectedOrganizer.beneficiary_name || 'N/A' }}</p>
+                  </div>
                 </div>
               </div>
             </div>
-            
-            <div class="col-md-6">
-              <div class="card">
-                <div class="card-header bg-light">
-                  <h6 class="mb-0"><i class="fa fa-share-alt me-2"></i>Social Media</h6>
+          </div>
+
+          <!-- Address Information - FULL ROW (matches add/edit layout) -->
+          <div class="col-12 mb-4">
+            <div class="card">
+              <div class="card-header bg-light">
+                <h6 class="mb-0">
+                  <i class="fa fa-map-marker-alt me-2"></i>Address Information
+                </h6>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label text-muted">Country</label>
+                    <p class="mb-0 fs-6">{{ selectedOrganizer.country || 'N/A' }}</p>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label text-muted">State</label>
+                    <p class="mb-0 fs-6">{{ selectedOrganizer.state || 'N/A' }}</p>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label text-muted">City</label>
+                    <p class="mb-0 fs-6">{{ selectedOrganizer.city || 'N/A' }}</p>
+                  </div>
                 </div>
-                <div class="card-body">
-                  <div class="d-flex gap-2">
-                    <a *ngIf="selectedOrganizer.instagram_link" [href]="selectedOrganizer.instagram_link" 
-                       target="_blank" class="btn btn-outline-danger btn-sm">
-                      <i class="fa fa-instagram"></i>
-                    </a>
-                    <a *ngIf="selectedOrganizer.facebook_link" [href]="selectedOrganizer.facebook_link" 
-                       target="_blank" class="btn btn-outline-primary btn-sm">
-                      <i class="fa fa-facebook"></i>
-                    </a>
-                    <a *ngIf="selectedOrganizer.twitter_link" [href]="selectedOrganizer.twitter_link" 
-                       target="_blank" class="btn btn-outline-info btn-sm">
-                      <i class="fa fa-twitter"></i>
-                    </a>
-                    <a *ngIf="selectedOrganizer.youtube_link" [href]="selectedOrganizer.youtube_link" 
-                       target="_blank" class="btn btn-outline-danger btn-sm">
-                      <i class="fa fa-youtube"></i>
-                    </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Social Media Links - FULL ROW (matches add/edit layout) -->
+          <div class="col-12 mb-4">
+            <div class="card">
+              <div class="card-header bg-light">
+                <h6 class="mb-0">
+                  <i class="fa fa-share-alt me-2"></i>Social Media Links
+                </h6>
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label text-muted">
+                      <i class="fa fa-instagram text-danger me-1"></i> Instagram
+                    </label>
+                    <p class="mb-0 fs-6">
+                      <span *ngIf="selectedOrganizer.instagram_link; else noInstagram">
+                        <a [href]="selectedOrganizer.instagram_link" target="_blank" class="text-decoration-none">
+                          {{ selectedOrganizer.instagram_link }}
+                        </a>
+                      </span>
+                      <ng-template #noInstagram>N/A</ng-template>
+                    </p>
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label text-muted">
+                      <i class="fa fa-facebook text-primary me-1"></i> Facebook
+                    </label>
+                    <p class="mb-0 fs-6">
+                      <span *ngIf="selectedOrganizer.facebook_link; else noFacebook">
+                        <a [href]="selectedOrganizer.facebook_link" target="_blank" class="text-decoration-none">
+                          {{ selectedOrganizer.facebook_link }}
+                        </a>
+                      </span>
+                      <ng-template #noFacebook>N/A</ng-template>
+                    </p>
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label text-muted">
+                      <i class="fa fa-twitter text-info me-1"></i> Twitter
+                    </label>
+                    <p class="mb-0 fs-6">
+                      <span *ngIf="selectedOrganizer.twitter_link; else noTwitter">
+                        <a [href]="selectedOrganizer.twitter_link" target="_blank" class="text-decoration-none">
+                          {{ selectedOrganizer.twitter_link }}
+                        </a>
+                      </span>
+                      <ng-template #noTwitter>N/A</ng-template>
+                    </p>
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-label text-muted">
+                      <i class="fa fa-youtube text-danger me-1"></i> YouTube
+                    </label>
+                    <p class="mb-0 fs-6">
+                      <span *ngIf="selectedOrganizer.youtube_link; else noYouTube">
+                        <a [href]="selectedOrganizer.youtube_link" target="_blank" class="text-decoration-none">
+                          {{ selectedOrganizer.youtube_link }}
+                        </a>
+                      </span>
+                      <ng-template #noYouTube>N/A</ng-template>
+                    </p>
+                  </div>
+                </div>
+                
+                <!-- Social Media Buttons Row -->
+                <div class="row mt-3">
+                  <div class="col-12">
+                    <div class="d-flex gap-2">
+                      <a *ngIf="selectedOrganizer.instagram_link" [href]="selectedOrganizer.instagram_link" 
+                         target="_blank" class="btn btn-outline-danger btn-sm">
+                        <i class="fa fa-instagram me-1"></i> Visit Instagram
+                      </a>
+                      <a *ngIf="selectedOrganizer.facebook_link" [href]="selectedOrganizer.facebook_link" 
+                         target="_blank" class="btn btn-outline-primary btn-sm">
+                        <i class="fa fa-facebook me-1"></i> Visit Facebook
+                      </a>
+                      <a *ngIf="selectedOrganizer.twitter_link" [href]="selectedOrganizer.twitter_link" 
+                         target="_blank" class="btn btn-outline-info btn-sm">
+                        <i class="fa fa-twitter me-1"></i> Visit Twitter
+                      </a>
+                      <a *ngIf="selectedOrganizer.youtube_link" [href]="selectedOrganizer.youtube_link" 
+                         target="_blank" class="btn btn-outline-danger btn-sm">
+                        <i class="fa fa-youtube me-1"></i> Visit YouTube
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -545,7 +683,8 @@
 
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          <i class="fa fa-times me-1"></i> Close
+          <!-- <i class="fa fa-times me-1"></i>  -->
+          Close
         </button>
       </div>
     </div>
@@ -554,7 +693,7 @@
 
 <!-- DELETE CONFIRMATION MODAL -->
 <div class="modal fade" id="deleteOrganizerModal" tabindex="-1" aria-labelledby="deleteOrganizerLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header bg-danger text-white">
         <h5 class="modal-title" id="deleteOrganizerLabel">
@@ -564,19 +703,19 @@
       </div>
 
       <div class="modal-body">
-        <div class="text-center">
-          <div class="mb-3">
+        <div class="text-start">
+          <!-- <div class="mb-3">
             <i class="fa fa-exclamation-triangle text-danger fa-3x"></i>
-          </div>
+          </div> -->
           <h6 class="mb-3">Are you sure you want to delete this organizer?</h6>
-          <p *ngIf="organizerToDelete" class="text-muted">
+          <!-- <p *ngIf="organizerToDelete" class="text-muted">
             <strong>{{ organizerToDelete.first_name }} {{ organizerToDelete.last_name }}</strong><br>
             <small>{{ organizerToDelete.org_name }} • {{ organizerToDelete.email }}</small>
           </p>
           <p class="text-danger small">
             <i class="fa fa-exclamation-circle me-1"></i>
             This action cannot be undone. All associated data will be permanently removed.
-          </p>
+          </p> -->
         </div>
       </div>
 

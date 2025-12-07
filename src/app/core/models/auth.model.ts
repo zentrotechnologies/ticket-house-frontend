@@ -238,6 +238,7 @@ export interface OrganizerModel {
   verification_status?: string;
   active?: number;
   created_on?: string;
+  password?: string;
 }
 
 // Update OrganizerRequest interface
