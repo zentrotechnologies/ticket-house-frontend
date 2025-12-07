@@ -390,3 +390,22 @@
   border-color: #86b7fe;
   box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
 }
+
+/* Add to your component's CSS file */
+.input-group .btn-outline-secondary {
+    border-color: #ced4da;
+}
+
+.input-group .btn-outline-secondary:hover {
+    background-color: #e9ecef;
+    border-color: #ced4da;
+}
+
+/* Ensure password input and button align properly */
+.input-group input.form-control {
+    border-right: 0;
+}
+
+.input-group .btn {
+    border-left: 0;
+}

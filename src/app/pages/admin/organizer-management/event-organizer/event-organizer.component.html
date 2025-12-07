@@ -204,22 +204,19 @@
                   <div class="col-md-4 mb-3">
                     <label class="form-label">First Name <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="Enter first name"
-                      [(ngModel)]="currentOrganizer.first_name" name="firstName" required 
-                      [disabled]="isEditMode">
+                      [(ngModel)]="currentOrganizer.first_name" name="firstName" required>
                   </div>
 
                   <div class="col-md-4 mb-3">
                     <label class="form-label">Last Name <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" placeholder="Enter last name"
-                      [(ngModel)]="currentOrganizer.last_name" name="lastName" required 
-                      [disabled]="isEditMode">
+                      [(ngModel)]="currentOrganizer.last_name" name="lastName" required>
                   </div>
 
                   <div class="col-md-4 mb-3">
                     <label class="form-label">Email <span class="text-danger">*</span></label>
                     <input type="email" class="form-control" placeholder="Enter email"
-                      [(ngModel)]="currentOrganizer.email" name="email" required 
-                      [disabled]="isEditMode">
+                      [(ngModel)]="currentOrganizer.email" name="email" required>
                   </div>
 
                   <div class="col-md-4 mb-3">
@@ -229,13 +226,27 @@
                   </div>
 
                   <div class="col-md-4 mb-3">
-                    <label class="form-label">Password <span class="text-danger" *ngIf="!isEditMode">*</span></label>
-                    <input type="password" class="form-control" placeholder="Enter password"
-                      [(ngModel)]="currentOrganizer.password" name="password" 
-                      [required]="!isEditMode">
-                    <small class="form-text text-muted">
-                      {{ isEditMode ? 'Leave empty to keep current password' : '' }}
-                    </small>
+                    <label class="form-label">
+                        Password 
+                        <span class="text-danger" *ngIf="!isEditMode">*</span>
+                        <!-- <span *ngIf="isEditMode" class="text-muted small">(Leave empty to keep current)</span> -->
+                    </label>
+                    <div class="input-group">
+                        <input [type]="showPassword ? 'text' : 'password'" 
+                              class="form-control" 
+                              placeholder="Enter password"
+                              [(ngModel)]="currentOrganizer.password" 
+                              name="password" 
+                              [required]="!isEditMode">
+                        <button class="btn btn-outline-secondary" 
+                                type="button" 
+                                (click)="togglePasswordVisibility()">
+                            <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+                        </button>
+                    </div>
+                    <!-- <small class="form-text text-muted" *ngIf="isEditMode">
+                        Leave empty to keep current password
+                    </small> -->
                   </div>
                 </div>
               </div>
@@ -653,7 +664,7 @@
                 </div>
                 
                 <!-- Social Media Buttons Row -->
-                <div class="row mt-3">
+                <!-- <div class="row mt-3">
                   <div class="col-12">
                     <div class="d-flex gap-2">
                       <a *ngIf="selectedOrganizer.instagram_link" [href]="selectedOrganizer.instagram_link" 
@@ -674,7 +685,7 @@
                       </a>
                     </div>
                   </div>
-                </div>
+                </div> -->
               </div>
             </div>
           </div>

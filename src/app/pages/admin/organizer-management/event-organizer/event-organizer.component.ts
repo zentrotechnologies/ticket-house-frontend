@@ -13,6 +13,8 @@ import {
 import { ApiService } from '../../../../core/services/api.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { Modal } from 'bootstrap';
+import { AesService } from '../../../../core/services/aes.service';
+import { DateworkerService } from '../../../../core/services/dateworker.service';
 
 @Component({
   selector: 'app-event-organizer',
@@ -39,10 +41,14 @@ export class EventOrganizerComponent implements OnInit {
   totalPages: number = 1;
   totalCount: number = 0;
 
+  showPassword: boolean = false;
+
   constructor(
     private apiService: ApiService,
     public authService: AuthService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private aesService: AesService,
+    private dateworkerService: DateworkerService
   ) {
     this.currentOrganizer = this.initializeOrganizer();
   }
@@ -62,6 +68,7 @@ export class EventOrganizerComponent implements OnInit {
       first_name: '',
       last_name: '',
       email: '',
+      country_code: '+91', // Default country code
       mobile: '',
       password: '',
       role_id: 2,
@@ -175,9 +182,15 @@ export class EventOrganizerComponent implements OnInit {
     };
   }
 
+  // Toggle password visibility
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
   // Prepare for add - opens modal in add mode
   prepareForAdd(): void {
     this.isEditMode = false;
+    this.showPassword = false;
     this.resetForm();
   }
 
@@ -220,169 +233,304 @@ export class EventOrganizerComponent implements OnInit {
   }
 
   // Edit organizer - opens modal in edit mode
+  // editOrganizer(organizer: OrganizerModel): void {
+  //   this.isEditMode = true;
+  //   this.selectedOrganizer = organizer;
+
+  //   // Convert OrganizerModel to OrganizerRequest for form
+  //   this.currentOrganizer = {
+  //     first_name: organizer.first_name || '',
+  //     last_name: organizer.last_name || '',
+  //     email: organizer.email || '',
+  //     mobile: organizer.mobile || '',
+  //     password: '', // Don't show password in edit
+  //     role_id: organizer.role_id || 2,
+  //     org_name: organizer.org_name || '',
+  //     org_start_date: organizer.org_start_date ? new Date(organizer.org_start_date.toString()) : undefined,
+  //     bank_account_no: organizer.bank_account_no || '',
+  //     bank_ifsc: organizer.bank_ifsc || '',
+  //     bank_name: organizer.bank_name || '',
+  //     beneficiary_name: organizer.beneficiary_name || '',
+  //     aadhar_number: organizer.aadhar_number || '',
+  //     pancard_number: organizer.pancard_number || '',
+  //     owner_personal_email: organizer.owner_personal_email || '',
+  //     owner_mobile: organizer.owner_mobile || '',
+  //     state: organizer.state || '',
+  //     city: organizer.city || '',
+  //     country: organizer.country || '',
+  //     gst_number: organizer.gst_number || '',
+  //     instagram_link: organizer.instagram_link || '',
+  //     youtube_link: organizer.youtube_link || '',
+  //     facebook_link: organizer.facebook_link || '',
+  //     twitter_link: organizer.twitter_link || '',
+  //     created_by: this.authService.getCurrentUserId() || '',
+  //     updated_by: this.authService.getCurrentUserId() || '',
+  //   };
+  // }
+
   editOrganizer(organizer: OrganizerModel): void {
     this.isEditMode = true;
+    this.showPassword = false;
     this.selectedOrganizer = organizer;
 
-    // Convert OrganizerModel to OrganizerRequest for form
-    this.currentOrganizer = {
-      first_name: organizer.first_name || '',
-      last_name: organizer.last_name || '',
-      email: organizer.email || '',
-      mobile: organizer.mobile || '',
-      password: '', // Don't show password in edit
-      role_id: organizer.role_id || 2,
-      org_name: organizer.org_name || '',
-      org_start_date: organizer.org_start_date ? new Date(organizer.org_start_date.toString()) : undefined,
-      bank_account_no: organizer.bank_account_no || '',
-      bank_ifsc: organizer.bank_ifsc || '',
-      bank_name: organizer.bank_name || '',
-      beneficiary_name: organizer.beneficiary_name || '',
-      aadhar_number: organizer.aadhar_number || '',
-      pancard_number: organizer.pancard_number || '',
-      owner_personal_email: organizer.owner_personal_email || '',
-      owner_mobile: organizer.owner_mobile || '',
-      state: organizer.state || '',
-      city: organizer.city || '',
-      country: organizer.country || '',
-      gst_number: organizer.gst_number || '',
-      instagram_link: organizer.instagram_link || '',
-      youtube_link: organizer.youtube_link || '',
-      facebook_link: organizer.facebook_link || '',
-      twitter_link: organizer.twitter_link || '',
-      created_by: this.authService.getCurrentUserId() || '',
-      updated_by: this.authService.getCurrentUserId() || '',
-    };
+    // Get organizer details with decrypted password
+    this.isLoading = true;
+    this.apiService.getOrganizerById(organizer.organizer_id!).subscribe({
+      next: (response: CommonResponseModel<OrganizerModel>) => {
+        this.isLoading = false;
+        if (response.status === 'Success' && response.data) {
+          const orgDetails = response.data;
+
+          console.log('Formatted date string:', this.formatDateForInput(orgDetails.org_start_date));
+          
+          // Convert OrganizerModel to OrganizerRequest for form
+          this.currentOrganizer = {
+            first_name: orgDetails.first_name || '',
+            last_name: orgDetails.last_name || '',
+            email: orgDetails.email || '',
+            country_code: '+91', // Default or extract from existing data
+            mobile: orgDetails.mobile || '',
+            password: orgDetails.password || '', // This now contains decrypted password
+            role_id: orgDetails.role_id || 2,
+            org_name: orgDetails.org_name || '',
+            // org_start_date: orgDetails.org_start_date ? new Date(orgDetails.org_start_date.toString()) : undefined,
+            org_start_date: this.formatDateForInput(orgDetails.org_start_date),
+            bank_account_no: orgDetails.bank_account_no || '',
+            bank_ifsc: orgDetails.bank_ifsc || '',
+            bank_name: orgDetails.bank_name || '',
+            beneficiary_name: orgDetails.beneficiary_name || '',
+            aadhar_number: orgDetails.aadhar_number || '',
+            pancard_number: orgDetails.pancard_number || '',
+            owner_personal_email: orgDetails.owner_personal_email || '',
+            owner_mobile: orgDetails.owner_mobile || '',
+            state: orgDetails.state || '',
+            city: orgDetails.city || '',
+            country: orgDetails.country || '',
+            gst_number: orgDetails.gst_number || '',
+            instagram_link: orgDetails.instagram_link || '',
+            youtube_link: orgDetails.youtube_link || '',
+            facebook_link: orgDetails.facebook_link || '',
+            twitter_link: orgDetails.twitter_link || '',
+            created_by: this.authService.getCurrentUserId() || '',
+            updated_by: this.authService.getCurrentUserId() || '',
+          };
+        }
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.toastr.error('Error loading organizer details', 'Error');
+      }
+    });
+  }
+
+  private formatDateForInput(dateValue: string | Date | undefined): any {
+    if (!dateValue) {
+      return undefined;
+    }
+    
+    try {
+      let date: Date;
+      
+      // Convert to Date object if it's a string
+      if (typeof dateValue === 'string') {
+        date = new Date(dateValue);
+      } else {
+        date = dateValue;
+      }
+      
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        console.error('Invalid date:', dateValue);
+        return undefined;
+      }
+      
+      // Format as yyyy-MM-dd for input[type="date"]
+      const year = date.getFullYear();
+      const month = ('0' + (date.getMonth() + 1)).slice(-2);
+      const day = ('0' + date.getDate()).slice(-2);
+      
+      return `${year}-${month}-${day}`;
+      
+    } catch (error) {
+      console.error('Error formatting date:', error, 'Value:', dateValue);
+      return undefined;
+    }
   }
 
   // Update organizer - FIXED VERSION
-  updateOrganizer(): void {
-    if (!this.selectedOrganizer?.organizer_id) {
-      this.toastr.error('Organizer ID not found', 'Error');
-      return;
-    }
+  // updateOrganizer(): void {
+  //   if (!this.selectedOrganizer?.organizer_id) {
+  //     this.toastr.error('Organizer ID not found', 'Error');
+  //     return;
+  //   }
 
-    if (!this.isOrganizerFormValid(true)) {
-      this.toastr.error('Please fill all required fields', 'Error');
-      return;
-    }
+  //   if (!this.isOrganizerFormValid(true)) {
+  //     this.toastr.error('Please fill all required fields', 'Error');
+  //     return;
+  //   }
 
-    const userId = this.authService.getCurrentUserId();
-    if (!userId) {
-      this.toastr.error('User not authenticated', 'Error');
-      return;
-    }
+  //   const userId = this.authService.getCurrentUserId();
+  //   if (!userId) {
+  //     this.toastr.error('User not authenticated', 'Error');
+  //     return;
+  //   }
 
-    this.currentOrganizer.updated_by = userId;
+  //   this.currentOrganizer.updated_by = userId;
 
-    // Create a new object without password if it's empty
-    let requestData: any = { ...this.currentOrganizer };
+  //   // Create a new object without password if it's empty
+  //   let requestData: any = { ...this.currentOrganizer };
     
-    // If password is empty in edit mode, create a copy without the password property
-    if (!requestData.password?.trim()) {
-      const { password, ...rest } = requestData;
-      requestData = rest;
-    }
+  //   // If password is empty in edit mode, create a copy without the password property
+  //   if (!requestData.password?.trim()) {
+  //     const { password, ...rest } = requestData;
+  //     requestData = rest;
+  //   }
 
-    this.isLoading = true;
+  //   this.isLoading = true;
 
-    this.apiService
-      .updateOrganizer(this.selectedOrganizer.organizer_id, requestData)
-      .subscribe({
-        next: (response: CommonResponseModel<OrganizerModel>) => {
-          this.isLoading = false;
-          if (response.status === 'Success' && response.data) {
-            this.toastr.success(response.message || 'Organizer updated successfully', 'Success');
-            this.closeModal('organizerModal');
-            this.loadOrganizers();
-            this.resetForm();
-          } else {
-            this.toastr.error(response.message || 'Failed to update organizer', 'Error');
-          }
-        },
-        error: (error) => {
-          this.isLoading = false;
-          this.toastr.error('Error updating organizer: ' + error.message, 'Error');
-          console.error('Error updating organizer:', error);
-        },
-      });
-  }
+  //   this.apiService
+  //     .updateOrganizer(this.selectedOrganizer.organizer_id, requestData)
+  //     .subscribe({
+  //       next: (response: CommonResponseModel<OrganizerModel>) => {
+  //         this.isLoading = false;
+  //         if (response.status === 'Success' && response.data) {
+  //           this.toastr.success(response.message || 'Organizer updated successfully', 'Success');
+  //           this.closeModal('organizerModal');
+  //           this.loadOrganizers();
+  //           this.resetForm();
+  //         } else {
+  //           this.toastr.error(response.message || 'Failed to update organizer', 'Error');
+  //         }
+  //       },
+  //       error: (error) => {
+  //         this.isLoading = false;
+  //         this.toastr.error('Error updating organizer: ' + error.message, 'Error');
+  //         console.error('Error updating organizer:', error);
+  //       },
+  //     });
+  // }
 
-  // Alternative updateOrganizer method - Option 2 (using type assertion)
-  updateOrganizerAlternative(): void {
-    if (!this.selectedOrganizer?.organizer_id) {
-      this.toastr.error('Organizer ID not found', 'Error');
-      return;
-    }
+  // // Alternative updateOrganizer method - Option 2 (using type assertion)
+  // updateOrganizerAlternative(): void {
+  //   if (!this.selectedOrganizer?.organizer_id) {
+  //     this.toastr.error('Organizer ID not found', 'Error');
+  //     return;
+  //   }
 
-    if (!this.isOrganizerFormValid(true)) {
-      this.toastr.error('Please fill all required fields', 'Error');
-      return;
-    }
+  //   if (!this.isOrganizerFormValid(true)) {
+  //     this.toastr.error('Please fill all required fields', 'Error');
+  //     return;
+  //   }
 
-    const userId = this.authService.getCurrentUserId();
-    if (!userId) {
-      this.toastr.error('User not authenticated', 'Error');
-      return;
-    }
+  //   const userId = this.authService.getCurrentUserId();
+  //   if (!userId) {
+  //     this.toastr.error('User not authenticated', 'Error');
+  //     return;
+  //   }
 
-    this.currentOrganizer.updated_by = userId;
+  //   this.currentOrganizer.updated_by = userId;
 
-    // Create request data without using delete operator
-    const requestData: Partial<OrganizerRequest> = {
-      first_name: this.currentOrganizer.first_name,
-      last_name: this.currentOrganizer.last_name,
-      email: this.currentOrganizer.email,
-      mobile: this.currentOrganizer.mobile,
-      role_id: this.currentOrganizer.role_id,
-      org_name: this.currentOrganizer.org_name,
-      org_start_date: this.currentOrganizer.org_start_date,
-      bank_account_no: this.currentOrganizer.bank_account_no,
-      bank_ifsc: this.currentOrganizer.bank_ifsc,
-      bank_name: this.currentOrganizer.bank_name,
-      beneficiary_name: this.currentOrganizer.beneficiary_name,
-      aadhar_number: this.currentOrganizer.aadhar_number,
-      pancard_number: this.currentOrganizer.pancard_number,
-      owner_personal_email: this.currentOrganizer.owner_personal_email,
-      owner_mobile: this.currentOrganizer.owner_mobile,
-      state: this.currentOrganizer.state,
-      city: this.currentOrganizer.city,
-      country: this.currentOrganizer.country,
-      gst_number: this.currentOrganizer.gst_number,
-      instagram_link: this.currentOrganizer.instagram_link,
-      youtube_link: this.currentOrganizer.youtube_link,
-      facebook_link: this.currentOrganizer.facebook_link,
-      twitter_link: this.currentOrganizer.twitter_link,
-      created_by: this.currentOrganizer.created_by,
-      updated_by: this.currentOrganizer.updated_by,
-    };
+  //   // Create request data without using delete operator
+  //   const requestData: Partial<OrganizerRequest> = {
+  //     first_name: this.currentOrganizer.first_name,
+  //     last_name: this.currentOrganizer.last_name,
+  //     email: this.currentOrganizer.email,
+  //     mobile: this.currentOrganizer.mobile,
+  //     role_id: this.currentOrganizer.role_id,
+  //     org_name: this.currentOrganizer.org_name,
+  //     org_start_date: this.currentOrganizer.org_start_date,
+  //     bank_account_no: this.currentOrganizer.bank_account_no,
+  //     bank_ifsc: this.currentOrganizer.bank_ifsc,
+  //     bank_name: this.currentOrganizer.bank_name,
+  //     beneficiary_name: this.currentOrganizer.beneficiary_name,
+  //     aadhar_number: this.currentOrganizer.aadhar_number,
+  //     pancard_number: this.currentOrganizer.pancard_number,
+  //     owner_personal_email: this.currentOrganizer.owner_personal_email,
+  //     owner_mobile: this.currentOrganizer.owner_mobile,
+  //     state: this.currentOrganizer.state,
+  //     city: this.currentOrganizer.city,
+  //     country: this.currentOrganizer.country,
+  //     gst_number: this.currentOrganizer.gst_number,
+  //     instagram_link: this.currentOrganizer.instagram_link,
+  //     youtube_link: this.currentOrganizer.youtube_link,
+  //     facebook_link: this.currentOrganizer.facebook_link,
+  //     twitter_link: this.currentOrganizer.twitter_link,
+  //     created_by: this.currentOrganizer.created_by,
+  //     updated_by: this.currentOrganizer.updated_by,
+  //   };
 
-    // Only include password if it's not empty
-    if (this.currentOrganizer.password?.trim()) {
-      (requestData as any).password = this.currentOrganizer.password;
-    }
+  //   // Only include password if it's not empty
+  //   if (this.currentOrganizer.password?.trim()) {
+  //     (requestData as any).password = this.currentOrganizer.password;
+  //   }
 
-    this.isLoading = true;
+  //   this.isLoading = true;
 
-    this.apiService
-      .updateOrganizer(this.selectedOrganizer.organizer_id, requestData as OrganizerRequest)
-      .subscribe({
-        next: (response: CommonResponseModel<OrganizerModel>) => {
-          this.isLoading = false;
-          if (response.status === 'Success' && response.data) {
-            this.toastr.success(response.message || 'Organizer updated successfully', 'Success');
-            this.closeModal('organizerModal');
-            this.loadOrganizers();
-            this.resetForm();
-          } else {
-            this.toastr.error(response.message || 'Failed to update organizer', 'Error');
-          }
-        },
-        error: (error) => {
-          this.isLoading = false;
-          this.toastr.error('Error updating organizer: ' + error.message, 'Error');
-          console.error('Error updating organizer:', error);
-        },
+  //   this.apiService
+  //     .updateOrganizer(this.selectedOrganizer.organizer_id, requestData as OrganizerRequest)
+  //     .subscribe({
+  //       next: (response: CommonResponseModel<OrganizerModel>) => {
+  //         this.isLoading = false;
+  //         if (response.status === 'Success' && response.data) {
+  //           this.toastr.success(response.message || 'Organizer updated successfully', 'Success');
+  //           this.closeModal('organizerModal');
+  //           this.loadOrganizers();
+  //           this.resetForm();
+  //         } else {
+  //           this.toastr.error(response.message || 'Failed to update organizer', 'Error');
+  //         }
+  //       },
+  //       error: (error) => {
+  //         this.isLoading = false;
+  //         this.toastr.error('Error updating organizer: ' + error.message, 'Error');
+  //         console.error('Error updating organizer:', error);
+  //       },
+  //     });
+  // }
+
+  // Update organizer - FIXED VERSION
+  updateOrganizer(): void {
+      if (!this.selectedOrganizer?.organizer_id) {
+          this.toastr.error('Organizer ID not found', 'Error');
+          return;
+      }
+
+      if (!this.isOrganizerFormValid(true)) {
+          this.toastr.error('Please fill all required fields', 'Error');
+          return;
+      }
+
+      const userId = this.authService.getCurrentUserId();
+      if (!userId) {
+          this.toastr.error('User not authenticated', 'Error');
+          return;
+      }
+
+      this.currentOrganizer.updated_by = userId;
+
+      // IMPORTANT: Don't encrypt password on frontend - let backend handle it
+      // The backend will check if password has actually changed before encrypting
+      
+      this.isLoading = true;
+
+      // Send the request as-is - backend will handle password encryption if needed
+      this.apiService.updateOrganizer(this.selectedOrganizer.organizer_id, this.currentOrganizer).subscribe({
+          next: (response: CommonResponseModel<OrganizerModel>) => {
+              this.isLoading = false;
+              if (response.status === 'Success' && response.data) {
+                  this.toastr.success(response.message || 'Organizer updated successfully', 'Success');
+                  this.closeModal('organizerModal');
+                  this.loadOrganizers();
+                  this.resetForm();
+              } else {
+                  this.toastr.error(response.message || 'Failed to update organizer', 'Error');
+              }
+          },
+          error: (error) => {
+              this.isLoading = false;
+              this.toastr.error('Error updating organizer: ' + error.message, 'Error');
+              console.error('Error updating organizer:', error);
+          },
       });
   }
 
@@ -466,6 +614,23 @@ export class EventOrganizerComponent implements OnInit {
   }
 
   // Form validation
+  // isOrganizerFormValid(isEdit: boolean = false): boolean {
+  //   const requiredFields = [
+  //     this.currentOrganizer.first_name?.trim(),
+  //     this.currentOrganizer.last_name?.trim(),
+  //     this.currentOrganizer.email?.trim(),
+  //     this.currentOrganizer.mobile?.trim(),
+  //     this.currentOrganizer.org_name?.trim()
+  //   ];
+
+  //   // Password is required only for add, not for edit
+  //   if (!isEdit) {
+  //     requiredFields.push(this.currentOrganizer.password?.trim());
+  //   }
+
+  //   return requiredFields.every(field => field && field.length > 0);
+  // }
+
   isOrganizerFormValid(isEdit: boolean = false): boolean {
     const requiredFields = [
       this.currentOrganizer.first_name?.trim(),
@@ -488,6 +653,7 @@ export class EventOrganizerComponent implements OnInit {
     this.currentOrganizer = this.initializeOrganizer();
     this.selectedOrganizer = null;
     this.isEditMode = false;
+    this.showPassword = false;
   }
 
   // Close modal properly - UPDATED VERSION
