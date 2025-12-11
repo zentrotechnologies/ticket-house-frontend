@@ -291,3 +291,121 @@ export interface PaginationRequest {
 }
 
 export interface OrganizerPagedResponse extends PagedResponse<OrganizerModel[]> {}
+
+// Event Models
+export interface EventDetailsModel {
+  event_id: number;
+  organizer_id?: string;
+  event_name: string;
+  event_description: string;
+  event_date: string | Date;
+  start_time: string;
+  end_time: string;
+  total_duration_minutes: number;
+  location: string;
+  full_address: string;
+  geo_map_url: string;
+  latitude: number | null;
+  longitude: number | null;
+  language: string;
+  event_category_id: number;
+  banner_image: string;
+  gallery_media: string; // JSON string
+  // gallery_media: any; // Changed from string to any for JSON object
+  age_limit: number | null;
+  artists: string; // JSON string
+  // artists: any; // Changed from string to any for JSON object
+  terms_and_conditions: string;
+  min_price: number | null;
+  max_price: number | null;
+  is_featured: boolean;
+  status: string;
+  no_of_seats: number | null;
+  created_by: string;
+  created_at: string;
+  updated_by: string;
+  updated_at: string | null;
+  active: number;
+}
+
+export interface EventArtistModel {
+  event_artist_id: number;
+  event_id: number;
+  artist_name: string;
+  artist_photo: string;
+  created_by: string;
+  created_on: string;
+  updated_by: string;
+  updated_on: string | null;
+  active: number;
+}
+
+export interface EventGalleryModel {
+  event_gallary_id: number;
+  event_id: number;
+  event_img: string;
+  created_by: string;
+  created_on: string;
+  updated_by: string;
+  updated_on: string | null;
+  active: number;
+}
+
+export interface EventMediaModel {
+  event_media_id: number;
+  event_id: number;
+  media_type: string;
+  media_url: string;
+  created_by: string;
+  created_on: string;
+  updated_by: string;
+  updated_on: string | null;
+  active: number;
+}
+
+// export interface EventCompleteResponseModel {
+//   EventDetails: EventDetailsModel;
+//   EventArtists: EventArtistModel[];
+//   EventGalleries: EventGalleryModel[];
+//   EventMedia: EventMediaModel[];
+// }
+
+export interface EventCompleteResponseModel {
+  eventDetails: EventDetailsModel;  // camelCase to match API
+  eventArtists: EventArtistModel[];
+  eventGalleries: EventGalleryModel[];
+  eventMedia?: EventMediaModel[]; // Optional if your API includes it
+}
+
+export interface EventCreateRequestModel {
+  EventDetails: EventDetailsModel;
+  EventArtists: EventArtistModel[];
+  EventGalleries: EventGalleryModel[];
+  BannerImageFile?: File;
+}
+
+export interface EventPaginationRequest {
+  created_by: string;
+  PageNumber: number;
+  PageSize: number;
+  SearchText?: string;
+  Status?: string;
+  FromDate?: string | null;
+  ToDate?: string | null;
+}
+
+export interface ArtistUploadRequest {
+  EventId: number;
+  ArtistName: string;
+  ArtistPhoto: File;
+}
+
+export interface GalleryUploadRequest {
+  EventId: number;
+  GalleryImage: File;
+}
+
+export interface BannerUploadRequest {
+  EventId: number;
+  BannerImage: File;
+}

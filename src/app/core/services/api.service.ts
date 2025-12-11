@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { CommonResponse, CommonResponseModel, EventCategoryModel, EventCategoryRequest, GenerateOTPRequest, OrganizerModel, OrganizerPagedResponse, OrganizerRequest, OTPResponse, PagedResponse, PaginationRequest, ResendOTPRequest, ResendOTPResponse, SignUpRequest, SignUpResponse, TestimonialModel, UpdateEventCategoryStatusRequest, UpdateOrganizerStatusRequest, UpdateTestimonialStatusRequest, UserIdRequest, VerifyOTPRequest } from '../models/auth.model';
+import { CommonResponse, CommonResponseModel, EventCategoryModel, EventCategoryRequest, EventCompleteResponseModel, EventCreateRequestModel, EventDetailsModel, EventPaginationRequest, GenerateOTPRequest, OrganizerModel, OrganizerPagedResponse, OrganizerRequest, OTPResponse, PagedResponse, PaginationRequest, ResendOTPRequest, ResendOTPResponse, SignUpRequest, SignUpResponse, TestimonialModel, UpdateEventCategoryStatusRequest, UpdateOrganizerStatusRequest, UpdateTestimonialStatusRequest, UserIdRequest, VerifyOTPRequest } from '../models/auth.model';
 
 @Injectable({
   providedIn: 'root',
@@ -161,5 +161,72 @@ export class ApiService {
   updateOrganizerStatus(request: UpdateOrganizerStatusRequest): Observable<CommonResponseModel<boolean>> {
     const url = `${this.ThApi}api/User/UpdateOrganizerStatus/${request.organizer_id}`;
     return this.httpClient.post<CommonResponseModel<boolean>>(url, { status: request.status });
+  }
+
+  // ===== EVENT APIS =====
+
+  // Upload artist photo
+  uploadArtistPhoto(eventId: number, artistName: string, artistPhoto: File): Observable<CommonResponseModel<string>> {
+    const formData = new FormData();
+    formData.append('EventId', eventId.toString());
+    formData.append('ArtistName', artistName);
+    formData.append('ArtistPhoto', artistPhoto);
+
+    const url = `${this.ThApi}api/EventDetails/UploadArtistPhoto`;
+    return this.httpClient.post<CommonResponseModel<string>>(url, formData);
+  }
+
+  // Upload gallery image
+  uploadGalleryImage(eventId: number, galleryImage: File): Observable<CommonResponseModel<string>> {
+    const formData = new FormData();
+    formData.append('EventId', eventId.toString());
+    formData.append('GalleryImage', galleryImage);
+
+    const url = `${this.ThApi}api/EventDetails/UploadGalleryImage`;
+    return this.httpClient.post<CommonResponseModel<string>>(url, formData);
+  }
+
+  // Upload event banner
+  uploadEventBanner(eventId: number, bannerImage: File): Observable<CommonResponseModel<string>> {
+    const formData = new FormData();
+    formData.append('EventId', eventId.toString());
+    formData.append('BannerImage', bannerImage);
+
+    const url = `${this.ThApi}api/EventDetails/UploadEventBanner`;
+    return this.httpClient.post<CommonResponseModel<string>>(url, formData);
+  }
+
+  // Create event with artists and galleries
+  createEventWithArtistsAndGalleries(eventData: FormData): Observable<CommonResponseModel<EventCompleteResponseModel>> {
+    const url = `${this.ThApi}api/EventDetails/CreateEventWithArtistsAndGalleries`;
+    return this.httpClient.post<CommonResponseModel<EventCompleteResponseModel>>(url, eventData, {
+      headers: { 'Accept': 'application/json' }
+    });
+  }
+
+  // Update event with artists and galleries
+  updateEventWithArtistsAndGalleries(eventData: FormData): Observable<CommonResponseModel<EventCompleteResponseModel>> {
+    const url = `${this.ThApi}api/EventDetails/UpdateEventWithArtistsAndGalleries`;
+    return this.httpClient.post<CommonResponseModel<EventCompleteResponseModel>>(url, eventData, {
+      headers: { 'Accept': 'application/json' }
+    });
+  }
+
+  // Get event with artists and galleries
+  getEventWithArtistsAndGalleries(eventId: number): Observable<CommonResponseModel<EventCompleteResponseModel>> {
+    const url = `${this.ThApi}api/EventDetails/GetEventWithArtistsAndGalleries/${eventId}`;
+    return this.httpClient.get<CommonResponseModel<EventCompleteResponseModel>>(url);
+  }
+
+  // Get paginated events by created_by
+  getPaginatedEventsByCreatedBy(request: EventPaginationRequest): Observable<PagedResponse<EventCompleteResponseModel[]>> {
+    const url = `${this.ThApi}api/EventDetails/GetPaginatedEventsByCreatedBy`;
+    return this.httpClient.post<PagedResponse<EventCompleteResponseModel[]>>(url, request);
+  }
+
+  // Delete event with artists and galleries
+  deleteEventWithArtistsAndGalleries(eventId: number, updatedBy: string): Observable<CommonResponseModel<boolean>> {
+    const url = `${this.ThApi}api/EventDetails/DeleteEventWithArtistsAndGalleries/${eventId}`;
+    return this.httpClient.post<CommonResponseModel<boolean>>(url, { updatedBy });
   }
 }

@@ -455,3 +455,162 @@ body.sidebar-collapsed .main-content,
     padding: 1rem;
   }
 }
+
+/* Artist and Gallery Styles */
+.artist-input-group .input-group {
+  margin-bottom: 0.5rem;
+}
+
+.artist-thumb {
+  border: 1px solid #e6e9ee;
+  border-radius: 6px;
+}
+
+.artists-list,
+.gallery-preview {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #eef2f6;
+}
+
+.gallery-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.gallery-item img {
+  transition: transform 0.3s ease;
+}
+
+.gallery-item:hover img {
+  transform: scale(1.05);
+}
+
+/* File upload styles */
+input[type="file"] {
+  padding: 0.5rem;
+}
+
+/* Loading states */
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Status badges */
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-active {
+  background: #f0f9ff;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.status-inactive {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.status-draft {
+  background: #fffbeb;
+  color: #d97706;
+  border: 1px solid #fed7aa;
+}
+
+/* Validation styles */
+input.ng-invalid.ng-touched,
+select.ng-invalid.ng-touched,
+textarea.ng-invalid.ng-touched {
+  border-color: #dc2626;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .gallery-preview .row-cols-3 {
+    row-cols: 2;
+  }
+  
+  .artist-input-group .input-group {
+    flex-direction: column;
+  }
+  
+  .artist-input-group .input-group > * {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Fallback image styles */
+img[onerror] {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+}
+
+/* Loading spinner */
+.fa-spin {
+  animation: fa-spin 2s infinite linear;
+}
+
+@keyframes fa-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* File input styling */
+input[type="file"]:disabled {
+  background-color: #e9ecef;
+  cursor: not-allowed;
+}
+
+/* Status text colors for better visibility */
+.status-active { color: #0369a1 !important; }
+.status-inactive { color: #dc2626 !important; }
+.status-draft { color: #d97706 !important; }
+
+/* Add to your admin-events.component.css */
+.loading-text {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.fa-spin {
+  animation: fa-spin 1s infinite linear;
+}
+
+.text-warning {
+  color: #f59e0b;
+}
+
+/* Disabled state for select */
+select:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+}
+
+/* Loading overlay for select */
+.loading-overlay {
+  position: relative;
+}
+
+.loading-overlay::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
