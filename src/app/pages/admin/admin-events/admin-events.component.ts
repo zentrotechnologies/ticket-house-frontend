@@ -1050,7 +1050,7 @@ export class AdminEventsComponent implements OnInit {
       geo_map_url: '',
       latitude: null,
       longitude: null,
-      language: 'english',
+      language: 'hindi',
       event_category_id: 0,
       banner_image: '',
       // gallery_media: '',

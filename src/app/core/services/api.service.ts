@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { CommonResponse, CommonResponseModel, EventCategoryModel, EventCategoryRequest, EventCompleteResponseModel, EventCreateRequestModel, EventDetailsModel, EventPaginationRequest, GenerateOTPRequest, OrganizerModel, OrganizerPagedResponse, OrganizerRequest, OTPResponse, PagedResponse, PaginationRequest, ResendOTPRequest, ResendOTPResponse, SignUpRequest, SignUpResponse, TestimonialModel, UpdateEventCategoryStatusRequest, UpdateOrganizerStatusRequest, UpdateTestimonialStatusRequest, UserIdRequest, VerifyOTPRequest } from '../models/auth.model';
+import { CommonResponse, CommonResponseModel, EventCategoryModel, EventCategoryRequest, EventCompleteResponseModel, EventCreateRequestModel, EventDetailsModel, EventPaginationRequest, GenerateOTPRequest, GetShowsByArtistsRequest, OrganizerModel, OrganizerPagedResponse, OrganizerRequest, OTPResponse, PagedResponse, PaginationRequest, ResendOTPRequest, ResendOTPResponse, ShowsByArtistsResponse, SignUpRequest, SignUpResponse, TestimonialModel, TestimonialsResponse, UpcomingEventsRequest, UpcomingEventsResponse, UpdateEventCategoryStatusRequest, UpdateOrganizerStatusRequest, UpdateTestimonialStatusRequest, UserIdRequest, VerifyOTPRequest } from '../models/auth.model';
 
 @Injectable({
   providedIn: 'root',
@@ -228,5 +228,37 @@ export class ApiService {
   deleteEventWithArtistsAndGalleries(eventId: number, updatedBy: string): Observable<CommonResponseModel<boolean>> {
     const url = `${this.ThApi}api/EventDetails/DeleteEventWithArtistsAndGalleries/${eventId}`;
     return this.httpClient.post<CommonResponseModel<boolean>>(url, { updatedBy });
+  }
+
+  // ===== USER EVENTS APIS =====
+
+  // Get upcoming events
+  getUpcomingEvents(request: UpcomingEventsRequest): Observable<UpcomingEventsResponse> {
+    const url = `${this.ThApi}api/UserEvents/GetUpcomingEvents`;
+    return this.httpClient.post<UpcomingEventsResponse>(url, request);
+  }
+
+  // Get upcoming events with default values
+  getUpcomingEventsDefault(): Observable<UpcomingEventsResponse> {
+    const url = `${this.ThApi}api/UserEvents/GetUpcomingEventsDefault`;
+    return this.httpClient.get<UpcomingEventsResponse>(url);
+  }
+
+  // Get shows by artists
+  getShowsByArtists(request: GetShowsByArtistsRequest): Observable<ShowsByArtistsResponse> {
+    const url = `${this.ThApi}api/UserEvents/GetShowsByArtists`;
+    return this.httpClient.post<ShowsByArtistsResponse>(url, request);
+  }
+
+  // Get shows by artists with default values
+  getShowsByArtistsDefault(): Observable<ShowsByArtistsResponse> {
+    const url = `${this.ThApi}api/UserEvents/GetShowsByArtistsDefault`;
+    return this.httpClient.get<ShowsByArtistsResponse>(url);
+  }
+
+  // Get testimonials by artists
+  getTestimonialsByArtists(): Observable<TestimonialsResponse> {
+    const url = `${this.ThApi}api/UserEvents/GetTestimonialsByArtists`;
+    return this.httpClient.get<TestimonialsResponse>(url);
   }
 }

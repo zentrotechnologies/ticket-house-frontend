@@ -409,3 +409,46 @@ export interface BannerUploadRequest {
   EventId: number;
   BannerImage: File;
 }
+
+//User Events
+export interface UpcomingEventResponse {
+  event_id: number;
+  event_name: string;
+  event_date: string;
+  start_time: string;
+  end_time: string;
+  location: string;
+  banner_image: string;
+  formatted_date: string;
+}
+
+export interface ArtistResponse {
+  event_artist_id: number;
+  artist_name: string;
+  artist_photo: string;
+  role: string;
+  event_count: number;
+}
+
+export interface TestimonialResponse {
+  testimonial_id: number;
+  name: string;
+  designation: string;
+  profile_img: string;
+  description: string;
+  role: string;
+}
+
+export interface UpcomingEventsRequest {
+  Count?: number;
+  IncludeLaterEvents?: boolean;
+}
+
+export interface GetShowsByArtistsRequest {
+  Count?: number;
+}
+
+// Add response types
+export interface UpcomingEventsResponse extends CommonResponseModel<UpcomingEventResponse[]> {}
+export interface ShowsByArtistsResponse extends CommonResponseModel<ArtistResponse[]> {}
+export interface TestimonialsResponse extends CommonResponseModel<TestimonialResponse[]> {}

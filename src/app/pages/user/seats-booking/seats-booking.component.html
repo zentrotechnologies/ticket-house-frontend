@@ -1,0 +1,90 @@
+<div class="audience-page audience-body">
+  <!-- HEADER (reuse existing header exactly as-is) -->
+  <header class="audience-header">
+    <div class="container">
+      <div class="header-row">
+        <!-- Left Section (Logo + Breadcrumbs) -->
+        <div class="header-col left-section-col">
+          <div class="left-section-content">
+            <!-- Logo -->
+            <div class="logo-wrapper">
+              <img
+                class="logo"
+                src="https://zentrotechnologies.com/wp-content/uploads/2025/02/Zentro_Final-Logo-05-scaled-e1753251642526.png"
+                alt="Zentro Logo"
+              />
+            </div>
+
+            <!-- Breadcrumbs -->
+            <nav class="breadcrumbs">
+              <span class="back-arrow" [routerLink]="['/events']">←</span>
+
+              <span class="crumb" [routerLink]="['/events']">Events</span>
+              <span class="separator">›</span>
+
+              <span class="crumb active" [routerLink]="['/seats-booking']">Ticket</span>
+              <span class="separator">›</span>
+
+              <span class="crumb muted">Review & Pay</span>
+            </nav>
+          </div>
+        </div>
+
+        <!-- Right Column (empty to keep layout intact) -->
+        <div class="header-col actions-col"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- PAGE CONTENT -->
+  <main class="ticket-page">
+    <div class="ticket-container">
+      <!-- Event Meta -->
+      <div class="event-meta">
+        <h2 class="event-title">BEST IN STAND-UP: PUNE</h2>
+        <p class="event-sub">Boka Book Cafe, Pune • Sat 13 Dec | 08:30 PM</p>
+      </div>
+
+      <!-- Ticket Selection -->
+      <section class="ticket-section">
+        <h3 class="section-title">Select Tickets</h3>
+        <p class="section-sub">You can add up to 10 tickets only</p>
+
+        <!-- Ticket Card -->
+        <div class="ticket-card">
+          <div class="ticket-info">
+            <div class="ticket-name">EARLY BIRD</div>
+            <div class="ticket-price">₹249</div>
+          </div>
+
+          <div class="ticket-qty">
+            <button class="qty-btn">−</button>
+            <span class="qty-count">3</span>
+            <button class="qty-btn">+</button>
+          </div>
+        </div>
+
+        <!-- Ticket Card -->
+        <div class="ticket-card">
+          <div class="ticket-info">
+            <div class="ticket-name">ENTRY FOR 2</div>
+            <div class="ticket-price">₹399</div>
+          </div>
+
+          <button class="add-btn">Add</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- STICKY FOOTER BAR -->
+  <div class="ticket-footer">
+    <div class="ticket-footer-inner">
+      <div class="total">
+        <div class="amount">₹747</div>
+        <div class="count">3 Tickets</div>
+      </div>
+      <button class="proceed-btn">Proceed</button>
+    </div>
+  </div>
+</div>

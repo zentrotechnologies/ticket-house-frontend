@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
+import { ArtistResponse, ShowsByArtistsResponse, TestimonialResponse, TestimonialsResponse, UpcomingEventResponse, UpcomingEventsResponse } from '../../../core/models/auth.model';
+import { ApiService } from '../../../core/services/api.service';
 
 @Component({
   selector: 'app-events',
@@ -9,8 +11,146 @@ import { Router, RouterModule } from '@angular/router';
   templateUrl: './events.component.html',
   styleUrl: './events.component.css',
 })
-export class EventsComponent {
-  constructor(private router: Router) {}
+export class EventsComponent implements OnInit {
+  upcomingEvents: UpcomingEventResponse[] = [];
+  artists: ArtistResponse[] = [];
+  testimonials: TestimonialResponse[] = [];
+  currentTestimonialIndex = 0;
+
+  isLoadingEvents = false;
+  isLoadingArtists = false;
+  isLoadingTestimonials = false;
+
+  sectionTitle = 'Coming This Week';
+
+  constructor(
+    private router: Router,
+    private apiService: ApiService
+  ) { }
+
+  ngOnInit(): void {
+    this.loadUpcomingEvents();
+    this.loadArtists();
+    this.loadTestimonials();
+  }
+
+  loadUpcomingEvents(): void {
+    this.isLoadingEvents = true;
+
+    const request = {
+      Count: 8,
+      IncludeLaterEvents: true
+    };
+
+    this.apiService.getUpcomingEvents(request).subscribe({
+      next: (response: UpcomingEventsResponse) => {
+        if (response.status === 'Success' && response.data) {
+          this.upcomingEvents = response.data;
+
+          // Update section title based on number of events
+          if (this.upcomingEvents.length === 0) {
+            this.sectionTitle = 'No Upcoming Events';
+          } else if (this.upcomingEvents.length < 3) {
+            this.sectionTitle = 'Upcoming Events';
+          }
+        }
+      },
+      error: (error) => {
+        console.error('Error loading upcoming events:', error);
+      },
+      complete: () => {
+        this.isLoadingEvents = false;
+      }
+    });
+  }
+
+  loadArtists(): void {
+    this.isLoadingArtists = true;
+
+    const request = {
+      Count: 5
+    };
+
+    this.apiService.getShowsByArtists(request).subscribe({
+      next: (response: ShowsByArtistsResponse) => {
+        if (response.status === 'Success' && response.data) {
+          this.artists = response.data;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading artists:', error);
+      },
+      complete: () => {
+        this.isLoadingArtists = false;
+      }
+    });
+  }
+
+  loadTestimonials(): void {
+    this.isLoadingTestimonials = true;
+
+    this.apiService.getTestimonialsByArtists().subscribe({
+      next: (response: TestimonialsResponse) => {
+        if (response.status === 'Success' && response.data) {
+          this.testimonials = response.data;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading testimonials:', error);
+      },
+      complete: () => {
+        this.isLoadingTestimonials = false;
+      }
+    });
+  }
+
+  nextTestimonial(): void {
+    if (this.testimonials.length > 0) {
+      this.currentTestimonialIndex =
+        (this.currentTestimonialIndex + 1) % this.testimonials.length;
+    }
+  }
+
+  prevTestimonial(): void {
+    if (this.testimonials.length > 0) {
+      this.currentTestimonialIndex =
+        (this.currentTestimonialIndex - 1 + this.testimonials.length) % this.testimonials.length;
+    }
+  }
+
+  getCurrentTestimonial(): TestimonialResponse | null {
+    return this.testimonials.length > 0
+      ? this.testimonials[this.currentTestimonialIndex]
+      : null;
+  }
+
+  /* Helper method for date formatting in component */
+  formatDate(dateString: string): string {
+    if (!dateString) return '';
+
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      weekday: 'short',
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+  }
+
+  // Add the missing viewAllEvents method
+  viewAllEvents(): void {
+    // Navigate to a dedicated events listing page or show all events
+    this.router.navigate(['/events/all']);
+    
+    // OR if you want to implement a modal/dialog to show all events
+    // this.showAllEventsModal();
+  }
+
+  // Optional: Method to show more events in a modal
+  showAllEventsModal(): void {
+    // You can implement a modal/dialog to show all events
+    console.log('Show all events modal');
+  }
 
   onSignIn() {
     this.router.navigate(['/auth/login']);

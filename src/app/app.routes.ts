@@ -35,6 +35,20 @@ export const routes: Routes = [
         (m) => m.EventBookingComponent
       ),
   },
+  {
+    path: 'seats-booking',
+    loadComponent: () =>
+      import('./pages/user/seats-booking/seats-booking.component').then(
+        (m) => m.SeatsBookingComponent
+      ),
+  },
+  {
+    path: 'payment',
+    loadComponent: () =>
+      import('./pages/user/event-payment/event-payment.component').then(
+        (m) => m.EventPaymentComponent
+      ),
+  },
   // Protected routes with layout
   {
     path: '',

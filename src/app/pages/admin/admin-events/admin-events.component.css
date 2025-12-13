@@ -115,15 +115,15 @@ body.sidebar-collapsed .main-content,
 
 /* column widths for events */
 .col-sr { width: 4%; white-space: nowrap; }
-.col-name { width: 18%; }
-.col-desc { width: 25%; }
+.col-name { width: 12%; }
+.col-desc { width: 18%; }
 .col-date { width: 10%; }
 .col-time { width: 12%; }
-.col-duration { width: 8%; }
+.col-duration { width: 5%; }
 .col-location { width: 10%; }
 .col-language { width: 8%; }
-.col-status { width: 8%; }
-.col-action { width: 7%; }
+.col-status { width: 5%; }
+.col-action { width: 15%; }
 
 /* event name with banner image */
 .event-name-with-media {
@@ -513,6 +513,10 @@ button:disabled {
   background: #f0f9ff;
   color: #0369a1;
   border: 1px solid #bae6fd;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
 .status-inactive {

@@ -31,7 +31,7 @@
         <div class="col-md-2">
           <select class="form-control" [(ngModel)]="statusFilter" (change)="onSearch()">
             <option value="">All Status</option>
-            <option value="draft">Draft</option>
+            <!-- <option value="draft">Draft</option> -->
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
           </select>
@@ -88,8 +88,7 @@
           <tr *ngFor="let event of events; let i = index">
             <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
             <td>
-              <div class="event-name-with-media">
-                <!-- Change EventDetails to eventDetails -->
+              <!-- <div class="event-name-with-media">
                 <div class="event-banner-small" *ngIf="event.eventDetails.banner_image">
                   <img
                     [src]="event.eventDetails.banner_image"
@@ -103,9 +102,10 @@
                   </div>
                 </div>
                 <span>{{ event.eventDetails.event_name }}</span>
-              </div>
+              </div> -->
+              {{ event.eventDetails.event_name }}
             </td>
-            <td class="event-description">
+            <td>
               {{ event.eventDetails.event_description | slice : 0 : 100
               }}{{ event.eventDetails.event_description.length > 100 ? '...' : '' }}
             </td>
@@ -352,11 +352,13 @@
                   name="language"
                   required
                 >
-                  <option value="english">English</option>
+                  <!-- <option value="english">English</option>
                   <option value="spanish">Spanish</option>
                   <option value="french">French</option>
-                  <option value="german">German</option>
+                  <option value="german">German</option> -->
+                  <option value="marathi">Marathi</option>
                   <option value="hindi">Hindi</option>
+                  <option value="english">English</option>
                 </select>
               </div>
 
@@ -659,7 +661,7 @@
               <div class="form-row">
                 <label>Status *</label>
                 <select class="form-control" [(ngModel)]="eventForm.status" name="status" required>
-                  <option value="draft">Draft</option>
+                  <!-- <option value="draft">Draft</option> -->
                   <option value="active">Active</option>
                   <option value="inactive">Inactive</option>
                 </select>
@@ -868,7 +870,7 @@
                   name="language"
                   required
                 >
-                  <option value="english" [selected]="eventForm.language === 'english'">
+                  <!-- <option value="english" [selected]="eventForm.language === 'english'">
                     English
                   </option>
                   <option value="spanish" [selected]="eventForm.language === 'spanish'">
@@ -879,8 +881,10 @@
                   </option>
                   <option value="german" [selected]="eventForm.language === 'german'">
                     German
-                  </option>
+                  </option> -->
+                  <option value="english" [selected]="eventForm.language === 'marathi'">Marathi</option>
                   <option value="hindi" [selected]="eventForm.language === 'hindi'">Hindi</option>
+                  <option value="english" [selected]="eventForm.language === 'english'">English</option>
                 </select>
               </div>
 
@@ -1183,7 +1187,7 @@
               <div class="form-row">
                 <label>Status *</label>
                 <select class="form-control" [(ngModel)]="eventForm.status" name="status" required>
-                  <option value="draft" [selected]="eventForm.status === 'draft'">Draft</option>
+                  <!-- <option value="draft" [selected]="eventForm.status === 'draft'">Draft</option> -->
                   <option value="active" [selected]="eventForm.status === 'active'">Active</option>
                   <option value="inactive" [selected]="eventForm.status === 'inactive'">
                     Inactive

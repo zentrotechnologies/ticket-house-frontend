@@ -1,0 +1,122 @@
+<div class="audience-page audience-body">
+  <!-- HEADER -->
+  <header class="audience-header">
+    <div class="container">
+      <div class="header-row">
+        <!-- Left Section (Logo + Breadcrumbs) -->
+        <div class="header-col left-section-col">
+          <div class="left-section-content">
+            <!-- Logo -->
+            <div class="logo-wrapper">
+              <img
+                class="logo"
+                src="https://zentrotechnologies.com/wp-content/uploads/2025/02/Zentro_Final-Logo-05-scaled-e1753251642526.png"
+                alt="Zentro Logo"
+              />
+            </div>
+
+            <!-- Breadcrumbs -->
+            <nav class="breadcrumbs">
+              <span class="back-arrow" [routerLink]="['/events']">←</span>
+
+              <span class="crumb" [routerLink]="['/events']">Events</span>
+              <span class="separator">›</span>
+
+              <span class="crumb" [routerLink]="['/seats-booking']">Ticket</span>
+              <span class="separator">›</span>
+
+              <span class="crumb active muted">Review & Pay</span>
+            </nav>
+          </div>
+        </div>
+
+        <!-- Right Column (empty to keep layout intact) -->
+        <div class="header-col actions-col"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- PAGE CONTENT -->
+  <main class="payment-page">
+    <div class="payment-container">
+      <!-- LEFT SECTION -->
+      <section class="payment-left">
+        <div class="payment-card">
+          <h3 class="card-title">Please select from the following option(s)</h3>
+
+          <!-- M Ticket -->
+          <label class="radio-row">
+            <input type="radio" checked />
+            <div class="radio-content">
+              <div class="radio-title">M-Ticket</div>
+              <div class="radio-sub">Save the planet. Use your phone as a ticket.</div>
+            </div>
+          </label>
+
+          <!-- Info Box -->
+          <div class="info-box">
+            <h4>M-Ticket Information</h4>
+            <ol>
+              <li>
+                Customer(s) can access their ticket(s) from the ‘My Profile’ section on the
+                app/mobile-web.
+              </li>
+              <li>It is mandatory to present the ticket(s) via app/mobile-web at the venue.</li>
+              <li>No physical ticket(s) are required.</li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT SECTION -->
+      <aside class="payment-right">
+        <div class="summary-card">
+          <div class="summary-header">
+            <div class="summary-title">BEST IN STAND-UP: PUNE</div>
+            <div class="summary-amount">₹747.00</div>
+          </div>
+
+          <div class="summary-body">
+            <p>3 Tickets</p>
+            <p>Sat, 13 Dec 2025</p>
+            <p>08:30 PM</p>
+            <p class="muted">Venue</p>
+            <p>Boka Book Cafe: Pune</p>
+
+            <hr />
+
+            <p>EARLY BIRD (₹249) · 3 ticket(s)</p>
+          </div>
+        </div>
+
+        <div class="price-breakup">
+          <div class="row">
+            <span>Sub-total</span>
+            <span>₹747.00</span>
+          </div>
+
+          <div class="row">
+            <span>Booking Fee</span>
+            <span>₹61.71</span>
+          </div>
+
+          <div class="row total">
+            <span>Total Amount</span>
+            <span>₹808.71</span>
+          </div>
+
+          <div class="state-select">
+            <label>Select State</label>
+            <select>
+              <option>Maharashtra</option>
+            </select>
+          </div>
+
+          <p class="consent">By proceeding, I express my consent to complete this transaction.</p>
+
+          <button class="pay-btn">Proceed to Pay</button>
+        </div>
+      </aside>
+    </div>
+  </main>
+</div>

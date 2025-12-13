@@ -35,178 +35,149 @@
     </div>
   </header>
 
-<!-- events-page.component.html -->
-<div class="events-page">
+  <!-- events-page.component.html -->
+  <div class="events-page">
     <section class="hero">
-        <div class="events-container">
-            <span class="badge">Satrangi Re</span>
-            <h1>PUNE — <small>By Sonu Nigam</small></h1>
-            <p class="hero-sub">Experience the musical night in the city with live performance</p>
-            <div class="date-pill">10th January 2026</div>
-        </div>
+      <div class="events-container">
+        <span class="badge">Satrangi Re</span>
+        <h1>PUNE — <small>By Sonu Nigam</small></h1>
+        <p class="hero-sub">Experience the musical night in the city with live performance</p>
+        <div class="date-pill">10th January 2026</div>
+      </div>
     </section>
 
     <main class="events-main">
-        <div class="events-container">
-            <!-- Coming This Week -->
-            <section class="events-section">
-                <h2 class="section-title">Coming This Week</h2>
+      <div class="events-container">
+        <!-- Coming This Week -->
+        <section class="events-section">
+          <h2 class="section-title">{{ sectionTitle }}</h2>
 
-                <div class="cards-grid">
-                    <!-- 10 static cards -->
-                    <div class="event-card">
-                        <div class="poster poster1"></div>
-                        <p class="meta">Sun, 5 Nov 2025, 7:00 pm</p>
-                        <p class="title">Papa Yaar - Zakir Khan Live</p>
-                        <p class="meta">Pandit Farms Pune</p>
-                    </div>
+          <div *ngIf="isLoadingEvents" class="loading-spinner">Loading events...</div>
 
-                    <div class="event-card">
-                        <div class="poster poster1"></div>
-                        <p class="meta">Sun, 5 Nov 2025, 7:00 pm</p>
-                        <p class="title">Papa Yaar - Zakir Khan Live</p>
-                        <p class="meta">Pandit Farms Pune</p>
-                    </div>
+          <div *ngIf="!isLoadingEvents && upcomingEvents.length === 0" class="no-events">
+            <p>No upcoming events found.</p>
+          </div>
 
-                    <div class="event-card">
-                        <div class="poster poster1"></div>
-                        <p class="meta">Sun, 5 Nov 2025, 7:00 pm</p>
-                        <p class="title">Papa Yaar - Zakir Khan Live</p>
-                        <p class="meta">Pandit Farms Pune</p>
-                    </div>
+          <div *ngIf="!isLoadingEvents && upcomingEvents.length > 0" class="cards-grid">
+            <div *ngFor="let event of upcomingEvents" class="event-card">
+              <div
+                class="poster"
+                [style.background-image]="
+                  'url(' +
+                  (event.banner_image ||
+                    'https://images.unsplash.com/photo-1526178611801-4f9d2f6d1a6c?w=800&q=60') +
+                  ')'
+                "
+              ></div>
+              <p class="meta">
+                {{ event.formatted_date || formatDate(event.event_date) }}, {{ event.start_time }}
+              </p>
+              <p class="title">{{ event.event_name }}</p>
+              <p class="meta">{{ event.location }}</p>
+            </div>
+          </div>
 
-                    <div class="event-card">
-                        <div class="poster poster1"></div>
-                        <p class="meta">Sun, 5 Nov 2025, 7:00 pm</p>
-                        <p class="title">Papa Yaar - Zakir Khan Live</p>
-                        <p class="meta">Pandit Farms Pune</p>
-                    </div>
+          <!-- Add View All Button - Only if you've implemented the method -->
+          <!--
+          <div *ngIf="upcomingEvents.length > 0" class="view-all-container">
+            <button class="view-all-btn" (click)="viewAllEvents()">View All Upcoming Events</button>
+          </div>
+          -->
+        </section>
 
-                    <div class="event-card">
-                        <div class="poster poster1"></div>
-                        <p class="meta">Sun, 5 Nov 2025, 7:00 pm</p>
-                        <p class="title">Papa Yaar - Zakir Khan Live</p>
-                        <p class="meta">Pandit Farms Pune</p>
-                    </div>
+        <!-- Show by Artist -->
+        <section class="artist-strip">
+          <h2 class="section-title">Show by Artist</h2>
 
-                    <div class="event-card">
-                        <div class="poster poster1"></div>
-                        <p class="meta">Sun, 5 Nov 2025, 7:00 pm</p>
-                        <p class="title">Papa Yaar - Zakir Khan Live</p>
-                        <p class="meta">Pandit Farms Pune</p>
-                    </div>
+          <div *ngIf="isLoadingArtists" class="loading-spinner">Loading artists...</div>
 
-                    <div class="event-card">
-                        <div class="poster poster1"></div>
-                        <p class="meta">Sun, 5 Nov 2025, 7:00 pm</p>
-                        <p class="title">Papa Yaar - Zakir Khan Live</p>
-                        <p class="meta">Pandit Farms Pune</p>
-                    </div>
+          <div *ngIf="!isLoadingArtists && artists.length === 0" class="no-artists">
+            <p>No artists found.</p>
+          </div>
 
-                    <div class="event-card">
-                        <div class="poster poster1"></div>
-                        <p class="meta">Sun, 5 Nov 2025, 7:00 pm</p>
-                        <p class="title">Papa Yaar - Zakir Khan Live</p>
-                        <p class="meta">Pandit Farms Pune</p>
-                    </div>
+          <div *ngIf="!isLoadingArtists && artists.length > 0" class="artist-list">
+            <div *ngFor="let artist of artists" class="artist-card">
+              <div
+                class="artist-pic"
+                [style.background-image]="
+                  'url(' +
+                  (artist.artist_photo ||
+                    'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&q=60') +
+                  ')'
+                "
+              ></div>
+              <p class="name">{{ artist.artist_name }}</p>
+              <p class="role">{{ artist.role }}</p>
+            </div>
+          </div>
+        </section>
 
-                    <div class="event-card">
-                        <div class="poster poster1"></div>
-                        <p class="meta">Sun, 5 Nov 2025, 7:00 pm</p>
-                        <p class="title">Papa Yaar - Zakir Khan Live</p>
-                        <p class="meta">Pandit Farms Pune</p>
-                    </div>
+        <!-- Testimonial -->
+        <section class="testimonial-section">
+          <h2 class="section-title">Testimonial by Artists</h2>
 
-                    <div class="event-card">
-                        <div class="poster poster1"></div>
-                        <p class="meta">Sun, 5 Nov 2025, 7:00 pm</p>
-                        <p class="title">Papa Yaar - Zakir Khan Live</p>
-                        <p class="meta">Pandit Farms Pune</p>
-                    </div>
-                </div>
-            </section>
+          <div *ngIf="isLoadingTestimonials" class="loading-spinner">Loading testimonials...</div>
 
-            <!-- Show by Artist -->
-            <section class="artist-strip">
-                <h2 class="section-title">Show by Artist</h2>
+          <div *ngIf="!isLoadingTestimonials && testimonials.length === 0" class="no-testimonials">
+            <p>No testimonials found.</p>
+          </div>
 
-                <div class="artist-list">
-                    <div class="artist-card">
-                        <div class="artist-pic pic1"></div>
-                        <p class="name">Zakir Khan</p>
-                        <p class="role">Stand-up Comedian</p>
-                    </div>
+          <div *ngIf="!isLoadingTestimonials && testimonials.length > 0" class="testimonial">
+            <div
+              class="test-img"
+              [style.background-image]="
+                'url(' +
+                (getCurrentTestimonial()?.profile_img ||
+                  'https://images.unsplash.com/photo-1504814532845-3f33f25f2b2d?w=1200&q=60') +
+                ')'
+              "
+            ></div>
+            <div class="test-text">
+              <h3>{{ getCurrentTestimonial()?.name || 'Saurabh Bhosale' }}</h3>
+              <p class="role">
+                {{ getCurrentTestimonial()?.role || 'Stand-up Comedian & Storyteller' }}
+              </p>
+              <p class="desc">
+                {{
+                  getCurrentTestimonial()?.description ||
+                    'Finally, a platform built for performers like us! Managing small shows and stand-up gigs has never been this easy. From listing events to tracking sales — everything feels simple and reliable.'
+                }}
+              </p>
+            </div>
+            <div class="arrow" (click)="nextTestimonial()">❯</div>
+          </div>
+        </section>
 
-                    <div class="artist-card">
-                        <div class="artist-pic pic1"></div>
-                        <p class="name">Zakir Khan</p>
-                        <p class="role">Stand-up Comedian</p>
-                    </div>
-
-                    <div class="artist-card">
-                        <div class="artist-pic pic1"></div>
-                        <p class="name">Zakir Khan</p>
-                        <p class="role">Stand-up Comedian</p>
-                    </div>
-
-                    <div class="artist-card">
-                        <div class="artist-pic pic1"></div>
-                        <p class="name">Zakir Khan</p>
-                        <p class="role">Stand-up Comedian</p>
-                    </div>
-
-                    <div class="artist-card">
-                        <div class="artist-pic pic1"></div>
-                        <p class="name">Zakir Khan</p>
-                        <p class="role">Stand-up Comedian</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Testimonial -->
-            <section class="testimonial-section">
-                <h2 class="section-title">Testimonial by Artists</h2>
-
-                <div class="testimonial">
-                    <div class="test-img"></div>
-                    <div class="test-text">
-                        <h3>Saurabh Bhosale</h3>
-                        <p class="role">Stand-up Comedian & Storyteller</p>
-                        <p class="desc">
-                            Finally, a platform built for performers like us! Managing small shows and stand-up gigs
-                            has never been this easy. From listing events to tracking sales — everything feels simple
-                            and reliable.
-                        </p>
-                    </div>
-                    <div class="arrow">❯</div>
-                </div>
-            </section>
-
-            <!-- CTA -->
-            <section class="cta-section">
-                <div class="cta">
-                    <p class="cta-text">List Your Show — It's Free!</p>
-                    <button class="cta-btn">Contact Us</button>
-                </div>
-            </section>
-        </div>
+        <!-- CTA -->
+        <section class="cta-section">
+          <div class="cta">
+            <p class="cta-text">List Your Show — It's Free!</p>
+            <button class="cta-btn">Contact Us</button>
+          </div>
+        </section>
+      </div>
     </main>
 
     <footer class="events-footer">
-        <div class="events-container">
-            <div class="footer-content">
-                <img src="https://zentrotechnologies.com/wp-content/uploads/2025/02/Zentro_Final-Logo-05-scaled-e1753251642526.png" class="footer-logo" alt="Zentro Logo">
-                <div class="footer-links">
-                    <span>List Your Event</span>
-                    <span>|</span>
-                    <span>Help & Support</span>
-                    <span>|</span>
-                    <span>Terms & Conditions</span>
-                    <span>|</span>
-                    <span>Privacy Policy</span>
-                </div>
-                <p class="copy">© 2025 Ticket House – All rights reserved.</p>
-            </div>
+      <div class="events-container">
+        <div class="footer-content">
+          <img
+            src="https://zentrotechnologies.com/wp-content/uploads/2025/02/Zentro_Final-Logo-05-scaled-e1753251642526.png"
+            class="footer-logo"
+            alt="Zentro Logo"
+          />
+          <div class="footer-links">
+            <span>List Your Event</span>
+            <span>|</span>
+            <span>Help & Support</span>
+            <span>|</span>
+            <span>Terms & Conditions</span>
+            <span>|</span>
+            <span>Privacy Policy</span>
+          </div>
+          <p class="copy">© 2025 Ticket House – All rights reserved.</p>
         </div>
+      </div>
     </footer>
+  </div>
 </div>
