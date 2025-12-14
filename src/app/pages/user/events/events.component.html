@@ -8,11 +8,9 @@
           <div class="left-section-content">
             <!-- Logo -->
             <div class="logo-wrapper">
-              <img
-                class="logo"
+              <img class="logo"
                 src="https://zentrotechnologies.com/wp-content/uploads/2025/02/Zentro_Final-Logo-05-scaled-e1753251642526.png"
-                alt="Zentro Logo"
-              />
+                alt="Zentro Logo" />
             </div>
 
             <!-- Search -->
@@ -59,7 +57,7 @@
           </div>
 
           <div *ngIf="!isLoadingEvents && upcomingEvents.length > 0" class="cards-grid">
-            <div *ngFor="let event of upcomingEvents" class="event-card">
+            <!-- <div *ngFor="let event of upcomingEvents" class="event-card">
               <div
                 class="poster"
                 [style.background-image]="
@@ -74,6 +72,23 @@
               </p>
               <p class="title">{{ event.event_name }}</p>
               <p class="meta">{{ event.location }}</p>
+            </div> -->
+
+            <div *ngFor="let event of upcomingEvents" class="event-card">
+              <div class="card-content" (click)="onEventClick(event)">
+                <div class="poster" [style.background-image]="
+                    'url(' +
+                    (event.banner_image ||
+                      'https://images.unsplash.com/photo-1526178611801-4f9d2f6d1a6c?w=800&q=60') +
+                    ')'
+                  ">
+                </div>
+                <p class="meta">
+                  {{ event.formatted_date || formatEventDate(event.event_date) }}, {{ event.start_time }}
+                </p>
+                <p class="title">{{ event.event_name }}</p>
+                <p class="meta">{{ event.location }}</p>
+              </div>
             </div>
           </div>
 
@@ -97,15 +112,12 @@
 
           <div *ngIf="!isLoadingArtists && artists.length > 0" class="artist-list">
             <div *ngFor="let artist of artists" class="artist-card">
-              <div
-                class="artist-pic"
-                [style.background-image]="
+              <div class="artist-pic" [style.background-image]="
                   'url(' +
                   (artist.artist_photo ||
                     'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&q=60') +
                   ')'
-                "
-              ></div>
+                "></div>
               <p class="name">{{ artist.artist_name }}</p>
               <p class="role">{{ artist.role }}</p>
             </div>
@@ -123,7 +135,7 @@
           </div>
 
           <div *ngIf="!isLoadingTestimonials && testimonials.length > 0" class="testimonial">
-            <div
+            <!-- <div
               class="test-img"
               [style.background-image]="
                 'url(' +
@@ -131,7 +143,13 @@
                   'https://images.unsplash.com/photo-1504814532845-3f33f25f2b2d?w=1200&q=60') +
                 ')'
               "
-            ></div>
+            ></div> -->
+            <div class="test-img" [style.background-image]="
+                'url(' +
+                (
+                  'assets/default-avatar.png') +
+                ')'
+              "></div>
             <div class="test-text">
               <h3>{{ getCurrentTestimonial()?.name || 'Saurabh Bhosale' }}</h3>
               <p class="role">
@@ -139,8 +157,9 @@
               </p>
               <p class="desc">
                 {{
-                  getCurrentTestimonial()?.description ||
-                    'Finally, a platform built for performers like us! Managing small shows and stand-up gigs has never been this easy. From listing events to tracking sales — everything feels simple and reliable.'
+                getCurrentTestimonial()?.description ||
+                'Finally, a platform built for performers like us! Managing small shows and stand-up gigs has never been
+                this easy. From listing events to tracking sales — everything feels simple and reliable.'
                 }}
               </p>
             </div>
@@ -163,9 +182,7 @@
         <div class="footer-content">
           <img
             src="https://zentrotechnologies.com/wp-content/uploads/2025/02/Zentro_Final-Logo-05-scaled-e1753251642526.png"
-            class="footer-logo"
-            alt="Zentro Logo"
-          />
+            class="footer-logo" alt="Zentro Logo" />
           <div class="footer-links">
             <span>List Your Event</span>
             <span>|</span>

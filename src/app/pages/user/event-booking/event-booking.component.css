@@ -1010,3 +1010,338 @@ booking-page {
     margin-left: 0 !important;
   }
 }
+
+/* Loading State */
+.loading-container {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.loading-spinner {
+  font-size: 18px;
+  color: var(--muted);
+}
+
+.loading-mini {
+  text-align: center;
+  padding: 20px;
+  color: var(--muted);
+}
+
+/* Error State */
+.error-container {
+  text-align: center;
+  padding: 80px 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.error-container h2 {
+  color: var(--primary);
+  margin-bottom: 16px;
+}
+
+.error-container p {
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+
+.back-btn {
+  background: var(--primary);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  background: #1e2060;
+}
+
+/* Mini Card Hover */
+.mini-card {
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.mini-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(36, 50, 80, 0.15);
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .booking-layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .event-title {
+    font-size: 24px;
+  }
+  
+  .shows-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Featured tag style */
+.tag.featured {
+    background: linear-gradient(135deg, #ffd700, #ffa500);
+    color: #000;
+    font-weight: 700;
+}
+
+/* Category tag style */
+.tag {
+    background: #f3f6fb;
+    color: var(--primary);
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 13px;
+    border: 1px solid rgba(72, 150, 209, 0.08);
+}
+
+/* Loading states */
+.loading-container {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.loading-spinner {
+    font-size: 18px;
+    color: var(--muted);
+}
+
+.loading-mini {
+    text-align: center;
+    padding: 20px;
+    color: var(--muted);
+}
+
+/* Error State */
+.error-container {
+    text-align: center;
+    padding: 80px 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.error-container h2 {
+    color: var(--primary);
+    margin-bottom: 16px;
+}
+
+.error-container p {
+    color: var(--muted);
+    margin-bottom: 24px;
+}
+
+.back-btn {
+    background: var(--primary);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+    background: #1e2060;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .booking-layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .event-title {
+        font-size: 24px;
+    }
+    
+    .shows-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .tags {
+        flex-wrap: wrap;
+    }
+}
+
+/* ======================== */
+/* BANNER IMAGE FIXES */
+/* ======================== */
+
+/* Hero / banner with fixed aspect ratio */
+.event-hero {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    width: 100%;
+}
+
+/* Fixed aspect ratio container (16:9 recommended for banners) */
+.hero-img {
+    width: 100%;
+    position: relative;
+    padding-top: 37.5%; /* 16:9 aspect ratio (9/16 = 0.5625 * 100 = 56.25%) */
+    /* Alternative ratios: */
+    /* 21:9 = 42.85% */
+    /* 16:9 = 56.25% (Recommended for banners) */
+    /* 4:3 = 75% */
+    /* 1:1 = 100% */
+    border-radius: 14px;
+    overflow: hidden;
+    background-color: #f5f7fa; /* Fallback background color */
+}
+
+.hero-img img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* This is key - covers the container while maintaining aspect ratio */
+    object-position: center; /* Centers the image */
+    display: block;
+}
+
+/* Sidebar poster with fixed size */
+.sidebar-poster {
+    width: 56px;
+    height: 56px;
+    border-radius: 10px;
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.sidebar-poster img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Similar shows mini posters with fixed aspect ratio */
+.mini-poster {
+    height: 120px;
+    border-radius: 10px;
+    background: #ddd center/cover no-repeat;
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+.mini-poster::before {
+    content: '';
+    display: block;
+    padding-top: 66.67%; /* 3:2 aspect ratio */
+}
+
+/* ======================== */
+/* EVENTS PAGE BANNER FIXES */
+/* ======================== */
+
+/* For events page cards */
+.poster {
+    height: 200px;
+    border-radius: 12px;
+    background-size: cover;
+    background-position: center;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+}
+
+.poster::before {
+    content: '';
+    display: block;
+    padding-top: 66.67%; /* 3:2 aspect ratio */
+}
+
+/* Ensure background images cover properly */
+.poster,
+.mini-poster {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* ======================== */
+/* LOADING STATES FOR IMAGES */
+/* ======================== */
+
+/* Loading placeholder for images */
+.image-loading {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ======================== */
+/* RESPONSIVE ADJUSTMENTS */
+/* ======================== */
+
+@media (max-width: 1024px) {
+    .hero-img {
+        padding-top: 42.85%; /* Slightly taller on tablets (21:9) */
+    }
+    
+    .poster {
+        height: 180px;
+    }
+    
+    .mini-poster {
+        height: 100px;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-img {
+        padding-top: 56.25%; /* 16:9 on mobile */
+        border-radius: 12px;
+    }
+    
+    .poster {
+        height: 160px;
+    }
+    
+    .mini-poster {
+        height: 90px;
+    }
+    
+    .sidebar-poster {
+        width: 50px;
+        height: 50px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-img {
+        padding-top: 66.67%; /* 3:2 on very small screens */
+    }
+    
+    .poster {
+        height: 140px;
+    }
+    
+    .mini-poster {
+        height: 80px;
+    }
+}

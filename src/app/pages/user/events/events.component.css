@@ -215,7 +215,8 @@
 }
 
 .test-img {
-    width: 300px;
+    /* width: 300px; */
+    width: 205px;
     height: 200px;
     border-radius: 16px;
     background: url('https://images.unsplash.com/photo-1504814532845-3f33f25f2b2d?w=1200&q=60') center/cover;
@@ -264,8 +265,10 @@
 }
 
 .arrow:hover {
-    background: var(--primary);
-    color: #fff;
+    /* background: var(--primary); 
+    color: #fff;  */
+    background: #f0f4ff;
+    color: #4896d1;
 }
 
 /* CTA SECTION */

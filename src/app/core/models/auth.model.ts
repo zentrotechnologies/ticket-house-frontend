@@ -309,6 +309,7 @@ export interface EventDetailsModel {
   longitude: number | null;
   language: string;
   event_category_id: number;
+  event_category_name?: string; //to display in event booking
   banner_image: string;
   gallery_media: string; // JSON string
   // gallery_media: any; // Changed from string to any for JSON object
@@ -452,3 +453,12 @@ export interface GetShowsByArtistsRequest {
 export interface UpcomingEventsResponse extends CommonResponseModel<UpcomingEventResponse[]> {}
 export interface ShowsByArtistsResponse extends CommonResponseModel<ArtistResponse[]> {}
 export interface TestimonialsResponse extends CommonResponseModel<TestimonialResponse[]> {}
+
+export interface SimilarEventsRequest {
+  categoryId: number;
+  excludeEventId: number;
+  count?: number;
+}
+
+// Add to auth.model.ts
+export interface SimilarEventsResponse extends CommonResponseModel<UpcomingEventResponse[]> {}

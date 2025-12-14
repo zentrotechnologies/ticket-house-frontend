@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ArtistResponse, ShowsByArtistsResponse, TestimonialResponse, TestimonialsResponse, UpcomingEventResponse, UpcomingEventsResponse } from '../../../core/models/auth.model';
 import { ApiService } from '../../../core/services/api.service';
 
@@ -25,7 +25,8 @@ export class EventsComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
@@ -154,5 +155,46 @@ export class EventsComponent implements OnInit {
 
   onSignIn() {
     this.router.navigate(['/auth/login']);
+  }
+
+  // Add click handler for event cards
+  onEventClick(event: UpcomingEventResponse): void {
+    // Create URL-friendly event name
+    const eventNameSlug = this.createSlug(event.event_name);
+    
+    // Navigate to event-booking with event_id and event_name in route
+    this.router.navigate(['/event-booking', event.event_id, eventNameSlug]);
+    
+    // Alternative: Using query params
+    // this.router.navigate(['/event-booking'], {
+    //   queryParams: { 
+    //     event_id: event.event_id,
+    //     event_name: eventNameSlug 
+    //   }
+    // });
+  }
+
+  // Helper method to create URL slug
+  private createSlug(text: string): string {
+    return text
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '') // Remove special characters
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/--+/g, '-') // Replace multiple hyphens with single
+      .trim();
+  }
+
+  // Optional: Format date for display
+  formatEventDate(dateString: string | Date): string {
+    if (!dateString) return '';
+    
+    const date = new Date(dateString);
+    const options: Intl.DateTimeFormatOptions = { 
+      weekday: 'short', 
+      day: 'numeric', 
+      month: 'short', 
+      year: 'numeric' 
+    };
+    return date.toLocaleDateString('en-US', options);
   }
 }

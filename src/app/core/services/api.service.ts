@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { CommonResponse, CommonResponseModel, EventCategoryModel, EventCategoryRequest, EventCompleteResponseModel, EventCreateRequestModel, EventDetailsModel, EventPaginationRequest, GenerateOTPRequest, GetShowsByArtistsRequest, OrganizerModel, OrganizerPagedResponse, OrganizerRequest, OTPResponse, PagedResponse, PaginationRequest, ResendOTPRequest, ResendOTPResponse, ShowsByArtistsResponse, SignUpRequest, SignUpResponse, TestimonialModel, TestimonialsResponse, UpcomingEventsRequest, UpcomingEventsResponse, UpdateEventCategoryStatusRequest, UpdateOrganizerStatusRequest, UpdateTestimonialStatusRequest, UserIdRequest, VerifyOTPRequest } from '../models/auth.model';
+import { CommonResponse, CommonResponseModel, EventCategoryModel, EventCategoryRequest, EventCompleteResponseModel, EventCreateRequestModel, EventDetailsModel, EventPaginationRequest, GenerateOTPRequest, GetShowsByArtistsRequest, OrganizerModel, OrganizerPagedResponse, OrganizerRequest, OTPResponse, PagedResponse, PaginationRequest, ResendOTPRequest, ResendOTPResponse, ShowsByArtistsResponse, SignUpRequest, SignUpResponse, SimilarEventsRequest, TestimonialModel, TestimonialsResponse, UpcomingEventResponse, UpcomingEventsRequest, UpcomingEventsResponse, UpdateEventCategoryStatusRequest, UpdateOrganizerStatusRequest, UpdateTestimonialStatusRequest, UserIdRequest, VerifyOTPRequest } from '../models/auth.model';
 
 @Injectable({
   providedIn: 'root',
@@ -260,5 +260,17 @@ export class ApiService {
   getTestimonialsByArtists(): Observable<TestimonialsResponse> {
     const url = `${this.ThApi}api/UserEvents/GetTestimonialsByArtists`;
     return this.httpClient.get<TestimonialsResponse>(url);
+  }
+
+  // Get event details by ID
+  getEventDetailsById(eventId: number): Observable<CommonResponseModel<EventDetailsModel>> {
+    const url = `${this.ThApi}api/UserEvents/GetEventDetailsById/${eventId}`;
+    return this.httpClient.get<CommonResponseModel<EventDetailsModel>>(url);
+  }
+
+  // Get similar events
+  getSimilarEventsByCategory(request: SimilarEventsRequest): Observable<CommonResponseModel<UpcomingEventResponse[]>> {
+    const url = `${this.ThApi}api/UserEvents/GetSimilarEventsByCategory`;
+    return this.httpClient.post<CommonResponseModel<UpcomingEventResponse[]>>(url, request);
   }
 }

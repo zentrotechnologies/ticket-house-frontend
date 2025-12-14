@@ -28,13 +28,28 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/user/events/events.component').then((m) => m.EventsComponent),
   },
+  // {
+  //   path: 'event-booking',
+  //   loadComponent: () =>
+  //     import('./pages/user/event-booking/event-booking.component').then(
+  //       (m) => m.EventBookingComponent
+  //     ),
+  // },
   {
-    path: 'event-booking',
+    path: 'event-booking/:event_id/:event_name',
     loadComponent: () =>
       import('./pages/user/event-booking/event-booking.component').then(
         (m) => m.EventBookingComponent
       ),
   },
+  // Alternative with query params:
+  // {
+  //   path: 'event-booking',
+  //   loadComponent: () =>
+  //     import('./pages/user/event-booking/event-booking.component').then(
+  //       (m) => m.EventBookingComponent
+  //     ),
+  // },
   {
     path: 'seats-booking',
     loadComponent: () =>
