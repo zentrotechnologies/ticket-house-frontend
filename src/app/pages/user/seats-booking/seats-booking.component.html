@@ -15,14 +15,18 @@
               />
             </div>
 
-            <!-- Breadcrumbs -->
+            <!-- Updated Breadcrumbs with proper navigation -->
             <nav class="breadcrumbs">
               <span class="back-arrow" [routerLink]="['/events']">←</span>
 
               <span class="crumb" [routerLink]="['/events']">Events</span>
               <span class="separator">›</span>
 
-              <span class="crumb active" [routerLink]="['/seats-booking']">Ticket</span>
+              <!-- Link back to the event booking page -->
+              <span class="crumb" [routerLink]="['/event-booking', eventId, eventNameSlug]">{{ getEventTitle() }}</span>
+              <span class="separator">›</span>
+
+              <span class="crumb active">Select Seats</span>
               <span class="separator">›</span>
 
               <span class="crumb muted">Review & Pay</span>
@@ -31,18 +35,29 @@
         </div>
 
         <!-- Right Column (empty to keep layout intact) -->
-        <div class="header-col actions-col"></div>
+        <div class="header-col actions-col">
+          <div class="user-actions">
+            <div class="location muted">Pune ▼</div>
+            <div class="pill" (click)="onSignIn()">Sign In</div>
+          </div>
+        </div>
       </div>
     </div>
   </header>
 
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="loading-spinner">Loading seat selection...</div>
+  </div>
+
   <!-- PAGE CONTENT -->
-  <main class="ticket-page">
+  <main class="ticket-page" *ngIf="!isLoading">
     <div class="ticket-container">
-      <!-- Event Meta -->
+      <!-- Event Meta - Dynamic -->
       <div class="event-meta">
-        <h2 class="event-title">BEST IN STAND-UP: PUNE</h2>
-        <p class="event-sub">Boka Book Cafe, Pune • Sat 13 Dec | 08:30 PM</p>
+        <h2 class="event-title">{{ getEventTitle() }}</h2>
+        <p class="event-sub">Select your seats for {{ getEventTitle() }}</p>
+        <!-- You can add more dynamic details here if you fetch event details -->
       </div>
 
       <!-- Ticket Selection -->
@@ -78,7 +93,7 @@
   </main>
 
   <!-- STICKY FOOTER BAR -->
-  <div class="ticket-footer">
+  <div class="ticket-footer" *ngIf="!isLoading">
     <div class="ticket-footer-inner">
       <div class="total">
         <div class="amount">₹747</div>

@@ -51,7 +51,7 @@ export const routes: Routes = [
   //     ),
   // },
   {
-    path: 'seats-booking',
+    path: 'seats-booking/:event_id/:event_name',
     loadComponent: () =>
       import('./pages/user/seats-booking/seats-booking.component').then(
         (m) => m.SeatsBookingComponent

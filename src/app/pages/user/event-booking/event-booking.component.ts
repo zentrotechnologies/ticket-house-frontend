@@ -201,9 +201,11 @@ export class EventBookingComponent implements OnInit {
   // Book Now action
   onBookNow(): void {
     if (this.eventDetails) {
-      this.router.navigate(['/seats-booking'], {
-        queryParams: { event_id: this.eventId }
-      });
+      // Create URL-friendly event name
+      const eventNameSlug = this.createSlug(this.eventDetails.event_name);
+      
+      // Navigate to seats-booking with both event_id and event_name
+      this.router.navigate(['/seats-booking', this.eventId, eventNameSlug]);
     }
   }
 
