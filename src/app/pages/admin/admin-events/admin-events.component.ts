@@ -1,7 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { EventCompleteResponseModel, EventDetailsModel, EventArtistModel, EventGalleryModel, EventPaginationRequest, EventCreateRequestModel, EventCategoryModel } from '../../../core/models/auth.model';
+import {
+  EventCompleteResponseModel,
+  EventDetailsModel,
+  EventArtistModel,
+  EventGalleryModel,
+  EventPaginationRequest,
+  EventCreateRequestModel,
+  EventCategoryModel,
+} from '../../../core/models/auth.model';
 import { ApiService } from '../../../core/services/api.service';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -62,7 +70,7 @@ export class AdminEventsComponent implements OnInit {
     created_at: '',
     updated_by: '',
     updated_at: null,
-    active: 1
+    active: 1,
   };
 
   // Artists and Galleries
@@ -88,7 +96,7 @@ export class AdminEventsComponent implements OnInit {
   categories: EventCategoryModel[] = [];
   isLoadingCategories: boolean = false;
 
-  constructor(private apiService: ApiService, private authService: AuthService) { }
+  constructor(private apiService: ApiService, private authService: AuthService) {}
 
   ngOnInit(): void {
     // Get current user from localStorage or AuthService
@@ -128,7 +136,6 @@ export class AdminEventsComponent implements OnInit {
         this.eventForm.created_by = this.userId;
         this.eventForm.updated_by = this.userId;
         this.eventForm.organizer_id = this.userId; // Set organizer_id with user_id
-
       } catch (error) {
         console.error('Error parsing current user:', error);
       }
@@ -162,7 +169,7 @@ export class AdminEventsComponent implements OnInit {
       },
       complete: () => {
         this.isLoadingCategories = false;
-      }
+      },
     });
   }
 
@@ -174,7 +181,7 @@ export class AdminEventsComponent implements OnInit {
       SearchText: this.searchText,
       Status: this.statusFilter,
       FromDate: this.fromDate || null,
-      ToDate: this.toDate || null
+      ToDate: this.toDate || null,
     };
 
     this.apiService.getPaginatedEventsByCreatedBy(request).subscribe({
@@ -188,7 +195,7 @@ export class AdminEventsComponent implements OnInit {
       error: (error) => {
         console.error('Error loading events:', error);
         alert('Failed to load events');
-      }
+      },
     });
   }
 
@@ -273,7 +280,7 @@ export class AdminEventsComponent implements OnInit {
         created_on: new Date().toISOString(),
         updated_by: this.eventForm.created_by,
         updated_on: null,
-        active: 1
+        active: 1,
       };
 
       // Store the file with the artist
@@ -285,39 +292,37 @@ export class AdminEventsComponent implements OnInit {
       // For existing events, upload immediately
       this.isUploadingArtist = true;
 
-      this.apiService.uploadArtistPhoto(
-        this.eventForm.event_id,
-        this.newArtistName,
-        this.newArtistPhoto!
-      ).subscribe({
-        next: (response) => {
-          if (response.status === 'Success' && response.data) {
-            const artist: EventArtistModel = {
-              event_artist_id: 0,
-              event_id: this.eventForm.event_id,
-              artist_name: this.newArtistName,
-              artist_photo: response.data,
-              created_by: this.eventForm.created_by,
-              created_on: new Date().toISOString(),
-              updated_by: this.eventForm.created_by,
-              updated_on: null,
-              active: 1
-            };
+      this.apiService
+        .uploadArtistPhoto(this.eventForm.event_id, this.newArtistName, this.newArtistPhoto!)
+        .subscribe({
+          next: (response) => {
+            if (response.status === 'Success' && response.data) {
+              const artist: EventArtistModel = {
+                event_artist_id: 0,
+                event_id: this.eventForm.event_id,
+                artist_name: this.newArtistName,
+                artist_photo: response.data,
+                created_by: this.eventForm.created_by,
+                created_on: new Date().toISOString(),
+                updated_by: this.eventForm.created_by,
+                updated_on: null,
+                active: 1,
+              };
 
-            this.artists.push(artist);
-            this.resetArtistForm();
-          } else {
-            alert(response.message || 'Failed to upload artist photo');
-          }
-        },
-        error: (error) => {
-          console.error('Error uploading artist photo:', error);
-          alert('Failed to upload artist photo');
-        },
-        complete: () => {
-          this.isUploadingArtist = false;
-        }
-      });
+              this.artists.push(artist);
+              this.resetArtistForm();
+            } else {
+              alert(response.message || 'Failed to upload artist photo');
+            }
+          },
+          error: (error) => {
+            console.error('Error uploading artist photo:', error);
+            alert('Failed to upload artist photo');
+          },
+          complete: () => {
+            this.isUploadingArtist = false;
+          },
+        });
     }
   }
 
@@ -371,7 +376,7 @@ export class AdminEventsComponent implements OnInit {
               created_on: new Date().toISOString(),
               updated_by: this.eventForm.created_by,
               updated_on: null,
-              active: 1
+              active: 1,
             };
 
             // Store the file with the gallery
@@ -403,7 +408,7 @@ export class AdminEventsComponent implements OnInit {
             created_on: new Date().toISOString(),
             updated_by: this.eventForm.created_by,
             updated_on: null,
-            active: 1
+            active: 1,
           };
 
           this.galleries.push(gallery);
@@ -417,7 +422,7 @@ export class AdminEventsComponent implements OnInit {
       },
       complete: () => {
         this.isUploadingGallery = false;
-      }
+      },
     });
   }
 
@@ -425,7 +430,128 @@ export class AdminEventsComponent implements OnInit {
     this.galleries.splice(index, 1);
   }
 
-  // Update the createEvent() method:
+  // **UPDATED createEvent() method**
+  //   createEvent(): void {
+  //   if (!this.validateEventForm()) {
+  //     return;
+  //   }
+
+  //   if (!this.eventForm.event_category_id) {
+  //     alert('Please select an event category');
+  //     return;
+  //   }
+
+  //   // Ensure user ID is set
+  //   if (!this.userId) {
+  //     alert('User not authenticated. Please login again.');
+  //     return;
+  //   }
+
+  //   // Set all user-related fields
+  //   this.eventForm.organizer_id = this.userId;
+  //   this.eventForm.created_by = this.userId;
+  //   this.eventForm.updated_by = this.userId;
+
+  //   console.log('Creating event with user ID:', this.userId);
+  //   console.log('Event form organizer_id:', this.eventForm.organizer_id);
+
+  //   this.isSubmitting = true;
+
+  //   // Create FormData
+  //   const formData = new FormData();
+
+  //   // Prepare event details with simple JSON strings
+  //   const currentDate = new Date();
+  //   const eventDetails = {
+  //     ...this.eventForm,
+  //     // Convert date string to proper Date object
+  //     event_date: new Date(this.eventForm.event_date).toISOString().split('T')[0],
+  //     start_time: this.eventForm.start_time,
+  //     end_time: this.eventForm.end_time,
+  //     // Set proper datetime values
+  //     created_at: currentDate.toISOString(),
+  //     updated_at: currentDate.toISOString(),
+  //     organizer_id: this.userId,
+  //     created_by: this.userId,
+  //     updated_by: this.userId,
+  //     latitude: this.eventForm.latitude || 0,
+  //     longitude: this.eventForm.longitude || 0,
+  //     min_price: this.eventForm.min_price || 0,
+  //     max_price: this.eventForm.max_price || 0,
+  //     age_limit: this.eventForm.age_limit || 0,
+  //     no_of_seats: this.eventForm.no_of_seats || 0,
+  //     // Simple empty JSON arrays as strings
+  //     gallery_media: '[]',
+  //     artists: '[]'
+  //   };
+
+  //   // Convert to JSON string
+  //   formData.append('EventDetails', JSON.stringify(eventDetails));
+
+  //   // Add banner image if selected
+  //   if (this.bannerImage) {
+  //     formData.append('BannerImageFile', this.bannerImage);
+  //   }
+
+  //   // Add artists data
+  //   const artistsWithUserIds = this.artists.map(artist => {
+  //     const artistCopy = { ...artist };
+  //     // Set proper datetime for artists
+  //     artistCopy.created_on = new Date().toISOString();
+  //     artistCopy.updated_on = new Date().toISOString();
+  //     artistCopy.created_by = this.userId;
+  //     artistCopy.updated_by = this.userId;
+  //     return artistCopy;
+  //   });
+  //   formData.append('EventArtists', JSON.stringify(artistsWithUserIds));
+
+  //   // Add galleries data
+  //   const galleriesWithUserIds = this.galleries.map(gallery => {
+  //     const galleryCopy = { ...gallery };
+  //     // Set proper datetime for galleries
+  //     galleryCopy.created_on = new Date().toISOString();
+  //     galleryCopy.updated_on = new Date().toISOString();
+  //     galleryCopy.created_by = this.userId;
+  //     galleryCopy.updated_by = this.userId;
+  //     return galleryCopy;
+  //   });
+  //   formData.append('EventGalleries', JSON.stringify(galleriesWithUserIds));
+
+  //   // Add createdBy field
+  //   formData.append('createdBy', this.userId);
+
+  //   // Debug: Log FormData contents
+  //   this.debugFormData(formData);
+
+  //   this.apiService.createEventWithArtistsAndGalleries(formData).subscribe({
+  //     next: (response) => {
+  //       if (response.status === 'Success') {
+  //         alert('Event created successfully!');
+  //         this.resetForm();
+  //         this.loadEvents();
+  //         this.closeModal('addEventModal');
+  //       } else {
+  //         alert(response.message || 'Failed to create event');
+  //       }
+  //     },
+  //     error: (error) => {
+  //       console.error('Error creating event:', error);
+  //       if (error.error?.errors) {
+  //         const errorMessages = Object.values(error.error.errors).flat().join('\n');
+  //         alert('Validation errors:\n' + errorMessages);
+  //       } else if (error.error?.message) {
+  //         alert('Error: ' + error.error.message);
+  //       } else {
+  //         alert('Failed to create event: ' + error.message);
+  //       }
+  //     },
+  //     complete: () => {
+  //       this.isSubmitting = false;
+  //     }
+  //   });
+  // }
+
+  // Update the createEvent method to handle Base64 conversion
   // createEvent(): void {
   //   if (!this.validateEventForm()) {
   //     return;
@@ -442,215 +568,234 @@ export class AdminEventsComponent implements OnInit {
   //     return;
   //   }
 
-  //   // Set organizer_id, created_by, and updated_by with current user ID
+  //   // Set all user-related fields
   //   this.eventForm.organizer_id = this.userId;
   //   this.eventForm.created_by = this.userId;
   //   this.eventForm.updated_by = this.userId;
 
   //   this.isSubmitting = true;
 
-  //   // Create FormData with proper formatting
+  //   // Create FormData
   //   const formData = new FormData();
 
-  //   // Add event details as JSON string with correct key name
+  //   // Prepare event details
+  //   const currentDate = new Date();
   //   const eventDetails = {
   //     ...this.eventForm,
-  //     event_date: this.eventForm.event_date.toString(),
-  //     start_time: this.eventForm.start_time.toString(),
-  //     end_time: this.eventForm.end_time.toString(),
-  //     organizer_id: this.userId, // Pass user_id as organizer_id
+  //     event_date: new Date(this.eventForm.event_date).toISOString().split('T')[0],
+  //     start_time: this.eventForm.start_time,
+  //     end_time: this.eventForm.end_time,
+  //     created_at: currentDate.toISOString(),
+  //     updated_at: currentDate.toISOString(),
+  //     organizer_id: this.userId,
   //     created_by: this.userId,
-  //     updated_by: this.userId
+  //     updated_by: this.userId,
+  //     latitude: this.eventForm.latitude || 0,
+  //     longitude: this.eventForm.longitude || 0,
+  //     min_price: this.eventForm.min_price || 0,
+  //     max_price: this.eventForm.max_price || 0,
+  //     age_limit: this.eventForm.age_limit || 0,
+  //     no_of_seats: this.eventForm.no_of_seats || 0,
+  //     gallery_media: '[]',
+  //     artists: '[]',
   //   };
 
   //   formData.append('EventDetails', JSON.stringify(eventDetails));
 
-  //   // Add banner image if selected
+  //   // Add banner image as Base64
   //   if (this.bannerImage) {
-  //     formData.append('BannerImageFile', this.bannerImage);
+  //     this.convertFileToBase64(this.bannerImage).then((base64String) => {
+  //       formData.append('BannerImageFile', base64String);
+  //     });
   //   }
 
-  //   // Add artists data
-  //   if (this.artists.length > 0) {
-  //     const artistsData = this.artists.map(artist => {
-  //       // Remove temporary file reference if exists
+  //   // Convert artists' photos to Base64
+  //   const convertArtistPhotos = async () => {
+  //     const artistsWithBase64 = [];
+  //     for (const artist of this.artists) {
   //       const artistCopy = { ...artist };
-  //       if ((artistCopy as any).photoFile) {
-  //         delete (artistCopy as any).photoFile;
-  //       }
-  //       return artistCopy;
-  //     });
-  //     formData.append('EventArtists', JSON.stringify(artistsData));
-  //   } else {
-  //     formData.append('EventArtists', '[]');
-  //   }
+  //       artistCopy.created_on = new Date().toISOString();
+  //       artistCopy.updated_on = new Date().toISOString();
+  //       artistCopy.created_by = this.userId;
+  //       artistCopy.updated_by = this.userId;
 
-  //   // Add galleries data
-  //   if (this.galleries.length > 0) {
-  //     const galleriesData = this.galleries.map(gallery => {
-  //       // Remove temporary file reference if exists
-  //       const galleryCopy = { ...gallery };
-  //       if ((galleryCopy as any).imageFile) {
-  //         delete (galleryCopy as any).imageFile;
+  //       // If artist has a photo file, convert to Base64
+  //       if ((artist as any).photoFile) {
+  //         artistCopy.artist_photo = await this.convertFileToBase64((artist as any).photoFile);
   //       }
-  //       return galleryCopy;
-  //     });
-  //     formData.append('EventGalleries', JSON.stringify(galleriesData));
-  //   } else {
-  //     formData.append('EventGalleries', '[]');
-  //   }
-
-  //   // Add created_by user
-  //   const userEmail = this.currentUser?.email || 'system';
-  //   formData.append('createdBy', userEmail);
-
-  //   this.apiService.createEventWithArtistsAndGalleries(formData).subscribe({
-  //     next: (response) => {
-  //       if (response.status === 'Success') {
-  //         alert('Event created successfully!');
-  //         this.resetForm();
-  //         this.loadEvents();
-  //         this.closeModal('addEventModal');
-  //       } else {
-  //         alert(response.message || 'Failed to create event');
-  //       }
-  //     },
-  //     error: (error) => {
-  //       console.error('Error creating event:', error);
-  //       if (error.error?.errors) {
-  //         // Display validation errors
-  //         const errorMessages = Object.values(error.error.errors).flat().join('\n');
-  //         alert('Validation errors:\n' + errorMessages);
-  //       } else {
-  //         alert('Failed to create event: ' + error.message);
-  //       }
-  //     },
-  //     complete: () => {
-  //       this.isSubmitting = false;
+  //       artistsWithBase64.push(artistCopy);
   //     }
-  //   });
+  //     return artistsWithBase64;
+  //   };
+
+  //   // Convert gallery images to Base64
+  //   const convertGalleryImages = async () => {
+  //     const galleriesWithBase64 = [];
+  //     for (const gallery of this.galleries) {
+  //       const galleryCopy = { ...gallery };
+  //       galleryCopy.created_on = new Date().toISOString();
+  //       galleryCopy.updated_on = new Date().toISOString();
+  //       galleryCopy.created_by = this.userId;
+  //       galleryCopy.updated_by = this.userId;
+
+  //       // If gallery has an image file, convert to Base64
+  //       if ((gallery as any).imageFile) {
+  //         galleryCopy.event_img = await this.convertFileToBase64((gallery as any).imageFile);
+  //       }
+  //       galleriesWithBase64.push(galleryCopy);
+  //     }
+  //     return galleriesWithBase64;
+  //   };
+
+  //   // Process all images and submit
+  //   Promise.all([convertArtistPhotos(), convertGalleryImages()]).then(
+  //     ([artistsWithBase64, galleriesWithBase64]) => {
+  //       formData.append('EventArtists', JSON.stringify(artistsWithBase64));
+  //       formData.append('EventGalleries', JSON.stringify(galleriesWithBase64));
+  //       formData.append('createdBy', this.userId);
+
+  //       this.apiService.createEventWithArtistsAndGalleries(formData).subscribe({
+  //         next: (response) => {
+  //           if (response.status === 'Success') {
+  //             alert('Event created successfully!');
+  //             this.resetForm();
+  //             this.loadEvents();
+  //             this.closeModal('addEventModal');
+  //           } else {
+  //             alert(response.message || 'Failed to create event');
+  //           }
+  //         },
+  //         error: (error) => {
+  //           console.error('Error creating event:', error);
+  //           if (error.error?.errors) {
+  //             const errorMessages = Object.values(error.error.errors).flat().join('\n');
+  //             alert('Validation errors:\n' + errorMessages);
+  //           } else if (error.error?.message) {
+  //             alert('Error: ' + error.error.message);
+  //           } else {
+  //             alert('Failed to create event: ' + error.message);
+  //           }
+  //         },
+  //         complete: () => {
+  //           this.isSubmitting = false;
+  //         },
+  //       });
+  //     }
+  //   );
   // }
 
-  // **UPDATED createEvent() method**
   createEvent(): void {
-  if (!this.validateEventForm()) {
-    return;
-  }
-
-  if (!this.eventForm.event_category_id) {
-    alert('Please select an event category');
-    return;
-  }
-
-  // Ensure user ID is set
-  if (!this.userId) {
-    alert('User not authenticated. Please login again.');
-    return;
-  }
-
-  // Set all user-related fields
-  this.eventForm.organizer_id = this.userId;
-  this.eventForm.created_by = this.userId;
-  this.eventForm.updated_by = this.userId;
-
-  console.log('Creating event with user ID:', this.userId);
-  console.log('Event form organizer_id:', this.eventForm.organizer_id);
-
-  this.isSubmitting = true;
-
-  // Create FormData
-  const formData = new FormData();
-
-  // Prepare event details with simple JSON strings
-  const currentDate = new Date();
-  const eventDetails = {
-    ...this.eventForm,
-    // Convert date string to proper Date object
-    event_date: new Date(this.eventForm.event_date).toISOString().split('T')[0],
-    start_time: this.eventForm.start_time,
-    end_time: this.eventForm.end_time,
-    // Set proper datetime values
-    created_at: currentDate.toISOString(),
-    updated_at: currentDate.toISOString(),
-    organizer_id: this.userId,
-    created_by: this.userId,
-    updated_by: this.userId,
-    latitude: this.eventForm.latitude || 0,
-    longitude: this.eventForm.longitude || 0,
-    min_price: this.eventForm.min_price || 0,
-    max_price: this.eventForm.max_price || 0,
-    age_limit: this.eventForm.age_limit || 0,
-    no_of_seats: this.eventForm.no_of_seats || 0,
-    // Simple empty JSON arrays as strings
-    gallery_media: '[]',
-    artists: '[]'
-  };
-
-  // Convert to JSON string
-  formData.append('EventDetails', JSON.stringify(eventDetails));
-
-  // Add banner image if selected
-  if (this.bannerImage) {
-    formData.append('BannerImageFile', this.bannerImage);
-  }
-
-  // Add artists data
-  const artistsWithUserIds = this.artists.map(artist => {
-    const artistCopy = { ...artist };
-    // Set proper datetime for artists
-    artistCopy.created_on = new Date().toISOString();
-    artistCopy.updated_on = new Date().toISOString();
-    artistCopy.created_by = this.userId;
-    artistCopy.updated_by = this.userId;
-    return artistCopy;
-  });
-  formData.append('EventArtists', JSON.stringify(artistsWithUserIds));
-
-  // Add galleries data
-  const galleriesWithUserIds = this.galleries.map(gallery => {
-    const galleryCopy = { ...gallery };
-    // Set proper datetime for galleries
-    galleryCopy.created_on = new Date().toISOString();
-    galleryCopy.updated_on = new Date().toISOString();
-    galleryCopy.created_by = this.userId;
-    galleryCopy.updated_by = this.userId;
-    return galleryCopy;
-  });
-  formData.append('EventGalleries', JSON.stringify(galleriesWithUserIds));
-
-  // Add createdBy field
-  formData.append('createdBy', this.userId);
-
-  // Debug: Log FormData contents
-  this.debugFormData(formData);
-
-  this.apiService.createEventWithArtistsAndGalleries(formData).subscribe({
-    next: (response) => {
-      if (response.status === 'Success') {
-        alert('Event created successfully!');
-        this.resetForm();
-        this.loadEvents();
-        this.closeModal('addEventModal');
-      } else {
-        alert(response.message || 'Failed to create event');
-      }
-    },
-    error: (error) => {
-      console.error('Error creating event:', error);
-      if (error.error?.errors) {
-        const errorMessages = Object.values(error.error.errors).flat().join('\n');
-        alert('Validation errors:\n' + errorMessages);
-      } else if (error.error?.message) {
-        alert('Error: ' + error.error.message);
-      } else {
-        alert('Failed to create event: ' + error.message);
-      }
-    },
-    complete: () => {
-      this.isSubmitting = false;
+    if (!this.validateEventForm()) {
+      return;
     }
-  });
-}
+
+    if (!this.eventForm.event_category_id) {
+      alert('Please select an event category');
+      return;
+    }
+
+    // Ensure user ID is set
+    if (!this.userId) {
+      alert('User not authenticated. Please login again.');
+      return;
+    }
+
+    // Set all user-related fields
+    this.eventForm.organizer_id = this.userId;
+    this.eventForm.created_by = this.userId;
+    this.eventForm.updated_by = this.userId;
+
+    this.isSubmitting = true;
+
+    // Create FormData
+    const formData = new FormData();
+
+    // Prepare event details
+    const currentDate = new Date();
+    const eventDetails = {
+      ...this.eventForm,
+      event_date: new Date(this.eventForm.event_date).toISOString().split('T')[0],
+      start_time: this.eventForm.start_time,
+      end_time: this.eventForm.end_time,
+      created_at: currentDate.toISOString(),
+      updated_at: currentDate.toISOString(),
+      organizer_id: this.userId,
+      created_by: this.userId,
+      updated_by: this.userId,
+      latitude: this.eventForm.latitude || 0,
+      longitude: this.eventForm.longitude || 0,
+      min_price: this.eventForm.min_price || 0,
+      max_price: this.eventForm.max_price || 0,
+      age_limit: this.eventForm.age_limit || 0,
+      no_of_seats: this.eventForm.no_of_seats || 0,
+      gallery_media: '[]', // Empty JSON array
+      artists: '[]', // Empty JSON array
+      // IMPORTANT: Clear banner_image field as we'll handle it separately
+      banner_image: '',
+    };
+
+    formData.append('EventDetails', JSON.stringify(eventDetails));
+
+    // Add banner image as file
+    if (this.bannerImage) {
+      formData.append('BannerImageFile', this.bannerImage);
+    }
+
+    // Add artists data (convert photos to Base64 on backend)
+    const artistsWithData = this.artists.map((artist) => {
+      const artistCopy = { ...artist };
+      artistCopy.created_on = new Date().toISOString();
+      artistCopy.updated_on = new Date().toISOString();
+      artistCopy.created_by = this.userId;
+      artistCopy.updated_by = this.userId;
+      return artistCopy;
+    });
+    formData.append('EventArtists', JSON.stringify(artistsWithData));
+
+    // Add galleries data (convert images to Base64 on backend)
+    const galleriesWithData = this.galleries.map((gallery) => {
+      const galleryCopy = { ...gallery };
+      galleryCopy.created_on = new Date().toISOString();
+      galleryCopy.updated_on = new Date().toISOString();
+      galleryCopy.created_by = this.userId;
+      galleryCopy.updated_by = this.userId;
+      return galleryCopy;
+    });
+    formData.append('EventGalleries', JSON.stringify(galleriesWithData));
+
+    // Add createdBy field
+    formData.append('createdBy', this.userId);
+
+    // Debug: Log FormData contents
+    this.debugFormData(formData);
+
+    this.apiService.createEventWithArtistsAndGalleries(formData).subscribe({
+      next: (response) => {
+        if (response.status === 'Success') {
+          alert('Event created successfully!');
+          this.resetForm();
+          this.loadEvents();
+          this.closeModal('addEventModal');
+        } else {
+          alert(response.message || 'Failed to create event');
+        }
+      },
+      error: (error) => {
+        console.error('Error creating event:', error);
+        if (error.error?.errors) {
+          const errorMessages = Object.values(error.error.errors).flat().join('\n');
+          alert('Validation errors:\n' + errorMessages);
+        } else if (error.error?.message) {
+          alert('Error: ' + error.error.message);
+        } else {
+          alert('Failed to create event: ' + error.message);
+        }
+      },
+      complete: () => {
+        this.isSubmitting = false;
+      },
+    });
+  }
 
   // Helper method to upload artist photos for new event
   async uploadArtistPhotosForNewEvent(formData: FormData): Promise<void> {
@@ -701,45 +846,45 @@ export class AdminEventsComponent implements OnInit {
   // }
 
   editEvent(event: EventCompleteResponseModel): void {
-  this.isEditMode = true;
-  this.selectedEvent = event;
+    this.isEditMode = true;
+    this.selectedEvent = event;
 
-  // Set event form - use eventDetails instead of EventDetails
-  this.eventForm = { ...event.eventDetails };
+    // Set event form - use eventDetails instead of EventDetails
+    this.eventForm = { ...event.eventDetails };
 
-  // Parse JSON fields if they're strings
-  if (typeof this.eventForm.gallery_media === 'string') {
-    try {
-      this.eventForm.gallery_media = JSON.parse(this.eventForm.gallery_media as string);
-    } catch (e) {
-      this.eventForm.gallery_media = JSON.stringify([]);
+    // Parse JSON fields if they're strings
+    if (typeof this.eventForm.gallery_media === 'string') {
+      try {
+        this.eventForm.gallery_media = JSON.parse(this.eventForm.gallery_media as string);
+      } catch (e) {
+        this.eventForm.gallery_media = JSON.stringify([]);
+      }
     }
-  }
 
-  if (typeof this.eventForm.artists === 'string') {
-    try {
-      this.eventForm.artists = JSON.parse(this.eventForm.artists as string);
-    } catch (e) {
-      this.eventForm.artists = JSON.stringify([]);
+    if (typeof this.eventForm.artists === 'string') {
+      try {
+        this.eventForm.artists = JSON.parse(this.eventForm.artists as string);
+      } catch (e) {
+        this.eventForm.artists = JSON.stringify([]);
+      }
     }
+
+    // Ensure datetime fields are properly set
+    if (!this.eventForm.created_at) {
+      this.eventForm.created_at = new Date().toISOString();
+    }
+
+    // Set artists and galleries - use eventArtists and eventGalleries
+    this.artists = [...event.eventArtists];
+    this.galleries = [...event.eventGalleries];
+
+    // Clear temporary files
+    this.bannerImage = null;
+    this.bannerPreviewUrl = null;
+
+    // Show edit modal
+    this.showModal('editEventModal');
   }
-
-  // Ensure datetime fields are properly set
-  if (!this.eventForm.created_at) {
-    this.eventForm.created_at = new Date().toISOString();
-  }
-
-  // Set artists and galleries - use eventArtists and eventGalleries
-  this.artists = [...event.eventArtists];
-  this.galleries = [...event.eventGalleries];
-
-  // Clear temporary files
-  this.bannerImage = null;
-  this.bannerPreviewUrl = null;
-
-  // Show edit modal
-  this.showModal('editEventModal');
-}
 
   // Update the updateEvent() method:
   // updateEvent(): void {
@@ -878,15 +1023,19 @@ export class AdminEventsComponent implements OnInit {
       age_limit: this.eventForm.age_limit || 0,
       no_of_seats: this.eventForm.no_of_seats || 0,
       // Handle JSON fields properly
-      gallery_media: this.galleries.length > 0 ?
-        JSON.stringify(this.galleries.map(g => ({ image: g.event_img }))) :
-        JSON.stringify([]),
-      artists: this.artists.length > 0 ?
-        JSON.stringify(this.artists.map(a => ({
-          name: a.artist_name,
-          photo: a.artist_photo
-        }))) :
-        JSON.stringify([])
+      gallery_media:
+        this.galleries.length > 0
+          ? JSON.stringify(this.galleries.map((g) => ({ image: g.event_img })))
+          : JSON.stringify([]),
+      artists:
+        this.artists.length > 0
+          ? JSON.stringify(
+              this.artists.map((a) => ({
+                name: a.artist_name,
+                photo: a.artist_photo,
+              }))
+            )
+          : JSON.stringify([]),
     };
 
     formData.append('EventDetails', JSON.stringify(eventDetails));
@@ -898,18 +1047,18 @@ export class AdminEventsComponent implements OnInit {
 
     // Add artists data
     const currentDateTime = new Date().toISOString();
-    const artistsWithUserIds = this.artists.map(artist => ({
+    const artistsWithUserIds = this.artists.map((artist) => ({
       ...artist,
       updated_by: this.userId,
-      updated_on: currentDateTime
+      updated_on: currentDateTime,
     }));
     formData.append('EventArtists', JSON.stringify(artistsWithUserIds));
 
     // Add galleries data
-    const galleriesWithUserIds = this.galleries.map(gallery => ({
+    const galleriesWithUserIds = this.galleries.map((gallery) => ({
       ...gallery,
       updated_by: this.userId,
-      updated_on: currentDateTime
+      updated_on: currentDateTime,
     }));
     formData.append('EventGalleries', JSON.stringify(galleriesWithUserIds));
 
@@ -942,7 +1091,7 @@ export class AdminEventsComponent implements OnInit {
       },
       complete: () => {
         this.isSubmitting = false;
-      }
+      },
     });
   }
 
@@ -983,7 +1132,7 @@ export class AdminEventsComponent implements OnInit {
         error: (error) => {
           console.error('Error deleting event:', error);
           alert('Failed to delete event');
-        }
+        },
       });
     }
   }
@@ -1001,7 +1150,7 @@ export class AdminEventsComponent implements OnInit {
       error: (error) => {
         console.error('Error loading event:', error);
         alert('Failed to load event details');
-      }
+      },
     });
   }
 
@@ -1068,7 +1217,7 @@ export class AdminEventsComponent implements OnInit {
       created_at: currentDate.toISOString(), // Set current datetime
       updated_by: '',
       updated_at: currentDate.toISOString(),
-      active: 1
+      active: 1,
     };
 
     this.artists = [];
@@ -1182,10 +1331,24 @@ export class AdminEventsComponent implements OnInit {
     this.showModal('addEventModal');
   }
 
+  // Add this helper method to convert file to Base64
+  convertFileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  }
+
   debugFormData(formData: FormData): void {
     console.log('=== FormData Contents ===');
     for (let pair of (formData as any).entries()) {
-      if (pair[0] === 'EventArtists' || pair[0] === 'EventGalleries' || pair[0] === 'EventDetails') {
+      if (
+        pair[0] === 'EventArtists' ||
+        pair[0] === 'EventGalleries' ||
+        pair[0] === 'EventDetails'
+      ) {
         try {
           console.log(pair[0] + ': ', JSON.parse(pair[1]));
         } catch (e) {
