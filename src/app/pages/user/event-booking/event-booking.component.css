@@ -298,7 +298,8 @@
 }
 
 .book-btn {
-    background: linear-gradient(90deg, var(--accent), var(--primary));
+    /* background: linear-gradient(90deg, var(--accent), var(--primary)); */
+    background: #4896d1;
     color: #fff;
     padding: 14px 24px;
     border-radius: 10px;

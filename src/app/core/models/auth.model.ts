@@ -371,11 +371,26 @@ export interface EventMediaModel {
 //   EventMedia: EventMediaModel[];
 // }
 
+export interface EventSeatTypeInventoryModel {
+  event_seat_type_inventory_id: number;
+  event_id: number;
+  seat_name: string;
+  price: number;
+  total_seats: number;
+  available_seats: number;
+  created_by: string;
+  created_on: string;
+  updated_by: string;
+  updated_on: string | null;
+  active: number;
+}
+
 export interface EventCompleteResponseModel {
   eventDetails: EventDetailsModel;  // camelCase to match API
   eventArtists: EventArtistModel[];
   eventGalleries: EventGalleryModel[];
   eventMedia?: EventMediaModel[]; // Optional if your API includes it
+  seatTypes?: EventSeatTypeInventoryModel[];
 }
 
 export interface EventCreateRequestModel {
@@ -383,6 +398,7 @@ export interface EventCreateRequestModel {
   EventArtists: EventArtistModel[];
   EventGalleries: EventGalleryModel[];
   BannerImageFile?: File;
+  SeatTypes: EventSeatTypeInventoryModel[];
 }
 
 export interface EventPaginationRequest {

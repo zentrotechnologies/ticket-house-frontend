@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   EventCompleteResponseModel,
   EventDetailsModel,
@@ -16,7 +16,7 @@ import { AuthService } from '../../../core/services/auth.service';
 @Component({
   selector: 'app-admin-events',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './admin-events.component.html',
   styleUrl: './admin-events.component.css',
 })
@@ -38,6 +38,15 @@ export class AdminEventsComponent implements OnInit {
 
   selectedEvent: EventCompleteResponseModel | null = null;
   isEditMode: boolean = false;
+
+  // Add these properties to the component
+  newSeatType: any = {
+    seat_name: '',
+    price: 0,
+    total_seats: 0,
+  };
+
+  seatTypes: any[] = [];
 
   // Event form
   eventForm: EventDetailsModel = {
@@ -763,6 +772,23 @@ export class AdminEventsComponent implements OnInit {
     });
     formData.append('EventGalleries', JSON.stringify(galleriesWithData));
 
+    // Add seat types to formData
+    const seatTypesWithUserIds = this.seatTypes.map(seatType => {
+        const seatTypeCopy = { ...seatType };
+        seatTypeCopy.created_on = new Date().toISOString();
+        seatTypeCopy.updated_on = new Date().toISOString();
+        seatTypeCopy.created_by = this.userId;
+        seatTypeCopy.updated_by = this.userId;
+        seatTypeCopy.event_id = 0; // Will be set by backend
+        return seatTypeCopy;
+    });
+
+    formData.append('SeatTypes', JSON.stringify(seatTypesWithUserIds));
+
+    // In createEvent() and updateEvent() methods:
+    console.log('Seat Types being sent:', this.seatTypes);
+    console.log('Seat Types JSON:', JSON.stringify(seatTypesWithUserIds));
+
     // Add createdBy field
     formData.append('createdBy', this.userId);
 
@@ -878,9 +904,15 @@ export class AdminEventsComponent implements OnInit {
     this.artists = [...event.eventArtists];
     this.galleries = [...event.eventGalleries];
 
+    // Set seat types
+    this.seatTypes = [...(event.seatTypes || [])]; // Add this line
+
     // Clear temporary files
     this.bannerImage = null;
     this.bannerPreviewUrl = null;
+
+    // Load seat types for the event
+    this.loadEventSeatTypes(event.eventDetails.event_id);
 
     // Show edit modal
     this.showModal('editEventModal');
@@ -1062,6 +1094,20 @@ export class AdminEventsComponent implements OnInit {
     }));
     formData.append('EventGalleries', JSON.stringify(galleriesWithUserIds));
 
+    // Add seat types to formData
+    const seatTypesWithUserIds = this.seatTypes.map(seatType => {
+        const seatTypeCopy = { ...seatType };
+        seatTypeCopy.updated_by = this.userId;
+        seatTypeCopy.updated_on = new Date().toISOString();
+        return seatTypeCopy;
+    });
+
+    formData.append('SeatTypes', JSON.stringify(seatTypesWithUserIds));
+
+    // In createEvent() and updateEvent() methods:
+    console.log('Seat Types being sent:', this.seatTypes);
+    console.log('Seat Types JSON:', JSON.stringify(seatTypesWithUserIds));
+
     // Add updatedBy field
     formData.append('updatedBy', this.userId);
 
@@ -1229,6 +1275,9 @@ export class AdminEventsComponent implements OnInit {
     this.newArtistPreviewUrl = null;
     this.isEditMode = false;
     this.selectedEvent = null;
+
+    this.seatTypes = [];
+    this.resetSeatTypeForm();
   }
 
   // Helper methods (pagination, duration calculation, etc.)
@@ -1359,5 +1408,61 @@ export class AdminEventsComponent implements OnInit {
       }
     }
     console.log('=========================');
+  }
+
+  // Add seat type methods
+  addSeatType(): void {
+    if (!this.isValidSeatType()) {
+      alert('Please fill all seat type fields correctly');
+      return;
+    }
+
+    const seatType = {
+      event_seat_type_inventory_id: 0,
+      event_id: this.eventForm.event_id,
+      seat_name: this.newSeatType.seat_name,
+      price: this.newSeatType.price,
+      total_seats: this.newSeatType.total_seats,
+      available_seats: this.newSeatType.total_seats,
+      created_by: this.userId,
+      updated_by: this.userId,
+      active: 1,
+    };
+
+    this.seatTypes.push(seatType);
+    this.resetSeatTypeForm();
+  }
+
+  isValidSeatType(): boolean {
+    return (
+      this.newSeatType.seat_name?.trim().length > 0 &&
+      this.newSeatType.price > 0 &&
+      this.newSeatType.total_seats > 0
+    );
+  }
+
+  resetSeatTypeForm(): void {
+    this.newSeatType = {
+      seat_name: '',
+      price: 0,
+      total_seats: 0,
+    };
+  }
+
+  removeSeatType(index: number): void {
+    this.seatTypes.splice(index, 1);
+  }
+
+  loadEventSeatTypes(eventId: number): void {
+    this.apiService.getEventSeatTypes(eventId).subscribe({
+      next: (response) => {
+        if (response.status === 'Success' && response.data) {
+          this.seatTypes = response.data;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading seat types:', error);
+      }
+    });
   }
 }

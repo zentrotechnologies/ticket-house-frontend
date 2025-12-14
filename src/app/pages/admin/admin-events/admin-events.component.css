@@ -618,3 +618,45 @@ select:disabled {
   align-items: center;
   justify-content: center;
 }
+
+/* Seat Types Styles */
+.seat-type-input-group .input-group {
+  margin-bottom: 0.5rem;
+}
+
+.seat-types-list {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #eef2f6;
+}
+
+.seat-types-list table {
+  margin-bottom: 0;
+}
+
+.seat-types-list th {
+  background-color: #f1f5f9;
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.85rem;
+}
+
+.seat-types-list td {
+  vertical-align: middle;
+  font-size: 0.9rem;
+}
+
+/* Responsive adjustments for seat type inputs */
+@media (max-width: 768px) {
+  .seat-type-input-group .input-group {
+    flex-direction: column;
+  }
+  
+  .seat-type-input-group .input-group > * {
+    width: 100%;
+    margin-bottom: 0.5rem;
+    max-width: 100% !important;
+  }
+}

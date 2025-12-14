@@ -4,12 +4,8 @@
   <div class="page-header">
     <h2 class="page-title">Events Listing</h2>
     <div class="header-actions">
-      <button
-        class="btn btn-primary btn-add"
-        data-bs-toggle="modal"
-        data-bs-target="#addEventModal"
-        (click)="resetFormAndOpenModal()"
-      >
+      <button class="btn btn-primary btn-add" data-bs-toggle="modal" data-bs-target="#addEventModal"
+        (click)="resetFormAndOpenModal()">
         <i class="fa fa-plus"></i>&nbsp; Add Event
       </button>
     </div>
@@ -20,13 +16,8 @@
     <div class="card-body">
       <div class="row g-3">
         <div class="col-md-3">
-          <input
-            type="text"
-            class="form-control"
-            [(ngModel)]="searchText"
-            placeholder="Search events..."
-            (keyup.enter)="onSearch()"
-          />
+          <input type="text" class="form-control" [(ngModel)]="searchText" placeholder="Search events..."
+            (keyup.enter)="onSearch()" />
         </div>
         <div class="col-md-2">
           <select class="form-control" [(ngModel)]="statusFilter" (change)="onSearch()">
@@ -37,22 +28,11 @@
           </select>
         </div>
         <div class="col-md-2">
-          <input
-            type="date"
-            class="form-control"
-            [(ngModel)]="fromDate"
-            (change)="onSearch()"
-            placeholder="From Date"
-          />
+          <input type="date" class="form-control" [(ngModel)]="fromDate" (change)="onSearch()"
+            placeholder="From Date" />
         </div>
         <div class="col-md-2">
-          <input
-            type="date"
-            class="form-control"
-            [(ngModel)]="toDate"
-            (change)="onSearch()"
-            placeholder="To Date"
-          />
+          <input type="date" class="form-control" [(ngModel)]="toDate" (change)="onSearch()" placeholder="To Date" />
         </div>
         <div class="col-md-3">
           <button class="btn btn-primary me-2" (click)="onSearch()">
@@ -114,33 +94,23 @@
             <td>{{ event.eventDetails.total_duration_minutes }} mins</td>
             <td>{{ event.eventDetails.location }}</td>
             <td class="text-center">
-              <span
-                [ngClass]="{
+              <span [ngClass]="{
                   'status-badge status-active': event.eventDetails.status === 'active',
                   'status-badge status-inactive': event.eventDetails.status === 'inactive',
                   'status-badge status-draft': event.eventDetails.status === 'draft'
-                }"
-              >
+                }">
                 {{ event.eventDetails.status | titlecase }}
               </span>
             </td>
             <td class="text-center">
               <!-- Update these click handlers too -->
-              <button
-                class="icon-btn me-1"
-                title="View"
-                (click)="viewEvent(event.eventDetails.event_id)"
-              >
+              <button class="icon-btn me-1" title="View" (click)="viewEvent(event.eventDetails.event_id)">
                 <i class="fa fa-eye"></i>
               </button>
               <button class="icon-btn me-1" title="Edit" (click)="editEvent(event)">
                 <i class="fa fa-pen"></i>
               </button>
-              <button
-                class="icon-btn danger"
-                title="Delete"
-                (click)="deleteEvent(event.eventDetails.event_id)"
-              >
+              <button class="icon-btn danger" title="Delete" (click)="deleteEvent(event.eventDetails.event_id)">
                 <i class="fa fa-trash"></i>
               </button>
             </td>
@@ -163,11 +133,7 @@
           <li class="page-item" [class.disabled]="currentPage === 1">
             <a class="page-link" href="javascript:void(0)" (click)="goToPage(currentPage - 1)">‹</a>
           </li>
-          <li
-            *ngFor="let page of getPageNumbers()"
-            class="page-item"
-            [class.active]="page === currentPage"
-          >
+          <li *ngFor="let page of getPageNumbers()" class="page-item" [class.active]="page === currentPage">
             <a class="page-link" href="javascript:void(0)" (click)="goToPage(page)">{{ page }}</a>
           </li>
           <li class="page-item" [class.disabled]="currentPage === totalPages">
@@ -180,24 +146,13 @@
 </div>
 
 <!-- ADD EVENT MODAL -->
-<div
-  class="modal fade"
-  id="addEventModal"
-  tabindex="-1"
-  aria-labelledby="addEventLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="addEventModal" tabindex="-1" aria-labelledby="addEventLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content modal-card">
       <div class="modal-header">
         <h5 class="modal-title" id="addEventLabel">Add New Event</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-          (click)="resetForm()"
-        ></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+          (click)="resetForm()"></button>
       </div>
 
       <div class="modal-body">
@@ -208,23 +163,12 @@
             <div class="form-grid">
               <div class="form-row">
                 <label>Event Name *</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  [(ngModel)]="eventForm.event_name"
-                  name="eventName"
-                  required
-                />
+                <input type="text" class="form-control" [(ngModel)]="eventForm.event_name" name="eventName" required />
               </div>
 
               <div class="form-row">
                 <label>Event Category *</label>
-                <select
-                  class="form-control"
-                  [(ngModel)]="eventForm.event_category_id"
-                  name="eventCategory"
-                  required
-                >
+                <select class="form-control" [(ngModel)]="eventForm.event_category_id" name="eventCategory" required>
                   <option value="">Select Category</option>
                   <!-- Loading State -->
                   <option *ngIf="isLoadingCategories" value="" disabled>
@@ -242,26 +186,18 @@
                 <small *ngIf="isLoadingCategories" class="text-muted mt-1">
                   <i class="fa fa-spinner fa-spin"></i> Loading categories...
                 </small>
-                <small
-                  *ngIf="!isLoadingCategories && categories.length === 0"
-                  class="text-warning mt-1"
-                >
+                <small *ngIf="!isLoadingCategories && categories.length === 0" class="text-warning mt-1">
                   No event categories found. Please add categories first.
                 </small>
               </div>
 
               <div class="form-row full-width">
                 <label>Event Description *</label>
-                <textarea
-                  class="form-control"
-                  rows="4"
-                  [(ngModel)]="eventForm.event_description"
-                  name="eventDescription"
-                  required
-                ></textarea>
+                <textarea class="form-control" rows="4" [(ngModel)]="eventForm.event_description"
+                  name="eventDescription" required></textarea>
               </div>
 
-              <div class="form-row">
+              <!-- <div class="form-row">
                 <label>No. of Seats</label>
                 <input
                   type="number"
@@ -270,7 +206,7 @@
                   name="noOfSeats"
                   placeholder="e.g., 100"
                 />
-              </div>
+              </div> -->
             </div>
           </div>
 
@@ -280,50 +216,26 @@
             <div class="form-grid">
               <div class="form-row">
                 <label>Event Date *</label>
-                <input
-                  type="date"
-                  class="form-control"
-                  [(ngModel)]="eventForm.event_date"
-                  name="eventDate"
-                  required
-                  (change)="calculateDuration()"
-                />
+                <input type="date" class="form-control" [(ngModel)]="eventForm.event_date" name="eventDate" required
+                  (change)="calculateDuration()" />
               </div>
 
               <div class="form-row">
                 <label>Start Time *</label>
-                <input
-                  type="time"
-                  class="form-control"
-                  [(ngModel)]="eventForm.start_time"
-                  name="startTime"
-                  required
-                  (change)="calculateDuration()"
-                />
+                <input type="time" class="form-control" [(ngModel)]="eventForm.start_time" name="startTime" required
+                  (change)="calculateDuration()" />
               </div>
 
               <div class="form-row">
                 <label>End Time *</label>
-                <input
-                  type="time"
-                  class="form-control"
-                  [(ngModel)]="eventForm.end_time"
-                  name="endTime"
-                  required
-                  (change)="calculateDuration()"
-                />
+                <input type="time" class="form-control" [(ngModel)]="eventForm.end_time" name="endTime" required
+                  (change)="calculateDuration()" />
               </div>
 
               <div class="form-row">
                 <label>Total Duration (minutes) *</label>
-                <input
-                  type="number"
-                  class="form-control"
-                  [(ngModel)]="eventForm.total_duration_minutes"
-                  name="totalDuration"
-                  required
-                  readonly
-                />
+                <input type="number" class="form-control" [(ngModel)]="eventForm.total_duration_minutes"
+                  name="totalDuration" required readonly />
               </div>
             </div>
           </div>
@@ -334,24 +246,13 @@
             <div class="form-grid">
               <div class="form-row">
                 <label>Location *</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  [(ngModel)]="eventForm.location"
-                  name="location"
-                  placeholder="e.g., Central Park"
-                  required
-                />
+                <input type="text" class="form-control" [(ngModel)]="eventForm.location" name="location"
+                  placeholder="e.g., Central Park" required />
               </div>
 
               <div class="form-row">
                 <label>Language *</label>
-                <select
-                  class="form-control"
-                  [(ngModel)]="eventForm.language"
-                  name="language"
-                  required
-                >
+                <select class="form-control" [(ngModel)]="eventForm.language" name="language" required>
                   <!-- <option value="english">English</option>
                   <option value="spanish">Spanish</option>
                   <option value="french">French</option>
@@ -364,45 +265,24 @@
 
               <div class="form-row full-width">
                 <label>Full Address *</label>
-                <textarea
-                  class="form-control"
-                  rows="3"
-                  [(ngModel)]="eventForm.full_address"
-                  name="fullAddress"
-                  required
-                ></textarea>
+                <textarea class="form-control" rows="3" [(ngModel)]="eventForm.full_address" name="fullAddress"
+                  required></textarea>
               </div>
 
               <div class="form-row">
                 <label>Google Maps URL</label>
-                <input
-                  type="url"
-                  class="form-control"
-                  [(ngModel)]="eventForm.geo_map_url"
-                  name="geoMapUrl"
-                />
+                <input type="url" class="form-control" [(ngModel)]="eventForm.geo_map_url" name="geoMapUrl" />
               </div>
 
               <div class="form-row">
                 <label>Latitude</label>
-                <input
-                  type="number"
-                  step="any"
-                  class="form-control"
-                  [(ngModel)]="eventForm.latitude"
-                  name="latitude"
-                />
+                <input type="number" step="any" class="form-control" [(ngModel)]="eventForm.latitude" name="latitude" />
               </div>
 
               <div class="form-row">
                 <label>Longitude</label>
-                <input
-                  type="number"
-                  step="any"
-                  class="form-control"
-                  [(ngModel)]="eventForm.longitude"
-                  name="longitude"
-                />
+                <input type="number" step="any" class="form-control" [(ngModel)]="eventForm.longitude"
+                  name="longitude" />
               </div>
             </div>
           </div>
@@ -415,41 +295,18 @@
                 <label>Add Artists</label>
                 <div class="artist-input-group mb-3">
                   <div class="input-group">
-                    <input
-                      type="text"
-                      class="form-control"
-                      [(ngModel)]="newArtistName"
-                      name="newArtistName"
-                      placeholder="Artist Name"
-                    />
-                    <input
-                      #artistPhotoInput
-                      type="file"
-                      class="form-control"
-                      id="artistPhotoInput"
-                      accept="image/*"
-                      (change)="onArtistPhotoSelected($event)"
-                      hidden
-                    />
-                    <button
-                      class="btn btn-outline-secondary"
-                      type="button"
-                      (click)="triggerFileInput()"
-                    >
+                    <input type="text" class="form-control" [(ngModel)]="newArtistName" name="newArtistName"
+                      placeholder="Artist Name" />
+                    <input #artistPhotoInput type="file" class="form-control" id="artistPhotoInput" accept="image/*"
+                      (change)="onArtistPhotoSelected($event)" hidden />
+                    <button class="btn btn-outline-secondary" type="button" (click)="triggerFileInput()">
                       <i class="fa fa-upload"></i> Choose Photo
                     </button>
-                    <button
-                      class="btn btn-primary"
-                      type="button"
-                      (click)="addArtist()"
-                      [disabled]="isUploadingArtist"
-                    >
+                    <button class="btn btn-primary" type="button" (click)="addArtist()" [disabled]="isUploadingArtist">
                       <i class="fa fa-plus"></i> {{ isUploadingArtist ? 'Uploading...' : 'Add' }}
                     </button>
                   </div>
-                  <small class="text-muted"
-                    >Max file size: 2MB | Allowed types: JPG, PNG, GIF</small
-                  >
+                  <small class="text-muted">Max file size: 2MB | Allowed types: JPG, PNG, GIF</small>
                 </div>
 
                 <!-- Artists List -->
@@ -459,20 +316,12 @@
                     <div class="list-group-item" *ngFor="let artist of artists; let i = index">
                       <div class="d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center">
-                          <img
-                            [src]="artist.artist_photo"
-                            [alt]="artist.artist_name"
-                            class="artist-thumb me-3"
+                          <img [src]="artist.artist_photo" [alt]="artist.artist_name" class="artist-thumb me-3"
                             style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px"
-                            onerror="this.src='assets/images/default-artist.png'"
-                          />
+                            onerror="this.src='assets/images/default-artist.png'" />
                           <span>{{ artist.artist_name }}</span>
                         </div>
-                        <button
-                          type="button"
-                          class="btn btn-sm btn-danger"
-                          (click)="removeArtist(i)"
-                        >
+                        <button type="button" class="btn btn-sm btn-danger" (click)="removeArtist(i)">
                           <i class="fa fa-trash"></i>
                         </button>
                       </div>
@@ -490,18 +339,10 @@
               <div class="form-row full-width">
                 <label>Add Gallery Images</label>
                 <div class="gallery-input-group mb-3">
-                  <input
-                    type="file"
-                    class="form-control"
-                    accept="image/*"
-                    multiple
-                    (change)="onGalleryImageSelected($event)"
-                    [disabled]="isUploadingGallery"
-                  />
-                  <small class="text-muted"
-                    >Max file size: 2MB per image | Allowed types: JPG, PNG, GIF | Multiple
-                    selection allowed</small
-                  >
+                  <input type="file" class="form-control" accept="image/*" multiple
+                    (change)="onGalleryImageSelected($event)" [disabled]="isUploadingGallery" />
+                  <small class="text-muted">Max file size: 2MB per image | Allowed types: JPG, PNG, GIF | Multiple
+                    selection allowed</small>
                   <div *ngIf="isUploadingGallery" class="text-info mt-1">
                     <i class="fa fa-spinner fa-spin"></i> Uploading images...
                   </div>
@@ -513,17 +354,11 @@
                   <div class="row row-cols-3 g-2">
                     <div class="col" *ngFor="let gallery of galleries; let i = index">
                       <div class="gallery-item position-relative">
-                        <img
-                          [src]="gallery.event_img"
-                          class="img-fluid rounded"
+                        <img [src]="gallery.event_img" class="img-fluid rounded"
                           style="height: 100px; width: 100%; object-fit: cover"
-                          onerror="this.src='assets/images/default-gallery.png'"
-                        />
-                        <button
-                          type="button"
-                          class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1"
-                          (click)="removeGallery(i)"
-                        >
+                          onerror="this.src='assets/images/default-gallery.png'" />
+                        <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1"
+                          (click)="removeGallery(i)">
                           <i class="fa fa-times"></i>
                         </button>
                       </div>
@@ -541,16 +376,9 @@
               <div class="form-row full-width">
                 <label>Upload Banner Image</label>
                 <div class="banner-input-group mb-3">
-                  <input
-                    type="file"
-                    class="form-control"
-                    accept="image/*"
-                    (change)="onBannerSelected($event)"
-                  />
-                  <small class="text-muted"
-                    >Recommended size: 1200x400px | Max file size: 5MB | Allowed types: JPG, PNG,
-                    GIF, WEBP</small
-                  >
+                  <input type="file" class="form-control" accept="image/*" (change)="onBannerSelected($event)" />
+                  <small class="text-muted">Recommended size: 1200x400px | Max file size: 5MB | Allowed types: JPG, PNG,
+                    GIF, WEBP</small>
                   <div *ngIf="isUploadingBanner" class="text-info mt-1">
                     <i class="fa fa-spinner fa-spin"></i> Uploading banner...
                   </div>
@@ -559,32 +387,73 @@
                 <!-- Banner Preview -->
                 <div *ngIf="bannerPreviewUrl" class="banner-preview mb-3">
                   <h6>Banner Preview</h6>
-                  <img
-                    [src]="bannerPreviewUrl"
-                    class="img-fluid rounded"
-                    style="max-height: 200px"
-                  />
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-danger mt-2"
-                    (click)="clearBannerPreview()"
-                  >
+                  <img [src]="bannerPreviewUrl" class="img-fluid rounded" style="max-height: 200px" />
+                  <button type="button" class="btn btn-sm btn-danger mt-2" (click)="clearBannerPreview()">
                     <i class="fa fa-times"></i> Remove
                   </button>
                 </div>
 
                 <!-- Existing Banner -->
-                <div
-                  *ngIf="eventForm.banner_image && !bannerPreviewUrl"
-                  class="existing-banner mb-3"
-                >
+                <div *ngIf="eventForm.banner_image && !bannerPreviewUrl" class="existing-banner mb-3">
                   <h6>Current Banner</h6>
-                  <img
-                    [src]="eventForm.banner_image"
-                    class="img-fluid rounded"
-                    style="max-height: 200px"
-                    onerror="this.src='assets/images/default-banner.png'"
-                  />
+                  <img [src]="eventForm.banner_image" class="img-fluid rounded" style="max-height: 200px"
+                    onerror="this.src='assets/images/default-banner.png'" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Add this section after Gallery Section in the modal -->
+          <div class="form-section">
+            <h6 class="section-title">Seat Types & Pricing</h6>
+            <div class="form-grid">
+              <div class="form-row full-width">
+                <label>Add Seat Types</label>
+                <div class="seat-type-input-group mb-3">
+                  <div class="input-group mb-2">
+                    <input type="text" class="form-control" [(ngModel)]="newSeatType.seat_name" name="newSeatName"
+                      placeholder="Seat Name (e.g., VIP, Gold, Silver)" style="max-width: 200px;" />
+                    <input type="number" class="form-control" [(ngModel)]="newSeatType.price" name="newSeatPrice"
+                      placeholder="Price per seat" min="0" step="0.01" style="max-width: 150px;" />
+                    <input type="number" class="form-control" [(ngModel)]="newSeatType.total_seats" name="newSeatTotal"
+                      placeholder="Total Seats" min="1" style="max-width: 150px;" />
+                    <button class="btn btn-primary" type="button" (click)="addSeatType()"
+                      [disabled]="!isValidSeatType()">
+                      <i class="fa fa-plus"></i> Add Seat Type
+                    </button>
+                  </div>
+                  <small class="text-muted">Add different seat types with pricing and capacity</small>
+                </div>
+
+                <!-- Seat Types List -->
+                <div class="seat-types-list" *ngIf="seatTypes.length > 0">
+                  <h6>Added Seat Types ({{ seatTypes.length }})</h6>
+                  <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                      <thead>
+                        <tr>
+                          <th>Seat Name</th>
+                          <th>Price (₹)</th>
+                          <th>Total Seats</th>
+                          <th>Available</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let seatType of seatTypes; let i = index">
+                          <td>{{ seatType.seat_name }}</td>
+                          <td>₹{{ seatType.price | number:'1.2-2' }}</td>
+                          <td>{{ seatType.total_seats }}</td>
+                          <td>{{ seatType.available_seats || seatType.total_seats }}</td>
+                          <td>
+                            <button type="button" class="btn btn-sm btn-danger" (click)="removeSeatType(i)">
+                              <i class="fa fa-trash"></i>
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
@@ -596,44 +465,34 @@
             <div class="form-grid">
               <div class="form-row">
                 <label>Age Limit</label>
-                <input
-                  type="number"
-                  class="form-control"
-                  [(ngModel)]="eventForm.age_limit"
-                  name="ageLimit"
-                />
+                <input type="number" class="form-control" [(ngModel)]="eventForm.age_limit" name="ageLimit" />
               </div>
 
               <div class="form-row">
+                <label>Status *</label>
+                <select class="form-control" [(ngModel)]="eventForm.status" name="status" required>
+                  <!-- <option value="draft">Draft</option> -->
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+
+              <!-- <div class="form-row">
                 <label>Minimum Price ($)</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  class="form-control"
-                  [(ngModel)]="eventForm.min_price"
-                  name="minPrice"
-                />
+                <input type="number" step="0.01" class="form-control" [(ngModel)]="eventForm.min_price"
+                  name="minPrice" />
               </div>
 
               <div class="form-row">
                 <label>Maximum Price ($)</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  class="form-control"
-                  [(ngModel)]="eventForm.max_price"
-                  name="maxPrice"
-                />
-              </div>
+                <input type="number" step="0.01" class="form-control" [(ngModel)]="eventForm.max_price"
+                  name="maxPrice" />
+              </div> -->
 
               <div class="form-row full-width">
                 <label>Terms & Conditions</label>
-                <textarea
-                  class="form-control"
-                  rows="4"
-                  [(ngModel)]="eventForm.terms_and_conditions"
-                  name="termsAndConditions"
-                ></textarea>
+                <textarea class="form-control" rows="4" [(ngModel)]="eventForm.terms_and_conditions"
+                  name="termsAndConditions"></textarea>
               </div>
             </div>
           </div>
@@ -645,12 +504,8 @@
               <div class="form-row">
                 <div class="checkbox-group">
                   <label class="checkbox-label">
-                    <input
-                      type="checkbox"
-                      class="form-checkbox"
-                      [(ngModel)]="eventForm.is_featured"
-                      name="isFeatured"
-                    />
+                    <input type="checkbox" class="form-checkbox" [(ngModel)]="eventForm.is_featured"
+                      name="isFeatured" />
                     <span class="checkmark"></span>
                     Featured Event
                   </label>
@@ -658,34 +513,23 @@
                 </div>
               </div>
 
-              <div class="form-row">
+              <!-- <div class="form-row">
                 <label>Status *</label>
                 <select class="form-control" [(ngModel)]="eventForm.status" name="status" required>
-                  <!-- <option value="draft">Draft</option> -->
                   <option value="active">Active</option>
                   <option value="inactive">Inactive</option>
                 </select>
-              </div>
+              </div> -->
             </div>
           </div>
         </form>
       </div>
 
       <div class="modal-footer">
-        <button
-          type="button"
-          class="btn btn-secondary"
-          data-bs-dismiss="modal"
-          (click)="resetForm()"
-        >
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="resetForm()">
           Cancel
         </button>
-        <button
-          type="button"
-          class="btn btn-primary btn-modal-add"
-          (click)="createEvent()"
-          [disabled]="isSubmitting"
-        >
+        <button type="button" class="btn btn-primary btn-modal-add" (click)="createEvent()" [disabled]="isSubmitting">
           <i class="fa fa-plus"></i> {{ isSubmitting ? 'Creating...' : 'Create Event' }}
         </button>
       </div>
@@ -694,24 +538,13 @@
 </div>
 
 <!-- EDIT EVENT MODAL -->
-<div
-  class="modal fade"
-  id="editEventModal"
-  tabindex="-1"
-  aria-labelledby="editEventLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="editEventModal" tabindex="-1" aria-labelledby="editEventLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content modal-card">
       <div class="modal-header">
         <h5 class="modal-title" id="editEventLabel">Edit Event</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-          (click)="resetForm()"
-        ></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+          (click)="resetForm()"></button>
       </div>
 
       <div class="modal-body">
@@ -722,23 +555,12 @@
             <div class="form-grid">
               <div class="form-row">
                 <label>Event Name *</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  [(ngModel)]="eventForm.event_name"
-                  name="eventName"
-                  required
-                />
+                <input type="text" class="form-control" [(ngModel)]="eventForm.event_name" name="eventName" required />
               </div>
 
               <div class="form-row">
                 <label>Event Category *</label>
-                <select
-                  class="form-control"
-                  [(ngModel)]="eventForm.event_category_id"
-                  name="eventCategory"
-                  required
-                >
+                <select class="form-control" [(ngModel)]="eventForm.event_category_id" name="eventCategory" required>
                   <option value="">Select Category</option>
                   <!-- Loading State -->
                   <option *ngIf="isLoadingCategories" value="" disabled>
@@ -749,46 +571,30 @@
                     No categories available
                   </option>
                   <!-- Categories List -->
-                  <option
-                    *ngFor="let category of categories"
-                    [value]="category.event_category_id"
-                    [selected]="category.event_category_id === eventForm.event_category_id"
-                  >
+                  <option *ngFor="let category of categories" [value]="category.event_category_id"
+                    [selected]="category.event_category_id === eventForm.event_category_id">
                     {{ category.event_category_name }}
                   </option>
                 </select>
                 <small *ngIf="isLoadingCategories" class="text-muted mt-1">
                   <i class="fa fa-spinner fa-spin"></i> Loading categories...
                 </small>
-                <small
-                  *ngIf="!isLoadingCategories && categories.length === 0"
-                  class="text-warning mt-1"
-                >
+                <small *ngIf="!isLoadingCategories && categories.length === 0" class="text-warning mt-1">
                   No event categories found. Please add categories first.
                 </small>
               </div>
 
               <div class="form-row full-width">
                 <label>Event Description *</label>
-                <textarea
-                  class="form-control"
-                  rows="4"
-                  [(ngModel)]="eventForm.event_description"
-                  name="eventDescription"
-                  required
-                ></textarea>
+                <textarea class="form-control" rows="4" [(ngModel)]="eventForm.event_description"
+                  name="eventDescription" required></textarea>
               </div>
 
-              <div class="form-row">
+              <!-- <div class="form-row">
                 <label>No. of Seats</label>
-                <input
-                  type="number"
-                  class="form-control"
-                  [(ngModel)]="eventForm.no_of_seats"
-                  name="noOfSeats"
-                  placeholder="e.g., 100"
-                />
-              </div>
+                <input type="number" class="form-control" [(ngModel)]="eventForm.no_of_seats" name="noOfSeats"
+                  placeholder="e.g., 100" />
+              </div> -->
             </div>
           </div>
 
@@ -798,50 +604,26 @@
             <div class="form-grid">
               <div class="form-row">
                 <label>Event Date *</label>
-                <input
-                  type="date"
-                  class="form-control"
-                  [(ngModel)]="eventForm.event_date"
-                  name="eventDate"
-                  required
-                  (change)="calculateDuration()"
-                />
+                <input type="date" class="form-control" [(ngModel)]="eventForm.event_date" name="eventDate" required
+                  (change)="calculateDuration()" />
               </div>
 
               <div class="form-row">
                 <label>Start Time *</label>
-                <input
-                  type="time"
-                  class="form-control"
-                  [(ngModel)]="eventForm.start_time"
-                  name="startTime"
-                  required
-                  (change)="calculateDuration()"
-                />
+                <input type="time" class="form-control" [(ngModel)]="eventForm.start_time" name="startTime" required
+                  (change)="calculateDuration()" />
               </div>
 
               <div class="form-row">
                 <label>End Time *</label>
-                <input
-                  type="time"
-                  class="form-control"
-                  [(ngModel)]="eventForm.end_time"
-                  name="endTime"
-                  required
-                  (change)="calculateDuration()"
-                />
+                <input type="time" class="form-control" [(ngModel)]="eventForm.end_time" name="endTime" required
+                  (change)="calculateDuration()" />
               </div>
 
               <div class="form-row">
                 <label>Total Duration (minutes) *</label>
-                <input
-                  type="number"
-                  class="form-control"
-                  [(ngModel)]="eventForm.total_duration_minutes"
-                  name="totalDuration"
-                  required
-                  readonly
-                />
+                <input type="number" class="form-control" [(ngModel)]="eventForm.total_duration_minutes"
+                  name="totalDuration" required readonly />
               </div>
             </div>
           </div>
@@ -852,24 +634,13 @@
             <div class="form-grid">
               <div class="form-row">
                 <label>Location *</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  [(ngModel)]="eventForm.location"
-                  name="location"
-                  placeholder="e.g., Central Park"
-                  required
-                />
+                <input type="text" class="form-control" [(ngModel)]="eventForm.location" name="location"
+                  placeholder="e.g., Central Park" required />
               </div>
 
               <div class="form-row">
                 <label>Language *</label>
-                <select
-                  class="form-control"
-                  [(ngModel)]="eventForm.language"
-                  name="language"
-                  required
-                >
+                <select class="form-control" [(ngModel)]="eventForm.language" name="language" required>
                   <!-- <option value="english" [selected]="eventForm.language === 'english'">
                     English
                   </option>
@@ -890,45 +661,24 @@
 
               <div class="form-row full-width">
                 <label>Full Address *</label>
-                <textarea
-                  class="form-control"
-                  rows="3"
-                  [(ngModel)]="eventForm.full_address"
-                  name="fullAddress"
-                  required
-                ></textarea>
+                <textarea class="form-control" rows="3" [(ngModel)]="eventForm.full_address" name="fullAddress"
+                  required></textarea>
               </div>
 
               <div class="form-row">
                 <label>Google Maps URL</label>
-                <input
-                  type="url"
-                  class="form-control"
-                  [(ngModel)]="eventForm.geo_map_url"
-                  name="geoMapUrl"
-                />
+                <input type="url" class="form-control" [(ngModel)]="eventForm.geo_map_url" name="geoMapUrl" />
               </div>
 
               <div class="form-row">
                 <label>Latitude</label>
-                <input
-                  type="number"
-                  step="any"
-                  class="form-control"
-                  [(ngModel)]="eventForm.latitude"
-                  name="latitude"
-                />
+                <input type="number" step="any" class="form-control" [(ngModel)]="eventForm.latitude" name="latitude" />
               </div>
 
               <div class="form-row">
                 <label>Longitude</label>
-                <input
-                  type="number"
-                  step="any"
-                  class="form-control"
-                  [(ngModel)]="eventForm.longitude"
-                  name="longitude"
-                />
+                <input type="number" step="any" class="form-control" [(ngModel)]="eventForm.longitude"
+                  name="longitude" />
               </div>
             </div>
           </div>
@@ -941,41 +691,18 @@
                 <label>Add Artists</label>
                 <div class="artist-input-group mb-3">
                   <div class="input-group">
-                    <input
-                      type="text"
-                      class="form-control"
-                      [(ngModel)]="newArtistName"
-                      name="newArtistName"
-                      placeholder="Artist Name"
-                    />
-                    <input
-                      #artistPhotoInputEdit
-                      type="file"
-                      class="form-control"
-                      id="artistPhotoInputEdit"
-                      accept="image/*"
-                      (change)="onArtistPhotoSelected($event)"
-                      hidden
-                    />
-                    <button
-                      class="btn btn-outline-secondary"
-                      type="button"
-                      (click)="triggerFileInputEdit()"
-                    >
+                    <input type="text" class="form-control" [(ngModel)]="newArtistName" name="newArtistName"
+                      placeholder="Artist Name" />
+                    <input #artistPhotoInputEdit type="file" class="form-control" id="artistPhotoInputEdit"
+                      accept="image/*" (change)="onArtistPhotoSelected($event)" hidden />
+                    <button class="btn btn-outline-secondary" type="button" (click)="triggerFileInputEdit()">
                       <i class="fa fa-upload"></i> Choose Photo
                     </button>
-                    <button
-                      class="btn btn-primary"
-                      type="button"
-                      (click)="addArtist()"
-                      [disabled]="isUploadingArtist"
-                    >
+                    <button class="btn btn-primary" type="button" (click)="addArtist()" [disabled]="isUploadingArtist">
                       <i class="fa fa-plus"></i> {{ isUploadingArtist ? 'Uploading...' : 'Add' }}
                     </button>
                   </div>
-                  <small class="text-muted"
-                    >Max file size: 2MB | Allowed types: JPG, PNG, GIF</small
-                  >
+                  <small class="text-muted">Max file size: 2MB | Allowed types: JPG, PNG, GIF</small>
                 </div>
 
                 <!-- Artists List -->
@@ -985,20 +712,12 @@
                     <div class="list-group-item" *ngFor="let artist of artists; let i = index">
                       <div class="d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center">
-                          <img
-                            [src]="artist.artist_photo"
-                            [alt]="artist.artist_name"
-                            class="artist-thumb me-3"
+                          <img [src]="artist.artist_photo" [alt]="artist.artist_name" class="artist-thumb me-3"
                             style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px"
-                            onerror="this.src='assets/images/default-artist.png'"
-                          />
+                            onerror="this.src='assets/images/default-artist.png'" />
                           <span>{{ artist.artist_name }}</span>
                         </div>
-                        <button
-                          type="button"
-                          class="btn btn-sm btn-danger"
-                          (click)="removeArtist(i)"
-                        >
+                        <button type="button" class="btn btn-sm btn-danger" (click)="removeArtist(i)">
                           <i class="fa fa-trash"></i>
                         </button>
                       </div>
@@ -1016,18 +735,10 @@
               <div class="form-row full-width">
                 <label>Add Gallery Images</label>
                 <div class="gallery-input-group mb-3">
-                  <input
-                    type="file"
-                    class="form-control"
-                    accept="image/*"
-                    multiple
-                    (change)="onGalleryImageSelected($event)"
-                    [disabled]="isUploadingGallery"
-                  />
-                  <small class="text-muted"
-                    >Max file size: 2MB per image | Allowed types: JPG, PNG, GIF | Multiple
-                    selection allowed</small
-                  >
+                  <input type="file" class="form-control" accept="image/*" multiple
+                    (change)="onGalleryImageSelected($event)" [disabled]="isUploadingGallery" />
+                  <small class="text-muted">Max file size: 2MB per image | Allowed types: JPG, PNG, GIF | Multiple
+                    selection allowed</small>
                   <div *ngIf="isUploadingGallery" class="text-info mt-1">
                     <i class="fa fa-spinner fa-spin"></i> Uploading images...
                   </div>
@@ -1039,17 +750,11 @@
                   <div class="row row-cols-3 g-2">
                     <div class="col" *ngFor="let gallery of galleries; let i = index">
                       <div class="gallery-item position-relative">
-                        <img
-                          [src]="gallery.event_img"
-                          class="img-fluid rounded"
+                        <img [src]="gallery.event_img" class="img-fluid rounded"
                           style="height: 100px; width: 100%; object-fit: cover"
-                          onerror="this.src='assets/images/default-gallery.png'"
-                        />
-                        <button
-                          type="button"
-                          class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1"
-                          (click)="removeGallery(i)"
-                        >
+                          onerror="this.src='assets/images/default-gallery.png'" />
+                        <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1"
+                          (click)="removeGallery(i)">
                           <i class="fa fa-times"></i>
                         </button>
                       </div>
@@ -1067,16 +772,9 @@
               <div class="form-row full-width">
                 <label>Upload Banner Image</label>
                 <div class="banner-input-group mb-3">
-                  <input
-                    type="file"
-                    class="form-control"
-                    accept="image/*"
-                    (change)="onBannerSelected($event)"
-                  />
-                  <small class="text-muted"
-                    >Recommended size: 1200x400px | Max file size: 5MB | Allowed types: JPG, PNG,
-                    GIF, WEBP</small
-                  >
+                  <input type="file" class="form-control" accept="image/*" (change)="onBannerSelected($event)" />
+                  <small class="text-muted">Recommended size: 1200x400px | Max file size: 5MB | Allowed types: JPG, PNG,
+                    GIF, WEBP</small>
                   <div *ngIf="isUploadingBanner" class="text-info mt-1">
                     <i class="fa fa-spinner fa-spin"></i> Uploading banner...
                   </div>
@@ -1085,32 +783,73 @@
                 <!-- Banner Preview -->
                 <div *ngIf="bannerPreviewUrl" class="banner-preview mb-3">
                   <h6>Banner Preview</h6>
-                  <img
-                    [src]="bannerPreviewUrl"
-                    class="img-fluid rounded"
-                    style="max-height: 200px"
-                  />
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-danger mt-2"
-                    (click)="clearBannerPreview()"
-                  >
+                  <img [src]="bannerPreviewUrl" class="img-fluid rounded" style="max-height: 200px" />
+                  <button type="button" class="btn btn-sm btn-danger mt-2" (click)="clearBannerPreview()">
                     <i class="fa fa-times"></i> Remove
                   </button>
                 </div>
 
                 <!-- Existing Banner -->
-                <div
-                  *ngIf="eventForm.banner_image && !bannerPreviewUrl"
-                  class="existing-banner mb-3"
-                >
+                <div *ngIf="eventForm.banner_image && !bannerPreviewUrl" class="existing-banner mb-3">
                   <h6>Current Banner</h6>
-                  <img
-                    [src]="eventForm.banner_image"
-                    class="img-fluid rounded"
-                    style="max-height: 200px"
-                    onerror="this.src='assets/images/default-banner.png'"
-                  />
+                  <img [src]="eventForm.banner_image" class="img-fluid rounded" style="max-height: 200px"
+                    onerror="this.src='assets/images/default-banner.png'" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Add this after the Banner Section -->
+          <div class="form-section">
+            <h6 class="section-title">Seat Types & Pricing</h6>
+            <div class="form-grid">
+              <div class="form-row full-width">
+                <label>Add Seat Types</label>
+                <div class="seat-type-input-group mb-3">
+                  <div class="input-group mb-2">
+                    <input type="text" class="form-control" [(ngModel)]="newSeatType.seat_name" name="newSeatName"
+                      placeholder="Seat Name (e.g., VIP, Gold, Silver)" style="max-width: 200px;" />
+                    <input type="number" class="form-control" [(ngModel)]="newSeatType.price" name="newSeatPrice"
+                      placeholder="Price per seat" min="0" step="0.01" style="max-width: 150px;" />
+                    <input type="number" class="form-control" [(ngModel)]="newSeatType.total_seats" name="newSeatTotal"
+                      placeholder="Total Seats" min="1" style="max-width: 150px;" />
+                    <button class="btn btn-primary" type="button" (click)="addSeatType()"
+                      [disabled]="!isValidSeatType()">
+                      <i class="fa fa-plus"></i> Add Seat Type
+                    </button>
+                  </div>
+                  <small class="text-muted">Add different seat types with pricing and capacity</small>
+                </div>
+
+                <!-- Seat Types List -->
+                <div class="seat-types-list" *ngIf="seatTypes.length > 0">
+                  <h6>Current Seat Types ({{ seatTypes.length }})</h6>
+                  <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                      <thead>
+                        <tr>
+                          <th>Seat Name</th>
+                          <th>Price (₹)</th>
+                          <th>Total Seats</th>
+                          <th>Available</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let seatType of seatTypes; let i = index">
+                          <td>{{ seatType.seat_name }}</td>
+                          <td>₹{{ seatType.price | number:'1.2-2' }}</td>
+                          <td>{{ seatType.total_seats }}</td>
+                          <td>{{ seatType.available_seats || seatType.total_seats }}</td>
+                          <td>
+                            <button type="button" class="btn btn-sm btn-danger" (click)="removeSeatType(i)">
+                              <i class="fa fa-trash"></i>
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1122,66 +861,7 @@
             <div class="form-grid">
               <div class="form-row">
                 <label>Age Limit</label>
-                <input
-                  type="number"
-                  class="form-control"
-                  [(ngModel)]="eventForm.age_limit"
-                  name="ageLimit"
-                />
-              </div>
-
-              <div class="form-row">
-                <label>Minimum Price ($)</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  class="form-control"
-                  [(ngModel)]="eventForm.min_price"
-                  name="minPrice"
-                />
-              </div>
-
-              <div class="form-row">
-                <label>Maximum Price ($)</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  class="form-control"
-                  [(ngModel)]="eventForm.max_price"
-                  name="maxPrice"
-                />
-              </div>
-
-              <div class="form-row full-width">
-                <label>Terms & Conditions</label>
-                <textarea
-                  class="form-control"
-                  rows="4"
-                  [(ngModel)]="eventForm.terms_and_conditions"
-                  name="termsAndConditions"
-                ></textarea>
-              </div>
-            </div>
-          </div>
-
-          <!-- Settings Section -->
-          <div class="form-section">
-            <h6 class="section-title">Settings</h6>
-            <div class="form-grid">
-              <div class="form-row">
-                <div class="checkbox-group">
-                  <label class="checkbox-label">
-                    <input
-                      type="checkbox"
-                      class="form-checkbox"
-                      [(ngModel)]="eventForm.is_featured"
-                      name="isFeatured"
-                    />
-                    <span class="checkmark"></span>
-                    Featured Event
-                  </label>
-                  <span class="checkbox-hint">Show this event as featured on homepage</span>
-                </div>
+                <input type="number" class="form-control" [(ngModel)]="eventForm.age_limit" name="ageLimit" />
               </div>
 
               <div class="form-row">
@@ -1194,26 +874,63 @@
                   </option>
                 </select>
               </div>
+
+              <!-- <div class="form-row">
+                <label>Minimum Price ($)</label>
+                <input type="number" step="0.01" class="form-control" [(ngModel)]="eventForm.min_price"
+                  name="minPrice" />
+              </div>
+
+              <div class="form-row">
+                <label>Maximum Price ($)</label>
+                <input type="number" step="0.01" class="form-control" [(ngModel)]="eventForm.max_price"
+                  name="maxPrice" />
+              </div> -->
+
+              <div class="form-row full-width">
+                <label>Terms & Conditions</label>
+                <textarea class="form-control" rows="4" [(ngModel)]="eventForm.terms_and_conditions"
+                  name="termsAndConditions"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Settings Section -->
+          <div class="form-section">
+            <h6 class="section-title">Settings</h6>
+            <div class="form-grid">
+              <div class="form-row">
+                <div class="checkbox-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" class="form-checkbox" [(ngModel)]="eventForm.is_featured"
+                      name="isFeatured" />
+                    <span class="checkmark"></span>
+                    Featured Event
+                  </label>
+                  <span class="checkbox-hint">Show this event as featured on homepage</span>
+                </div>
+              </div>
+
+              <!-- <div class="form-row">
+                <label>Status *</label>
+                <select class="form-control" [(ngModel)]="eventForm.status" name="status" required>
+                  <option value="active" [selected]="eventForm.status === 'active'">Active</option>
+                  <option value="inactive" [selected]="eventForm.status === 'inactive'">
+                    Inactive
+                  </option>
+                </select>
+              </div> -->
             </div>
           </div>
         </form>
       </div>
 
       <div class="modal-footer">
-        <button
-          type="button"
-          class="btn btn-secondary"
-          data-bs-dismiss="modal"
-          (click)="resetForm()"
-        >
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="resetForm()">
           Cancel
         </button>
-        <button
-          type="button"
-          class="btn btn-primary btn-modal-update"
-          (click)="updateEvent()"
-          [disabled]="isSubmitting"
-        >
+        <button type="button" class="btn btn-primary btn-modal-update" (click)="updateEvent()"
+          [disabled]="isSubmitting">
           <i class="fa fa-save"></i> {{ isSubmitting ? 'Updating...' : 'Update Event' }}
         </button>
       </div>

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { CommonResponse, CommonResponseModel, EventCategoryModel, EventCategoryRequest, EventCompleteResponseModel, EventCreateRequestModel, EventDetailsModel, EventPaginationRequest, GenerateOTPRequest, GetShowsByArtistsRequest, OrganizerModel, OrganizerPagedResponse, OrganizerRequest, OTPResponse, PagedResponse, PaginationRequest, ResendOTPRequest, ResendOTPResponse, ShowsByArtistsResponse, SignUpRequest, SignUpResponse, SimilarEventsRequest, TestimonialModel, TestimonialsResponse, UpcomingEventResponse, UpcomingEventsRequest, UpcomingEventsResponse, UpdateEventCategoryStatusRequest, UpdateOrganizerStatusRequest, UpdateTestimonialStatusRequest, UserIdRequest, VerifyOTPRequest } from '../models/auth.model';
+import { CommonResponse, CommonResponseModel, EventCategoryModel, EventCategoryRequest, EventCompleteResponseModel, EventCreateRequestModel, EventDetailsModel, EventPaginationRequest, EventSeatTypeInventoryModel, GenerateOTPRequest, GetShowsByArtistsRequest, OrganizerModel, OrganizerPagedResponse, OrganizerRequest, OTPResponse, PagedResponse, PaginationRequest, ResendOTPRequest, ResendOTPResponse, ShowsByArtistsResponse, SignUpRequest, SignUpResponse, SimilarEventsRequest, TestimonialModel, TestimonialsResponse, UpcomingEventResponse, UpcomingEventsRequest, UpcomingEventsResponse, UpdateEventCategoryStatusRequest, UpdateOrganizerStatusRequest, UpdateTestimonialStatusRequest, UserIdRequest, VerifyOTPRequest } from '../models/auth.model';
 
 @Injectable({
   providedIn: 'root',
@@ -194,6 +194,19 @@ export class ApiService {
 
     const url = `${this.ThApi}api/EventDetails/UploadEventBanner`;
     return this.httpClient.post<CommonResponseModel<string>>(url, formData);
+  }
+
+  // Get seat types for event
+  getEventSeatTypes(eventId: number): Observable<CommonResponseModel<EventSeatTypeInventoryModel[]>> {
+    const url = `${this.ThApi}api/EventDetails/GetEventSeatTypes/${eventId}`;
+    return this.httpClient.get<CommonResponseModel<EventSeatTypeInventoryModel[]>>(url);
+  }
+
+  // Add seat types to event
+  addEventSeatTypes(seatTypes: EventSeatTypeInventoryModel[]): 
+    Observable<CommonResponseModel<EventSeatTypeInventoryModel[]>> {
+    const url = `${this.ThApi}api/EventDetails/AddEventSeatTypes`;
+    return this.httpClient.post<CommonResponseModel<EventSeatTypeInventoryModel[]>>(url, seatTypes);
   }
 
   // Create event with artists and galleries
