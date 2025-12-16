@@ -13,6 +13,9 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
+  private authOrigin = new BehaviorSubject<string | null>(null);
+  public authOrigin$ = this.authOrigin.asObservable();
+
   // constructor(private http: HttpClient) {
   //   this.loadUserFromStorage();
   // }
@@ -124,6 +127,26 @@ export class AuthService {
     this.currentUserSubject.next(user);
   }
 
+  // Add this method to AuthService class
+  setcurrentUser(user: User): void {
+    this.currentUserSubject.next(user);
+  }
+
+  // Modify the existing setCurrentUser method to be private
+  private setCurrentUserFromLogin(loginResponse: LoginResponse): void {
+    const user: User = {
+      user_id: loginResponse.user_id,
+      first_name: loginResponse.first_name,
+      last_name: loginResponse.last_name,
+      email: loginResponse.email,
+      mobile: loginResponse.mobile,
+      country_code: loginResponse.country_code,
+      profile_img: loginResponse.profile_img,
+      role_id: loginResponse.role_id,
+    };
+    this.currentUserSubject.next(user);
+  }
+
   private loadUserFromStorage(): void {
     const userData = localStorage.getItem(environment.USERDATA_KEY);
     if (userData) {
@@ -195,5 +218,27 @@ export class AuthService {
   getUserRoleName(): string {
     const roleId = this.getUserRole();
     return ROLE_NAMES[roleId!] || 'Unknown Role';
+  }
+
+  // Set authentication origin
+  setAuthOrigin(origin: string): void {
+    this.authOrigin.next(origin);
+  }
+
+  // Get authentication origin
+  getAuthOrigin(): string | null {
+    return this.authOrigin.value;
+  }
+
+  // Clear authentication origin
+  clearAuthOrigin(): void {
+    this.authOrigin.next(null);
+  }
+
+  // Method to get superadmin/system user ID
+  getSystemUserId(): string {
+    // Return system user ID or get from environment/config
+    // return environment.SUPERADMIN_USER_ID || 'system';
+    return 'system';
   }
 }

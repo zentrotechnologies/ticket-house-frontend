@@ -99,3 +99,111 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+/* User Welcome Dropdown Styles */
+.user-welcome-dropdown {
+  position: relative;
+  cursor: pointer;
+}
+
+.user-welcome-trigger {
+  color: #4896d1;
+  font-weight: 600;
+  padding: 8px 16px;
+  background: rgba(72, 150, 209, 0.1);
+  border-radius: 20px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.user-welcome-trigger:hover {
+  background: rgba(72, 150, 209, 0.15);
+}
+
+.user-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  min-width: 180px;
+  z-index: 1000;
+  border: 1px solid #e9ecef;
+  overflow: hidden;
+}
+
+.dropdown-item {
+  padding: 12px 16px;
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background-color: #e9ecef;
+  margin: 4px 0;
+}
+
+.logout-item {
+  color: #e53935;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logout-icon {
+  font-size: 16px;
+}
+
+/* Alternative simple style */
+.user-welcome-with-logout {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(72, 150, 209, 0.1);
+  padding: 8px 16px;
+  border-radius: 20px;
+}
+
+.user-welcome-with-logout span:first-child {
+  color: #4896d1;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.logout-link {
+  color: #e53935;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: rgba(229, 57, 53, 0.1);
+  transition: all 0.3s ease;
+}
+
+.logout-link:hover {
+  background: rgba(229, 57, 53, 0.2);
+}
+
+/* Dropdown backdrop */
+.dropdown-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+}

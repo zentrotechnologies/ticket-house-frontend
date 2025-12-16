@@ -1,5 +1,5 @@
 <div class="audience-page audience-body">
-  <!-- HEADER (reuse existing header exactly as-is) -->
+  <!-- HEADER -->
   <header class="audience-header">
     <div class="container">
       <div class="header-row">
@@ -8,11 +8,9 @@
           <div class="left-section-content">
             <!-- Logo -->
             <div class="logo-wrapper">
-              <img
-                class="logo"
+              <img class="logo"
                 src="https://zentrotechnologies.com/wp-content/uploads/2025/02/Zentro_Final-Logo-05-scaled-e1753251642526.png"
-                alt="Zentro Logo"
-              />
+                alt="Zentro Logo" />
             </div>
 
             <!-- Updated Breadcrumbs with proper navigation -->
@@ -34,11 +32,51 @@
           </div>
         </div>
 
-        <!-- Right Column (empty to keep layout intact) -->
+        <!-- Right Column -->
+        <!-- <div class="header-col actions-col">
+          <div class="user-actions">
+            <div class="location muted">Pune ▼</div>
+            <div *ngIf="isUserLoggedIn" class="user-welcome">
+              Welcome, {{ getUserDisplayName() }}!
+            </div>
+            <div *ngIf="!isUserLoggedIn" class="pill" (click)="onSignIn()">Sign In</div>
+          </div>
+        </div> -->
         <div class="header-col actions-col">
           <div class="user-actions">
             <div class="location muted">Pune ▼</div>
-            <div class="pill" (click)="onSignIn()">Sign In</div>
+
+            <!-- Show user welcome with dropdown when logged in -->
+            <div *ngIf="isUserLoggedIn" class="user-welcome-dropdown">
+              <div class="user-welcome-trigger" (click)="toggleDropdown()">
+                Welcome, {{ getUserDisplayName() }}! ▼
+              </div>
+
+              <!-- Dropdown menu -->
+              <div *ngIf="showUserDropdown" class="user-dropdown-menu">
+                <div class="dropdown-item" (click)="onViewProfile()">
+                  View Profile
+                </div>
+                <div class="dropdown-item" (click)="onViewBookings()">
+                  My Bookings
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-item logout-item" (click)="onLogout()">
+                  <span class="logout-icon">🚪</span>
+                  Logout
+                </div>
+              </div>
+            </div>
+
+            <!-- Simple user welcome without dropdown (alternative) -->
+            <!-- <div *ngIf="isUserLoggedIn" class="user-welcome-with-logout">
+                    <span>Welcome, {{ getUserDisplayName() }}!</span>
+                    <span class="logout-link" (click)="onLogout()">Logout</span>
+                  </div> 
+            -->
+
+            <!-- Show Sign In button when not logged in -->
+            <div *ngIf="!isUserLoggedIn" class="pill" (click)="onSignIn()">Sign In</div>
           </div>
         </div>
       </div>
@@ -46,18 +84,17 @@
   </header>
 
   <!-- Loading State -->
-  <div *ngIf="isLoading" class="loading-container">
+  <div *ngIf="isSeatLoading" class="loading-container">
     <div class="loading-spinner">Loading seat selection...</div>
   </div>
 
   <!-- PAGE CONTENT -->
-  <main class="ticket-page" *ngIf="!isLoading">
+  <main class="ticket-page" *ngIf="!isSeatLoading">
     <div class="ticket-container">
       <!-- Event Meta - Dynamic -->
       <div class="event-meta">
         <h2 class="event-title">{{ getEventTitle() }}</h2>
         <p class="event-sub">Select your seats for {{ getEventTitle() }}</p>
-        <!-- You can add more dynamic details here if you fetch event details -->
       </div>
 
       <!-- Ticket Selection -->
@@ -65,41 +102,181 @@
         <h3 class="section-title">Select Tickets</h3>
         <p class="section-sub">You can add up to 10 tickets only</p>
 
-        <!-- Ticket Card -->
-        <div class="ticket-card">
+        <!-- Dynamic Seat Cards -->
+        <div *ngFor="let seatType of seatTypes" class="ticket-card">
           <div class="ticket-info">
-            <div class="ticket-name">EARLY BIRD</div>
-            <div class="ticket-price">₹249</div>
+            <div class="ticket-name">{{ seatType.seat_name }}</div>
+            <div class="ticket-price">₹{{ seatType.price }}</div>
+            <div class="ticket-availability">
+              <span class="available-seats">{{ seatType.available_seats }} seats available</span>
+              <span class="total-seats">/ {{ seatType.total_seats }} total</span>
+            </div>
           </div>
 
-          <div class="ticket-qty">
-            <button class="qty-btn">−</button>
-            <span class="qty-count">3</span>
-            <button class="qty-btn">+</button>
+          <!-- Quantity Selector -->
+          <div *ngIf="selectedSeats[seatType.event_seat_type_inventory_id] > 0" class="ticket-qty">
+            <button class="qty-btn" (click)="decreaseSeats(seatType.event_seat_type_inventory_id)">−</button>
+            <span class="qty-count">{{ selectedSeats[seatType.event_seat_type_inventory_id] }}</span>
+            <button class="qty-btn" (click)="increaseSeats(seatType.event_seat_type_inventory_id)">+</button>
           </div>
+
+          <!-- Add Button (when quantity is 0) -->
+          <button *ngIf="selectedSeats[seatType.event_seat_type_inventory_id] === 0" class="add-btn"
+            (click)="increaseSeats(seatType.event_seat_type_inventory_id)" [disabled]="seatType.available_seats === 0">
+            {{ seatType.available_seats === 0 ? 'Sold Out' : 'Add' }}
+          </button>
         </div>
 
-        <!-- Ticket Card -->
-        <div class="ticket-card">
-          <div class="ticket-info">
-            <div class="ticket-name">ENTRY FOR 2</div>
-            <div class="ticket-price">₹399</div>
+        <!-- Selected Seats Summary -->
+        <div *ngIf="hasSelectedSeats()" class="selected-summary">
+          <h4>Selected Seats Summary</h4>
+          <div *ngFor="let item of getSelectedSeatsList()" class="summary-item">
+            <span>{{ item.seatType.seat_name }} × {{ item.quantity }}</span>
+            <span>₹{{ item.seatType.price * item.quantity }}</span>
           </div>
-
-          <button class="add-btn">Add</button>
+          <div class="summary-total">
+            <span>Total</span>
+            <span>₹{{ totalAmount }}</span>
+          </div>
         </div>
       </section>
     </div>
   </main>
 
   <!-- STICKY FOOTER BAR -->
-  <div class="ticket-footer" *ngIf="!isLoading">
+  <div class="ticket-footer" *ngIf="!isSeatLoading && hasSelectedSeats()">
     <div class="ticket-footer-inner">
       <div class="total">
-        <div class="amount">₹747</div>
-        <div class="count">3 Tickets</div>
+        <div class="amount">₹{{ totalAmount }}</div>
+        <div class="count">{{ getSelectedSeatCount() }} Tickets</div>
       </div>
-      <button class="proceed-btn">Proceed</button>
+      <button class="proceed-btn" (click)="onProceed()">Proceed</button>
+    </div>
+  </div>
+
+  <!-- Updated Login/Signup Modal -->
+  <div *ngIf="showAuthModal" class="modal-overlay">
+    <div class="modal-content auth-modal">
+      <div class="modal-header">
+        <h3>{{ isLoginMode ? 'Sign In' : 'Create Account' }}</h3>
+        <button class="modal-close" (click)="onCloseAuthModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Progress Steps for Signup -->
+        <div *ngIf="!isLoginMode" class="signup-steps">
+          <div class="step" [class.active]="signupStep === 1">
+            <span class="step-number">1</span>
+            <span class="step-text">Account Details</span>
+          </div>
+          <div class="step" [class.active]="signupStep === 2">
+            <span class="step-number">2</span>
+            <span class="step-text">Verify Email</span>
+          </div>
+        </div>
+
+        <!-- Login Form -->
+        <div *ngIf="isLoginMode && !showOTPVerification" class="login-section">
+          <div class="form-group">
+            <input type="email" [(ngModel)]="loginEmail" placeholder="Email" [disabled]="isLoading">
+          </div>
+          <div class="form-group">
+            <input type="password" [(ngModel)]="loginPassword" placeholder="Password" [disabled]="isLoading">
+          </div>
+
+          <button class="auth-btn" (click)="onLogin()" [disabled]="isLoading || !loginEmail || !loginPassword">
+            <span *ngIf="!isLoading">Sign In</span>
+            <span *ngIf="isLoading">Signing In...</span>
+          </button>
+
+          <div class="auth-footer">
+            <p>Don't have an account?
+              <a (click)="switchToSignup()">Sign Up</a>
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 1: Signup Form -->
+        <!-- In the signup section of your modal -->
+        <div *ngIf="!isLoginMode && signupStep === 1" class="signup-section">
+          <div class="form-group">
+            <input type="text" [(ngModel)]="signupFirstName" placeholder="First Name" [disabled]="isLoading">
+          </div>
+          <div class="form-group">
+            <input type="text" [(ngModel)]="signupLastName" placeholder="Last Name" [disabled]="isLoading">
+          </div>
+          <div class="form-group">
+            <input type="email" [(ngModel)]="signupEmail" placeholder="Email" [disabled]="isLoading">
+          </div>
+          <div class="form-group">
+            <input type="password" [(ngModel)]="signupPassword" placeholder="Password (min. 8 characters)"
+              [disabled]="isLoading">
+          </div>
+          <div class="form-row">
+            <div class="form-group country-code">
+              <select [(ngModel)]="signupCountryCode" [disabled]="isLoading">
+                <option value="+91">+91 IN</option>
+                <option value="+1">+1 US</option>
+                <option value="+44">+44 UK</option>
+                <option value="+61">+61 AU</option>
+                <option value="+65">+65 SG</option>
+              </select>
+            </div>
+            <div class="form-group phone-number">
+              <input type="text" [(ngModel)]="signupPhone" placeholder="Phone Number (optional)" [disabled]="isLoading">
+            </div>
+          </div>
+
+          <button class="auth-btn" (click)="onSignupStep1()"
+            [disabled]="isLoading || !signupFirstName || !signupEmail || !signupPassword || !isValidSignupStep1()">
+            <span *ngIf="!isLoading">Send OTP</span>
+            <span *ngIf="isLoading">Sending OTP...</span>
+          </button>
+
+          <div class="auth-footer">
+            <p>Already have an account?
+              <a (click)="switchToLogin()">Sign In</a>
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 2: OTP Verification -->
+        <div *ngIf="signupStep === 2 || showOTPVerification" class="otp-verification-section">
+          <div class="verification-header">
+            <h4>Verify Your Email</h4>
+            <p>Enter the 4-digit code sent to<br>
+              <strong>{{ signupEmail || loginEmail }}</strong>
+            </p>
+          </div>
+
+          <div class="otp-input-container">
+            <div class="otp-inputs">
+              <input *ngFor="let i of [0,1,2,3]; let idx = index" type="text" maxlength="1" [(ngModel)]="otpDigits[idx]"
+                (input)="onOtpInput($event, idx)" (keydown)="onOtpKeyDown($event, idx)" [disabled]="isLoading"
+                class="otp-digit">
+            </div>
+          </div>
+
+          <div class="otp-timer" *ngIf="otpTimer > 0">
+            OTP expires in: {{ formatOtpTimer() }}
+          </div>
+
+          <div class="otp-actions">
+            <button class="resend-btn" (click)="resendOTP()" [disabled]="otpTimer > 0 || isLoading">
+              Resend OTP
+            </button>
+
+            <button class="verify-btn" (click)="verifyOTP()" [disabled]="!isOtpComplete() || isLoading">
+              <span *ngIf="!isLoading">Verify & Continue</span>
+              <span *ngIf="isLoading">Verifying...</span>
+            </button>
+          </div>
+
+          <div class="auth-footer" *ngIf="signupStep === 2">
+            <a (click)="goBackToStep1()">← Back to Signup</a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

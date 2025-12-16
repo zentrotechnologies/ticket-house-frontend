@@ -478,3 +478,86 @@ export interface SimilarEventsRequest {
 
 // Add to auth.model.ts
 export interface SimilarEventsResponse extends CommonResponseModel<UpcomingEventResponse[]> {}
+
+// ===== BOOKING MODELS =====
+
+// Request Models
+export interface SeatSelectionRequest {
+  EventId: number;
+  SeatSelections: SeatSelection[];
+}
+
+export interface SeatSelection {
+  SeatTypeId: number;
+  Quantity: number;
+}
+
+export interface CreateBookingRequest {
+  EventId: number;
+  SeatSelections: SeatSelection[];
+}
+
+export interface SeatAvailabilityRequest {
+  SeatSelections: SeatSelection[];
+}
+
+export interface SeatUpdateRequest {
+  SeatTypeId: number;
+  Quantity: number;
+}
+
+// Response Models
+export interface SeatSelectionResponse {
+  EventId: number;
+  SeatDetails: SeatDetail[];
+  TotalAmount: number;
+}
+
+export interface SeatDetail {
+  SeatTypeId: number;
+  SeatName: string;
+  Price: number;
+  Quantity: number;
+  Subtotal: number;
+  AvailableSeats: number;
+}
+
+export interface BookingResponse {
+  BookingId: number;
+  BookingCode: string;
+  EventId: number;
+  EventName: string;
+  TotalAmount: number;
+  Status: string;
+  CreatedOn: Date;
+}
+
+export interface BookingDetailsResponse {
+  booking_id: number;
+  booking_code: string;
+  user_id: string;
+  event_id: number;
+  event_name: string;
+  event_date: Date;
+  start_time: string;
+  end_time: string;
+  location: string;
+  banner_image: string;
+  total_amount: number;
+  status: string;
+  created_on: Date;
+  first_name: string;
+  last_name: string;
+  email: string;
+  mobile: string;
+  BookingSeats: BookingSeatResponse[];
+}
+
+export interface BookingSeatResponse {
+  booking_seat_id: number;
+  event_seat_type_inventory_id: number;
+  seat_name: string;
+  quantity: number;
+  price_per_seat: number;
+  subtotal: number;
+}

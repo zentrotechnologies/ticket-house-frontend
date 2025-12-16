@@ -22,7 +22,10 @@
               <span class="crumb" [routerLink]="['/events']">Events</span>
               <span class="separator">›</span>
 
-              <span class="crumb" [routerLink]="['/seats-booking']">Ticket</span>
+              <span class="crumb" [routerLink]="['/event-booking', eventId, eventNameSlug]">{{ getFormattedEventTitle() }}</span>
+              <span class="separator">›</span>
+
+              <span class="crumb" [routerLink]="['/seats-booking', eventId, eventNameSlug]">Select Seats</span>
               <span class="separator">›</span>
 
               <span class="crumb active muted">Review & Pay</span>
@@ -30,8 +33,16 @@
           </div>
         </div>
 
-        <!-- Right Column (empty to keep layout intact) -->
-        <div class="header-col actions-col"></div>
+        <!-- Right Column -->
+        <div class="header-col actions-col">
+          <div class="user-actions">
+            <div class="location muted">Pune ▼</div>
+            <!-- Show user name when logged in -->
+            <div *ngIf="authService.isLoggedIn()" class="user-welcome">
+              Welcome, {{ authService.getUserDisplayName() }}!
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </header>
@@ -58,63 +69,106 @@
             <h4>M-Ticket Information</h4>
             <ol>
               <li>
-                Customer(s) can access their ticket(s) from the ‘My Profile’ section on the
+                Customer(s) can access their ticket(s) from the 'My Profile' section on the
                 app/mobile-web.
               </li>
               <li>It is mandatory to present the ticket(s) via app/mobile-web at the venue.</li>
               <li>No physical ticket(s) are required.</li>
             </ol>
           </div>
+
+          <!-- Booking Summary -->
+          <div class="booking-summary" *ngIf="seatSelections.length > 0">
+            <h4>Your Booking Details</h4>
+            <div class="summary-item" *ngFor="let seat of seatSelections">
+              <div class="seat-info">
+                <span class="seat-name">Seat Type {{ seat.SeatTypeId }}</span>
+                <span class="seat-quantity">× {{ seat.Quantity }}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       <!-- RIGHT SECTION -->
       <aside class="payment-right">
-        <div class="summary-card">
+        <!-- Event Summary Card -->
+        <div class="summary-card" *ngIf="eventTitle">
           <div class="summary-header">
-            <div class="summary-title">BEST IN STAND-UP: PUNE</div>
-            <div class="summary-amount">₹747.00</div>
+            <div class="summary-title">{{ eventTitle }}</div>
+            <div class="summary-amount">₹{{ totalAmount }}</div>
           </div>
 
           <div class="summary-body">
-            <p>3 Tickets</p>
-            <p>Sat, 13 Dec 2025</p>
-            <p>08:30 PM</p>
+            <p>{{ getTotalTickets() }} Tickets</p>
+            <p *ngIf="eventDate">{{ formatDate(eventDate) }}</p>
+            <p *ngIf="eventTime">{{ eventTime }}</p>
             <p class="muted">Venue</p>
-            <p>Boka Book Cafe: Pune</p>
+            <p *ngIf="eventLocation">{{ eventLocation }}</p>
 
             <hr />
 
-            <p>EARLY BIRD (₹249) · 3 ticket(s)</p>
+            <!-- Show seat details -->
+            <div *ngFor="let seat of seatSelections" class="seat-detail">
+              <p>Seat Type {{ seat.SeatTypeId }} · {{ seat.Quantity }} ticket(s)</p>
+            </div>
           </div>
         </div>
 
-        <div class="price-breakup">
+        <!-- Price Breakdown -->
+        <div class="price-breakup" *ngIf="totalAmount > 0">
           <div class="row">
             <span>Sub-total</span>
-            <span>₹747.00</span>
+            <span>₹{{ totalAmount }}</span>
           </div>
 
           <div class="row">
-            <span>Booking Fee</span>
-            <span>₹61.71</span>
+            <span>Booking Fee (8.26%)</span>
+            <span>₹{{ bookingFee }}</span>
           </div>
 
           <div class="row total">
             <span>Total Amount</span>
-            <span>₹808.71</span>
+            <span>₹{{ finalAmount }}</span>
           </div>
 
           <div class="state-select">
             <label>Select State</label>
-            <select>
+            <select [(ngModel)]="selectedState">
               <option>Maharashtra</option>
+              <option>Delhi</option>
+              <option>Karnataka</option>
+              <option>Tamil Nadu</option>
+              <option>Gujarat</option>
             </select>
           </div>
 
           <p class="consent">By proceeding, I express my consent to complete this transaction.</p>
 
-          <button class="pay-btn">Proceed to Pay</button>
+          <!-- Payment Button -->
+          <button 
+            class="pay-btn" 
+            (click)="onProceedToPay()" 
+            [disabled]="isProcessing || seatSelections.length === 0">
+            <span *ngIf="!isProcessing">Proceed to Pay ₹{{ finalAmount }}</span>
+            <span *ngIf="isProcessing">Processing...</span>
+          </button>
+
+          <!-- Confirm Payment Button (shows after booking is created) -->
+          <button 
+            *ngIf="bookingDetails" 
+            class="pay-btn confirm-btn"
+            (click)="confirmPayment()" 
+            [disabled]="isProcessing">
+            <span *ngIf="!isProcessing">Confirm Payment</span>
+            <span *ngIf="isProcessing">Confirming...</span>
+          </button>
+
+          <!-- Loading State -->
+          <div *ngIf="isProcessing" class="loading-state">
+            <div class="spinner"></div>
+            <p>Please wait while we process your request...</p>
+          </div>
         </div>
       </aside>
     </div>

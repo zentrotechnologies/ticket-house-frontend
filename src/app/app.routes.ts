@@ -58,7 +58,7 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'payment',
+    path: 'event-payment/:event_id/:event_name',
     loadComponent: () =>
       import('./pages/user/event-payment/event-payment.component').then(
         (m) => m.EventPaymentComponent
