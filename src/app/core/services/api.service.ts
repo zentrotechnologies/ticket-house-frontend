@@ -269,6 +269,12 @@ export class ApiService {
     return this.httpClient.get<ShowsByArtistsResponse>(url);
   }
 
+  // Add this method to get the price in range (200-1000)
+  getEventPriceInRange(eventId: number): Observable<CommonResponseModel<number>> {
+    const url = `${this.ThApi}api/UserEvents/GetEventPriceInRange/${eventId}`;
+    return this.httpClient.get<CommonResponseModel<number>>(url);
+  }
+
   // Get testimonials by artists
   getTestimonialsByArtists(): Observable<TestimonialsResponse> {
     const url = `${this.ThApi}api/UserEvents/GetTestimonialsByArtists`;

@@ -831,7 +831,7 @@
                           <th>Seat Name</th>
                           <th>Price (₹)</th>
                           <th>Total Seats</th>
-                          <th>Available</th>
+                          <!-- <th>Available</th> -->
                           <th>Action</th>
                         </tr>
                       </thead>
@@ -840,7 +840,7 @@
                           <td>{{ seatType.seat_name }}</td>
                           <td>₹{{ seatType.price | number:'1.2-2' }}</td>
                           <td>{{ seatType.total_seats }}</td>
-                          <td>{{ seatType.available_seats || seatType.total_seats }}</td>
+                          <!-- <td>{{ seatType.available_seats || seatType.total_seats }}</td> -->
                           <td>
                             <button type="button" class="btn btn-sm btn-danger" (click)="removeSeatType(i)">
                               <i class="fa fa-trash"></i>

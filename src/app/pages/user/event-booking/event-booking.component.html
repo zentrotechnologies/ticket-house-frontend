@@ -136,7 +136,7 @@
                             <div class="info-row">
                                 <div class="info-icon">⏱</div>
                                 <div class="info-text">
-                                    {{ formatTimeForDisplay(eventDetails.start_time) }} - 
+                                    {{ formatTimeForDisplay(eventDetails.start_time) }} -
                                     {{ formatTimeForDisplay(eventDetails.end_time) }}
                                 </div>
                             </div>
@@ -177,10 +177,12 @@
                             <div class="price-row">
                                 <div class="price-info">
                                     <div class="price">
-                                        {{ eventDetails.min_price ? '₹' + eventDetails.min_price : 'Free' }}
-                                        <span
-                                            *ngIf="eventDetails.max_price && eventDetails.min_price && eventDetails.max_price > eventDetails.min_price">
-                                            - ₹{{ eventDetails.max_price }}
+                                        <!-- Display price based on priority -->
+                                        <span *ngIf="!isPriceLoading">
+                                            {{ getDisplayPrice() }}{{ getPriceRangeDisplay() }}
+                                        </span>
+                                        <span *ngIf="isPriceLoading" class="price-loading">
+                                            Loading price...
                                         </span>
                                     </div>
                                     <div class="fill">Filling Fast</div>
@@ -236,78 +238,3 @@
             <img id="modalImage" src alt="Preview">
         </div>
     </div>
-
-    <!-- <script>
-        // Click-to-open modal for mini cards + main poster can also be clicked
-        (function(){
-        const modal = document.getElementById('imgModal');
-        const modalImg = document.getElementById('modalImage');
-        const modalClose = document.getElementById('modalClose');
-
-        // Open modal with image URL
-        function openModal(imgUrl, alt) {
-            modalImg.src = imgUrl;
-            modalImg.alt = alt || 'preview';
-            modal.classList.add('open');
-            modal.setAttribute('aria-hidden','false');
-            // prevent body scroll
-            document.body.style.overflow = 'hidden';
-        }
-
-        // Close modal
-        function closeModal() {
-            modal.classList.remove('open');
-            modal.setAttribute('aria-hidden','true');
-            modalImg.src = '';
-            document.body.style.overflow = '';
-        }
-
-        // Attach click handlers to all mini-cards
-        document.querySelectorAll('.mini-card').forEach(card => {
-            card.addEventListener('click', () => {
-            const img = card.getAttribute('data-img') || card.querySelector('.mini-poster').style.backgroundImage;
-            // if style background-image, convert to URL
-            let url = img;
-            if (img && img.indexOf('url(') === 0) {
-                url = img.replace(/^url\(['"]?/, '').replace(/['"]?\)$/, '');
-            }
-            openModal(url, card.querySelector('.mini-title')?.innerText || 'Show image');
-            });
-
-            // keyboard accessibility: open on Enter
-            card.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                card.click();
-            }
-            });
-        });
-
-        // Also allow clicking main poster to open (use same image)
-        const mainPoster = document.getElementById('mainPoster');
-        if (mainPoster) {
-            mainPoster.style.cursor = 'zoom-in';
-            mainPoster.addEventListener('click', () => {
-            openModal(mainPoster.src, 'Main poster');
-            });
-        }
-
-        // closing
-        modalClose.addEventListener('click', closeModal);
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
-        });
-
-        // esc key to close
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
-        });
-
-        // Example Book Now action
-        window.onBookNow = function() {
-            // You can redirect to your booking route or open a modal; here we redirect as an example:
-            // window.location.href = '/booking?eventId=ET0001';
-            alert('Redirect to booking flow (replace this with a real redirect in your app).');
-        }
-        })();
-    </script> -->

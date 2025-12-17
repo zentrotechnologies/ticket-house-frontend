@@ -20,6 +20,8 @@ export class EventBookingComponent implements OnInit {
   similarEvents: UpcomingEventResponse[] = [];
   isLoading = true;
   isSimilarLoading = false;
+  priceInRange: number | null = null; // Add this property
+  isPriceLoading = false; // Add loading state for price
 
   constructor(
     private route: ActivatedRoute,
@@ -50,6 +52,9 @@ export class EventBookingComponent implements OnInit {
       next: (response) => {
         if (response.status === 'Success' && response.data) {
           this.eventDetails = response.data;
+
+          // Load price in range AFTER getting event details
+          this.loadPriceInRange();
           
           // Load similar events after getting category ID
           if (this.eventDetails.event_category_id) {
@@ -66,6 +71,31 @@ export class EventBookingComponent implements OnInit {
       },
       complete: () => {
         this.isLoading = false;
+      }
+    });
+  }
+
+  // Add this new method to load price in range
+  loadPriceInRange(): void {
+    if (!this.eventId) return;
+    
+    this.isPriceLoading = true;
+    
+    this.apiService.getEventPriceInRange(this.eventId).subscribe({
+      next: (response) => {
+        if (response.status === 'Success' && response.data !== null) {
+          this.priceInRange = response.data;
+        } else {
+          // If no price in range found, keep it null to fallback to min_price
+          this.priceInRange = null;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading price in range:', error);
+        this.priceInRange = null;
+      },
+      complete: () => {
+        this.isPriceLoading = false;
       }
     });
   }
@@ -138,6 +168,35 @@ export class EventBookingComponent implements OnInit {
     } catch (error) {
       return 'Invalid date';
     }
+  }
+
+  // Add a helper method to display the price
+  getDisplayPrice(): string {
+    // First priority: Price in range (200-1000)
+    if (this.priceInRange !== null && this.priceInRange > 0) {
+      return `₹${this.priceInRange}`;
+    }
+    
+    // Fallback to min_price from eventDetails
+    if (this.eventDetails?.min_price) {
+      return `₹${this.eventDetails.min_price}`;
+    }
+    
+    // Final fallback
+    return 'Free';
+  }
+
+  // Add this method
+  getPriceRangeDisplay(): string {
+    if (this.priceInRange !== null) return '';
+    
+    if (!this.eventDetails?.max_price || !this.eventDetails?.min_price) return '';
+    
+    if (this.eventDetails.max_price > this.eventDetails.min_price) {
+      return ` - ₹${this.eventDetails.max_price}`;
+    }
+    
+    return '';
   }
 
   // Format time for display - SIMPLIFIED VERSION

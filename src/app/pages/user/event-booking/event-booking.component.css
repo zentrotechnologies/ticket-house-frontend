@@ -1346,3 +1346,17 @@ booking-page {
         height: 80px;
     }
 }
+
+/* Price loading state */
+.price-loading {
+  font-size: 16px;
+  color: var(--muted);
+  font-weight: normal;
+}
+
+/* Ensure price displays properly */
+.price {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
