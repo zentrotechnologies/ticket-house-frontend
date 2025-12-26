@@ -561,3 +561,24 @@ export interface BookingSeatResponse {
   price_per_seat: number;
   subtotal: number;
 }
+
+export interface MyBookingsResponse {
+    booking_id: number;
+    booking_code: string;
+    user_id: string;
+    event_id: number;
+    total_amount: number;
+    status: string;
+    created_on: string;
+    
+    // Event Details
+    event_name: string;
+    event_date: string;
+    start_time: string;
+    end_time: string;
+    location: string;
+    banner_image: string;
+    
+    // Booking Seats
+    BookingSeats: BookingSeatResponse[];
+}

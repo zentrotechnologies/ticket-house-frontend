@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { BookingDetailsResponse, BookingResponse, CommonResponse, CommonResponseModel, CreateBookingRequest, EventCategoryModel, EventCategoryRequest, EventCompleteResponseModel, EventCreateRequestModel, EventDetailsModel, EventPaginationRequest, EventSeatTypeInventoryModel, GenerateOTPRequest, GetShowsByArtistsRequest, OrganizerModel, OrganizerPagedResponse, OrganizerRequest, OTPResponse, PagedResponse, PaginationRequest, ResendOTPRequest, ResendOTPResponse, SeatAvailabilityRequest, ShowsByArtistsResponse, SignUpRequest, SignUpResponse, SimilarEventsRequest, TestimonialModel, TestimonialsResponse, UpcomingEventResponse, UpcomingEventsRequest, UpcomingEventsResponse, UpdateEventCategoryStatusRequest, UpdateOrganizerStatusRequest, UpdateTestimonialStatusRequest, UserIdRequest, VerifyOTPRequest } from '../models/auth.model';
+import { BookingDetailsResponse, BookingResponse, CommonResponse, CommonResponseModel, CreateBookingRequest, EventCategoryModel, EventCategoryRequest, EventCompleteResponseModel, EventCreateRequestModel, EventDetailsModel, EventPaginationRequest, EventSeatTypeInventoryModel, GenerateOTPRequest, GetShowsByArtistsRequest, MyBookingsResponse, OrganizerModel, OrganizerPagedResponse, OrganizerRequest, OTPResponse, PagedResponse, PaginationRequest, ResendOTPRequest, ResendOTPResponse, SeatAvailabilityRequest, ShowsByArtistsResponse, SignUpRequest, SignUpResponse, SimilarEventsRequest, TestimonialModel, TestimonialsResponse, UpcomingEventResponse, UpcomingEventsRequest, UpcomingEventsResponse, UpdateEventCategoryStatusRequest, UpdateOrganizerStatusRequest, UpdateTestimonialStatusRequest, UserIdRequest, VerifyOTPRequest } from '../models/auth.model';
 
 @Injectable({
   providedIn: 'root',
@@ -341,5 +341,11 @@ export class ApiService {
   getAvailableSeats(eventId: number): Observable<CommonResponseModel<EventSeatTypeInventoryModel[]>> {
     const url = `${this.ThApi}api/Booking/GetAvailableSeats/${eventId}`;
     return this.httpClient.get<CommonResponseModel<EventSeatTypeInventoryModel[]>>(url);
+  }
+
+  //my bookings
+  getMyBookingsByUserId(userId: string): Observable<CommonResponseModel<MyBookingsResponse[]>> {
+    const url = `${this.ThApi}api/Booking/GetMyBookingsByUserId/${userId}`;
+    return this.httpClient.get<CommonResponseModel<MyBookingsResponse[]>>(url);
   }
 }

@@ -1,13 +1,17 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { ArtistResponse, ShowsByArtistsResponse, TestimonialResponse, TestimonialsResponse, UpcomingEventResponse, UpcomingEventsResponse } from '../../../core/models/auth.model';
+import { ArtistResponse, GenerateOTPRequest, LoginResponse, ShowsByArtistsResponse, SignUpRequest, SignUpResponse, TestimonialResponse, TestimonialsResponse, UpcomingEventResponse, UpcomingEventsResponse, User, VerifyOTPRequest } from '../../../core/models/auth.model';
 import { ApiService } from '../../../core/services/api.service';
+import { ToastrService } from 'ngx-toastr';
+import { AuthService } from '../../../core/services/auth.service';
+import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-events',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './events.component.html',
   styleUrl: './events.component.css',
 })
@@ -23,10 +27,43 @@ export class EventsComponent implements OnInit {
 
   sectionTitle = 'Coming This Week';
 
+  // Auth properties
+  isUserLoggedIn = false;
+  currentUserId: string | null = null;
+  showAuthModal = false;
+  userFirstName: string = '';
+  showUserDropdown = false;
+
+  // Login properties
+  isLoginMode = true;
+  loginEmail: string = '';
+  loginPassword: string = '';
+
+  // Signup properties
+  signupStep = 1;
+  signupFirstName: string = '';
+  signupLastName: string = '';
+  signupEmail: string = '';
+  signupPassword: string = '';
+  signupPhone: string = '';
+  signupCountryCode: string = '+91';
+
+  // OTP properties
+  showOTPVerification = false;
+  otpDigits: string[] = ['', '', '', ''];
+  currentOtpId: number | null = null;
+  otpTimer = 0;
+  otpInterval: any;
+  isLoading = false;
+
+  private userSubscription: Subscription = new Subscription();
+  
   constructor(
     private router: Router,
     private apiService: ApiService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private authService: AuthService,
+    private toastr: ToastrService
   ) { }
 
   ngOnInit(): void {
@@ -153,10 +190,6 @@ export class EventsComponent implements OnInit {
     console.log('Show all events modal');
   }
 
-  onSignIn() {
-    this.router.navigate(['/auth/login']);
-  }
-
   // Add click handler for event cards
   onEventClick(event: UpcomingEventResponse): void {
     // Create URL-friendly event name
@@ -196,5 +229,455 @@ export class EventsComponent implements OnInit {
       year: 'numeric' 
     };
     return date.toLocaleDateString('en-US', options);
+  }
+
+  // Check authentication status
+  checkAuthStatus(): void {
+    this.isUserLoggedIn = this.authService.isLoggedIn();
+    if (this.isUserLoggedIn) {
+      this.currentUserId = this.authService.getCurrentUserId();
+      
+      // Subscribe to user changes
+      this.userSubscription = this.authService.currentUser$.subscribe((user) => {
+        if (user) {
+          this.userFirstName = user.first_name;
+          this.currentUserId = user.user_id;
+        }
+      });
+    }
+  }
+
+  onSignIn() {
+    this.showAuthModal = true;
+    this.resetAuthForms();
+  }
+
+  // ===========================================
+  // AUTHENTICATION METHODS
+  // ===========================================
+
+  onCloseAuthModal(): void {
+    this.showAuthModal = false;
+    this.resetAuthForms();
+  }
+
+  resetAuthForms(): void {
+    this.isLoginMode = true;
+    this.signupStep = 1;
+    this.showOTPVerification = false;
+    this.loginEmail = '';
+    this.loginPassword = '';
+    this.signupFirstName = '';
+    this.signupLastName = '';
+    this.signupEmail = '';
+    this.signupPassword = '';
+    this.signupPhone = '';
+    this.signupCountryCode = '+91';
+    this.otpDigits = ['', '', '', ''];
+    this.currentOtpId = null;
+    this.clearOtpTimer();
+  }
+
+  switchToSignup(): void {
+    this.isLoginMode = false;
+    this.signupStep = 1;
+    this.showOTPVerification = false;
+  }
+
+  switchToLogin(): void {
+    this.isLoginMode = true;
+    this.showOTPVerification = false;
+  }
+
+  // Login Method
+  onLogin(): void {
+    if (!this.loginEmail || !this.loginPassword) {
+      this.toastr.warning('Please enter email and password', 'Validation Error');
+      return;
+    }
+
+    this.isLoading = true;
+
+    const loginReq = {
+      email: this.loginEmail,
+      password: this.loginPassword,
+    };
+
+    this.apiService.UserLogin(loginReq).subscribe({
+      next: (response: any) => {
+        this.isLoading = false;
+
+        if (response.response.status === 'Success') {
+          // Save user data
+          this.saveUserData(response);
+
+          // Update auth status
+          this.isUserLoggedIn = true;
+          this.userFirstName = response.first_name;
+          this.currentUserId = response.user_id;
+
+          // Close modal
+          this.showAuthModal = false;
+          this.toastr.success('Logged in successfully!', 'Success');
+
+          // Reset auth forms
+          this.resetAuthForms();
+        } else {
+          this.toastr.error(response.response.message, 'Login Failed');
+        }
+      },
+      error: (error: any) => {
+        this.isLoading = false;
+        this.toastr.error('Login failed. Please check your credentials and try again.', 'Error');
+      },
+    });
+  }
+
+  // Save user data to localStorage and AuthService
+  private saveUserData(loginResponse: LoginResponse): void {
+    localStorage.setItem('jwt_token', loginResponse.token);
+    localStorage.setItem('refresh_token', loginResponse.refresh_token);
+    localStorage.setItem('token_expiry', loginResponse.token_expiry);
+    localStorage.setItem('refresh_token_expiry', loginResponse.refresh_token_expiry);
+
+    // Save user info
+    const userData: User = {
+      user_id: loginResponse.user_id,
+      first_name: loginResponse.first_name,
+      last_name: loginResponse.last_name,
+      email: loginResponse.email,
+      mobile: loginResponse.mobile,
+      country_code: loginResponse.country_code,
+      profile_img: loginResponse.profile_img,
+      role_id: loginResponse.role_id,
+    };
+    localStorage.setItem('user_data', JSON.stringify(userData));
+
+    // Update auth service
+    this.authService.setcurrentUser(userData);
+  }
+
+  // Signup Step 1: Account Details
+  isValidSignupStep1(): boolean {
+    return (
+      this.signupFirstName.length >= 2 &&
+      this.signupLastName.length >= 2 &&
+      this.isValidEmail(this.signupEmail) &&
+      this.signupPassword.length >= 8
+    );
+  }
+
+  onSignupStep1(): void {
+    if (!this.isValidSignupStep1()) {
+      this.toastr.warning('Please fill all required fields correctly', 'Validation Error');
+      return;
+    }
+
+    this.isLoading = true;
+
+    // Generate OTP for email verification
+    const otpRequest: GenerateOTPRequest = {
+      contact_type: 'email',
+      email: this.signupEmail,
+      newUser: true,
+    };
+
+    this.apiService.GenerateOTP(otpRequest).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        if (response.response.status === 'Success') {
+          this.currentOtpId = response.validationotp_id;
+          this.signupStep = 2;
+          this.startOtpTimer(120); // 2 minutes
+          this.toastr.success('OTP sent to your email', 'Success');
+        } else {
+          this.toastr.error(response.response.message, 'OTP Failed');
+        }
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.toastr.error('Failed to send OTP. Please try again.', 'Error');
+      },
+    });
+  }
+
+  // OTP Methods
+  onOtpInput(event: any, index: number): void {
+    const input = event.target;
+    const value = input.value;
+
+    // Only allow digits
+    if (!/^\d*$/.test(value)) {
+      input.value = '';
+      this.otpDigits[index] = '';
+      return;
+    }
+
+    this.otpDigits[index] = value;
+
+    // Auto-focus next input
+    if (value && index < 3) {
+      const nextInput = document.querySelectorAll('.otp-digit')[index + 1] as HTMLInputElement;
+      if (nextInput) {
+        nextInput.focus();
+      }
+    }
+  }
+
+  onOtpKeyDown(event: any, index: number): void {
+    if (event.key === 'Backspace' && !this.otpDigits[index] && index > 0) {
+      const prevInput = document.querySelectorAll('.otp-digit')[index - 1] as HTMLInputElement;
+      if (prevInput) {
+        prevInput.focus();
+      }
+    }
+  }
+
+  isOtpComplete(): boolean {
+    return this.otpDigits.every((digit) => digit.length === 1);
+  }
+
+  getOtpCode(): string {
+    return this.otpDigits.join('');
+  }
+
+  startOtpTimer(seconds: number): void {
+    this.otpTimer = seconds;
+    this.clearOtpTimer();
+
+    this.otpInterval = setInterval(() => {
+      this.otpTimer--;
+      if (this.otpTimer <= 0) {
+        this.clearOtpTimer();
+      }
+    }, 1000);
+  }
+
+  clearOtpTimer(): void {
+    if (this.otpInterval) {
+      clearInterval(this.otpInterval);
+      this.otpInterval = null;
+    }
+  }
+
+  formatOtpTimer(): string {
+    const minutes = Math.floor(this.otpTimer / 60);
+    const seconds = this.otpTimer % 60;
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  resendOTP(): void {
+    if (this.otpTimer > 30) {
+      this.toastr.warning('Please wait before resending OTP', 'Warning');
+      return;
+    }
+
+    this.isLoading = true;
+
+    const otpRequest: GenerateOTPRequest = {
+      contact_type: 'email',
+      email: this.signupEmail,
+      newUser: true,
+    };
+
+    this.apiService.GenerateOTP(otpRequest).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        if (response.response.status === 'Success') {
+          this.currentOtpId = response.validationotp_id;
+          this.startOtpTimer(120);
+          this.toastr.success('New OTP sent to your email', 'Success');
+        } else {
+          this.toastr.error(response.response.message, 'Resend Failed');
+        }
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.toastr.error('Failed to resend OTP', 'Error');
+      },
+    });
+  }
+
+  // Verify OTP and Complete Signup
+  verifyOTP(): void {
+    if (!this.isOtpComplete() || !this.currentOtpId) {
+      this.toastr.warning('Please enter complete OTP', 'Validation Error');
+      return;
+    }
+
+    this.isLoading = true;
+
+    const verifyRequest: VerifyOTPRequest = {
+      otp_id: this.currentOtpId,
+      otp: this.getOtpCode(),
+      email: this.signupEmail,
+      contact_type: 'email',
+    };
+
+    this.apiService.VerifyOTP(verifyRequest).subscribe({
+      next: (response) => {
+        if (response.status === 'Success') {
+          // OTP verified, now create the user account
+          this.completeSignup();
+        } else {
+          this.toastr.error(response.message, 'OTP Verification Failed');
+          this.isLoading = false;
+        }
+      },
+      error: (error) => {
+        this.toastr.error('OTP verification failed', 'Error');
+        this.isLoading = false;
+      },
+    });
+  }
+
+  // Complete Signup - Create user account
+  completeSignup(): void {
+    // Prepare signup data
+    const signUpData: SignUpRequest = {
+      first_name: this.signupFirstName,
+      last_name: this.signupLastName,
+      email: this.signupEmail,
+      password: this.signupPassword,
+      role_id: 3, // Always set role_id = 3 for audience
+
+      // Optional fields
+      mobile: this.signupPhone || undefined,
+      country_code: this.signupPhone ? this.signupCountryCode : undefined,
+    };
+
+    this.apiService.UserSignUp(signUpData).subscribe({
+      next: (response: SignUpResponse) => {
+        if (response.response.status === 'Success') {
+          // Auto-login after successful signup
+          this.autoLoginAfterSignup();
+        } else {
+          this.toastr.error(response.response.message, 'Signup Failed');
+          this.isLoading = false;
+        }
+      },
+      error: (error) => {
+        this.toastr.error('Account creation failed. Please try again.', 'Error');
+        this.isLoading = false;
+      },
+    });
+  }
+
+  // Auto login after successful signup
+  private autoLoginAfterSignup(): void {
+    const loginReq = {
+      email: this.signupEmail,
+      password: this.signupPassword,
+    };
+
+    this.apiService.UserLogin(loginReq).subscribe({
+      next: (response: any) => {
+        this.isLoading = false;
+
+        if (response.response.status === 'Success') {
+          // Save user data
+          this.saveUserData(response);
+
+          // Update auth status
+          this.isUserLoggedIn = true;
+          this.userFirstName = response.first_name;
+          this.currentUserId = response.user_id;
+
+          // Close modal
+          this.showAuthModal = false;
+          this.toastr.success('Account created and logged in successfully!', 'Success');
+
+          // Reset auth forms
+          this.resetAuthForms();
+        } else {
+          // If auto-login fails, show success message and switch to login
+          this.toastr.success('Account created successfully! Please login to continue.', 'Success');
+          this.switchToLogin();
+          this.loginEmail = this.signupEmail;
+        }
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.toastr.success('Account created successfully! Please login to continue.', 'Success');
+        this.switchToLogin();
+        this.loginEmail = this.signupEmail;
+      },
+    });
+  }
+
+  goBackToStep1(): void {
+    this.signupStep = 1;
+    this.clearOtpTimer();
+  }
+
+  // Helper Methods
+  private isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  // Get current user name for display
+  getUserDisplayName(): string {
+    return this.userFirstName || 'User';
+  }
+
+  toggleDropdown(): void {
+    this.showUserDropdown = !this.showUserDropdown;
+
+    if (this.showUserDropdown) {
+      // Close dropdown when clicking outside
+      setTimeout(() => {
+        document.addEventListener('click', this.closeDropdownOnClickOutside.bind(this));
+      });
+    }
+  }
+
+  closeDropdownOnClickOutside(event: MouseEvent): void {
+    const dropdown = document.querySelector('.user-welcome-dropdown');
+    if (dropdown && !dropdown.contains(event.target as Node)) {
+      this.showUserDropdown = false;
+      document.removeEventListener('click', this.closeDropdownOnClickOutside.bind(this));
+    }
+  }
+
+  onViewProfile(): void {
+    this.showUserDropdown = false;
+    this.toastr.info('Profile page coming soon!', 'Info');
+  }
+
+  onViewBookings(): void {
+    this.showUserDropdown = false;
+    
+    if (!this.currentUserId) {
+      this.toastr.error('User information not found. Please login again.', 'Error');
+      return;
+    }
+
+    // Navigate to My Bookings page with user_id in the route
+    this.router.navigate(['/my-bookings', this.currentUserId]);
+  }
+
+  onLogout(): void {
+    this.showUserDropdown = false;
+
+    // Call auth service logout
+    this.authService.logout();
+
+    // Update component state
+    this.isUserLoggedIn = false;
+    this.userFirstName = '';
+    this.currentUserId = null;
+
+    // Show success message
+    this.toastr.success('Logged out successfully!', 'Success');
+  }
+
+  // Clean up event listener when component is destroyed
+  ngOnDestroy(): void {
+    document.removeEventListener('click', this.closeDropdownOnClickOutside.bind(this));
+    this.clearOtpTimer();
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe();
+    }
   }
 }

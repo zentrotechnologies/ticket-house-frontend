@@ -64,6 +64,13 @@ export const routes: Routes = [
         (m) => m.EventPaymentComponent
       ),
   },
+  {
+    path: 'my-bookings/:user_id',
+    loadComponent: () =>
+      import('./pages/user/my-bookings/my-bookings.component').then(
+        (m) => m.MyBookingsComponent
+      ),
+  },
   // Protected routes with layout
   {
     path: '',

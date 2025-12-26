@@ -1,0 +1,107 @@
+<div class="my-bookings-page">
+  <!-- Header -->
+  <header class="bookings-header">
+    <div class="container">
+      <div class="header-row">
+        <div class="header-col">
+          <div class="left-section-content">
+            <!-- Logo -->
+            <div class="logo-wrapper">
+              <img class="logo"
+                src="https://zentrotechnologies.com/wp-content/uploads/2025/02/Zentro_Final-Logo-05-scaled-e1753251642526.png"
+                alt="Zentro Logo" (click)="onBackToEvents()" style="cursor: pointer;" />
+            </div>
+            
+            <!-- Page Title -->
+            <div class="page-title">
+              <h1>My Bookings</h1>
+              <p *ngIf="userId">User ID: {{ userId }}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="header-col actions-col">
+          <div class="user-actions">
+            <button class="back-btn" (click)="onBackToEvents()">← Back to Events</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="bookings-main">
+    <div class="container">
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-container">
+        <div class="loading-spinner">Loading your bookings...</div>
+      </div>
+
+      <!-- No Bookings State -->
+      <div *ngIf="!isLoading && bookings.length === 0" class="no-bookings">
+        <div class="empty-state">
+          <div class="empty-icon">📋</div>
+          <h2>No Bookings Found</h2>
+          <p>You haven't made any bookings yet.</p>
+          <button class="browse-events-btn" (click)="onBackToEvents()">Browse Events</button>
+        </div>
+      </div>
+
+      <!-- Bookings List -->
+      <div *ngIf="!isLoading && bookings.length > 0" class="bookings-list">
+        <h2 class="section-title">Your Bookings ({{ bookings.length }})</h2>
+        
+        <div class="bookings-grid">
+          <div class="booking-card">
+            <div class="booking-header">
+              <div class="booking-id">Booking #booking_id</div>
+              <div class="booking-date">booking_date</div>
+            </div>
+            
+            <div class="booking-body">
+              <div class="event-info">
+                <h3 class="event-name">event_name</h3>
+                <p class="event-location">event_location</p>
+                <p class="event-date">event_date</p>
+              </div>
+              
+              <div class="booking-details">
+                <div class="detail-item">
+                  <span class="label">Tickets:</span>
+                  <span class="value">total_tickets</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Amount:</span>
+                  <span class="value">₹total_amount</span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Status:</span>
+                  <span class="value status-badge">
+                    booking_status
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="booking-footer">
+              <button class="view-details-btn">
+                View Details
+              </button>
+              <button class="cancel-btn">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bookings-footer">
+    <div class="container">
+      <p>Need help with your bookings? <a href="#">Contact Support</a></p>
+      <p class="copyright">© 2025 Ticket House – All rights reserved.</p>
+    </div>
+  </footer>
+</div>
