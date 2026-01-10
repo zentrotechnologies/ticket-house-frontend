@@ -96,6 +96,20 @@ export const routes: Routes = [
               import('./pages/admin/admin-events/admin-events.component').then(
                 (m) => m.AdminEventsComponent
               ),
+          }
+        ],
+      },
+      {
+        path: 'admin',
+        canActivate: [roleGuard],
+        data: { roles: [1] },
+        children: [
+          {
+            path: 'event-organizer',
+            loadComponent: () =>
+              import('./pages/admin/organizer-management/event-organizer/event-organizer.component').then(
+                (m) => m.EventOrganizerComponent
+              ),
           },
           {
             path: 'event-categories',
@@ -109,20 +123,6 @@ export const routes: Routes = [
             loadComponent: () =>
               import('./pages/admin/testimonial/testimonial.component').then(
                 (m) => m.TestimonialComponent
-              ),
-          },
-        ],
-      },
-      {
-        path: 'admin',
-        canActivate: [roleGuard],
-        data: { roles: [1] },
-        children: [
-          {
-            path: 'event-organizer',
-            loadComponent: () =>
-              import('./pages/admin/organizer-management/event-organizer/event-organizer.component').then(
-                (m) => m.EventOrganizerComponent
               ),
           },
         ]

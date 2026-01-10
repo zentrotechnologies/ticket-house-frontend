@@ -142,10 +142,30 @@
             <span>₹{{ totalAmount }}</span>
           </div>
 
-          <div class="row">
-            <span>Booking Fee (8.26%)</span>
+          <!-- <div class="row">
+            <span>Booking Fee (6.5%)</span>
             <span>₹{{ bookingFee }}</span>
+          </div> -->
+
+          <div class="row">
+            <span>Convenience Fee (6.5%)</span>
+            <span>₹{{ convenienceFee | number:'1.2-2' }}</span>
           </div>
+
+          <div class="row">
+            <span>GST (18% on Convenience Fee)</span>
+            <span>₹{{ gstTotal | number:'1.2-2' }}</span>
+          </div>
+
+          <!-- <div class="row">
+            <span>CGST (9% on Convenience Fee)</span>
+            <span>₹{{ cgstAmount | number:'1.2-2' }}</span>
+          </div>
+
+          <div class="row">
+            <span>SGST (9% on Convenience Fee)</span>
+            <span>₹{{ sgstAmount | number:'1.2-2' }}</span>
+          </div> -->
 
           <div class="row total">
             <span>Total Amount</span>
@@ -309,4 +329,14 @@
       </div>
     </div>
   </div>
+
+  <!-- Booking Success Modal -->
+  <app-booking-success-modal
+    *ngIf="showSuccessModal"
+    [qrCodeBase64]="qrCodeBase64"
+    [thankYouMessage]="thankYouMessage"
+    [bookingDetails]="bookingDetails"
+    [bookingCode]="bookingCode"
+    (close)="onSuccessModalClose()">
+  </app-booking-success-modal>
 </div>

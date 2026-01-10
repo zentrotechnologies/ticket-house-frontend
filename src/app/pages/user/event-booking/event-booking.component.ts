@@ -273,4 +273,8 @@ export class EventBookingComponent implements OnInit {
     if (!imageUrl) return;
     console.log('Open image modal:', imageUrl);
   }
+
+  navigateToSignUp(): void {
+    this.router.navigate(['/auth/sign-up']);
+  }
 }

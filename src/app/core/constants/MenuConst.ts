@@ -26,7 +26,7 @@ export const MENU_ITEMS: MenuItem[] = [
       {
         title: 'Event Categories',
         route: '/admin/event-categories',
-        roles: [1, 2]
+        roles: [1]
       }
     ]
   },
@@ -34,7 +34,7 @@ export const MENU_ITEMS: MenuItem[] = [
     title: 'Testimonial',
     icon: '',
     route: '/admin/testimonial',
-    roles: [1, 2] // Role 1 and 2 can access
+    roles: [1] // Role 1 and 2 can access
   },
   {
     title: 'Organizer Management',

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { BookingDetailsResponse, BookingResponse, CommonResponse, CommonResponseModel, CreateBookingRequest, EventCategoryModel, EventCategoryRequest, EventCompleteResponseModel, EventCreateRequestModel, EventDetailsModel, EventPaginationRequest, EventSeatTypeInventoryModel, GenerateOTPRequest, GetShowsByArtistsRequest, MyBookingsResponse, OrganizerModel, OrganizerPagedResponse, OrganizerRequest, OTPResponse, PagedResponse, PaginationRequest, ResendOTPRequest, ResendOTPResponse, SeatAvailabilityRequest, ShowsByArtistsResponse, SignUpRequest, SignUpResponse, SimilarEventsRequest, TestimonialModel, TestimonialsResponse, UpcomingEventResponse, UpcomingEventsRequest, UpcomingEventsResponse, UpdateEventCategoryStatusRequest, UpdateOrganizerStatusRequest, UpdateTestimonialStatusRequest, UserIdRequest, VerifyOTPRequest } from '../models/auth.model';
+import { BookingDetailsResponse, BookingQRResponse, BookingResponse, CommonResponse, CommonResponseModel, CreateBookingRequest, EventCategoryModel, EventCategoryRequest, EventCompleteResponseModel, EventCreateRequestModel, EventDetailsModel, EventPaginationRequest, EventSeatTypeInventoryModel, GenerateOTPRequest, GetShowsByArtistsRequest, MyBookingsResponse, OrganizerModel, OrganizerPagedResponse, OrganizerRequest, OTPResponse, PagedResponse, PaginationRequest, QRCodeDataResponse, ResendOTPRequest, ResendOTPResponse, SeatAvailabilityRequest, ShowsByArtistsResponse, SignUpRequest, SignUpResponse, SimilarEventsRequest, TestimonialModel, TestimonialsResponse, UpcomingEventResponse, UpcomingEventsRequest, UpcomingEventsResponse, UpdateEventCategoryStatusRequest, UpdateOrganizerStatusRequest, UpdateTestimonialStatusRequest, UserIdRequest, VerifyOTPRequest } from '../models/auth.model';
 
 @Injectable({
   providedIn: 'root',
@@ -347,5 +347,17 @@ export class ApiService {
   getMyBookingsByUserId(userId: string): Observable<CommonResponseModel<MyBookingsResponse[]>> {
     const url = `${this.ThApi}api/Booking/GetMyBookingsByUserId/${userId}`;
     return this.httpClient.get<CommonResponseModel<MyBookingsResponse[]>>(url);
+  }
+
+  // Confirm booking with QR code generation
+  confirmBookingWithQR(bookingId: number): Observable<CommonResponseModel<BookingQRResponse>> {
+    const url = `${this.ThApi}api/Booking/ConfirmBookingWithQR/${bookingId}`;
+    return this.httpClient.post<CommonResponseModel<BookingQRResponse>>(url, {});
+  }
+
+  // Decode QR code data
+  decodeQRCode(qrCodeBase64: string): Observable<CommonResponseModel<QRCodeDataResponse>> {
+    const url = `${this.ThApi}api/Booking/DecodeQRCode`;
+    return this.httpClient.post<CommonResponseModel<QRCodeDataResponse>>(url, { QRCodeBase64: qrCodeBase64 });
   }
 }

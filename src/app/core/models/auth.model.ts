@@ -530,6 +530,8 @@ export interface BookingResponse {
   TotalAmount: number;
   Status: string;
   CreatedOn: Date;
+  bookingId: number;        // lowercase b
+  bookingCode: string;      // lowercase b
 }
 
 export interface BookingDetailsResponse {
@@ -581,4 +583,33 @@ export interface MyBookingsResponse {
     
     // Booking Seats
     BookingSeats: BookingSeatResponse[];
+}
+
+export interface BookingQRResponse extends BookingResponse {
+  qrCodeBase64: string;
+  thankYouMessage: string;
+  bookingDetails: BookingDetailsResponse;
+}
+
+export interface QRCodeDataResponse {
+  bookingId: number;
+  bookingCode: string;
+  eventName: string;
+  eventDate: string;
+  eventTime: string;
+  location: string;
+  customerName: string;
+  customerEmail: string;
+  totalAmount: number;
+  status: string;
+  bookingDate: string;
+  seats: QRSeatDetail[];
+  message: string;
+}
+
+export interface QRSeatDetail {
+  seatType: string;
+  quantity: number;
+  price: number;
+  subtotal: number;
 }

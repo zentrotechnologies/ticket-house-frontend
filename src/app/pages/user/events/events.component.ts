@@ -672,6 +672,10 @@ export class EventsComponent implements OnInit {
     this.toastr.success('Logged out successfully!', 'Success');
   }
 
+  navigateToSignUp(): void {
+    this.router.navigate(['/auth/sign-up']);
+  }
+
   // Clean up event listener when component is destroyed
   ngOnDestroy(): void {
     document.removeEventListener('click', this.closeDropdownOnClickOutside.bind(this));

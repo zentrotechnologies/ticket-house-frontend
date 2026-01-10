@@ -6,11 +6,12 @@ import { ApiService } from '../../../core/services/api.service';
 import { ToastrService } from 'ngx-toastr';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LoginResponse, User, GenerateOTPRequest, VerifyOTPRequest, SignUpRequest, SignUpResponse } from '../../../core/models/auth.model';
+import { BookingSuccessModalComponent } from '../booking-success-modal/booking-success-modal.component';
 
 @Component({
   selector: 'app-event-payment',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, ReactiveFormsModule, BookingSuccessModalComponent],
   templateUrl: './event-payment.component.html',
   styleUrl: './event-payment.component.css',
 })
@@ -29,6 +30,11 @@ export class EventPaymentComponent implements OnInit {
   eventDate: string = '';
   eventTime: string = '';
   eventLocation: string = '';
+  // Add these properties along with your existing amount properties
+  convenienceFee: number = 0;
+  cgstAmount: number = 0;
+  sgstAmount: number = 0;
+  gstTotal: number = 0;
 
   // Auth properties (from seats-booking)
   isUserLoggedIn = false;
@@ -56,6 +62,13 @@ export class EventPaymentComponent implements OnInit {
   currentOtpId: number | null = null;
   otpTimer = 0;
   otpInterval: any;
+
+  // QR Code Success Modal Properties
+  showSuccessModal = false;
+  qrCodeBase64: string = '';
+  thankYouMessage: string = '';
+  bookingDetails: any = null;
+  bookingCode: string = '';
 
   constructor(
     private router: Router,
@@ -149,10 +162,26 @@ export class EventPaymentComponent implements OnInit {
     });
   }
 
+  // calculateBookingFee(): void {
+  //   // Calculate 8.26% booking fee
+  //   this.bookingFee = parseFloat((this.totalAmount * 0.0826).toFixed(2));
+  //   this.finalAmount = parseFloat((this.totalAmount + this.bookingFee).toFixed(2));
+  // }
+
   calculateBookingFee(): void {
-    // Calculate 8.26% booking fee
-    this.bookingFee = parseFloat((this.totalAmount * 0.0826).toFixed(2));
-    this.finalAmount = parseFloat((this.totalAmount + this.bookingFee).toFixed(2));
+    // Calculate 6.5% convenience fee
+    this.convenienceFee = parseFloat((this.totalAmount * 0.065).toFixed(2));
+    
+    // Calculate GST on convenience fee only (18% = 9% CGST + 9% SGST)
+    this.cgstAmount = parseFloat((this.convenienceFee * 0.09).toFixed(2));
+    this.sgstAmount = parseFloat((this.convenienceFee * 0.09).toFixed(2));
+    this.gstTotal = parseFloat((this.cgstAmount + this.sgstAmount).toFixed(2));
+    
+    // Calculate final amount: total + convenience fee + GST
+    this.finalAmount = parseFloat((this.totalAmount + this.convenienceFee + this.gstTotal).toFixed(2));
+    
+    // Keep the old bookingFee property for backward compatibility if needed
+    this.bookingFee = parseFloat((this.convenienceFee + this.gstTotal).toFixed(2));
   }
 
   getTotalTickets(): number {
@@ -169,15 +198,68 @@ export class EventPaymentComponent implements OnInit {
     });
   }
 
+  // onProceedToPay(): void {
+  //   if (!this.authService.isLoggedIn()) {
+  //     this.toastr.warning('Please sign in to complete booking', 'Authentication Required');
+  //     this.router.navigate(['/seats-booking', this.eventId, this.eventNameSlug]);
+  //     return;
+  //   }
+
+  //   if (!this.userId) {
+  //     this.toastr.error('User information not found', 'Error');
+  //     return;
+  //   }
+
+  //   if (this.seatSelections.length === 0) {
+  //     this.toastr.error('No seats selected', 'Error');
+  //     return;
+  //   }
+
+  //   this.isProcessing = true;
+
+  //   const bookingRequest = {
+  //     EventId: this.eventId,
+  //     SeatSelections: this.seatSelections.map(seat => ({
+  //       SeatTypeId: seat.SeatTypeId,
+  //       Quantity: seat.Quantity
+  //     })),
+  //     UserId: this.userId // Include user ID in booking request
+  //   };
+
+  //   console.log('Creating booking with:', bookingRequest);
+
+  //   this.apiService.createBooking(bookingRequest).subscribe({
+  //     next: (response) => {
+  //       this.isProcessing = false;
+  //       if (response.status === 'Success' && response.data) {
+  //         // Show success message
+  //         this.toastr.success('Booking created successfully! Redirecting to events...', 'Booking Created');
+          
+  //         // Clear all local storage
+  //         this.clearAllLocalStorage();
+          
+  //         // Redirect to events listing page after 1.5 seconds (to show toast message)
+  //         setTimeout(() => {
+  //           this.router.navigate(['/events']);
+  //         }, 1500);
+          
+  //       } else {
+  //         this.toastr.error(response.message || 'Failed to create booking', 'Error');
+  //       }
+  //     },
+  //     error: (error) => {
+  //       this.isProcessing = false;
+  //       console.error('Booking error:', error);
+  //       this.toastr.error('Error creating booking. Please try again.', 'Error');
+  //     }
+  //   });
+  // }
+
+  // Updated onProceedToPay method to use ConfirmBookingWithQR
   onProceedToPay(): void {
     if (!this.authService.isLoggedIn()) {
       this.toastr.warning('Please sign in to complete booking', 'Authentication Required');
       this.router.navigate(['/seats-booking', this.eventId, this.eventNameSlug]);
-      return;
-    }
-
-    if (!this.userId) {
-      this.toastr.error('User information not found', 'Error');
       return;
     }
 
@@ -188,42 +270,118 @@ export class EventPaymentComponent implements OnInit {
 
     this.isProcessing = true;
 
+    // First create the booking
     const bookingRequest = {
       EventId: this.eventId,
       SeatSelections: this.seatSelections.map(seat => ({
         SeatTypeId: seat.SeatTypeId,
         Quantity: seat.Quantity
-      })),
-      UserId: this.userId // Include user ID in booking request
+      }))
     };
 
     console.log('Creating booking with:', bookingRequest);
 
     this.apiService.createBooking(bookingRequest).subscribe({
       next: (response) => {
-        this.isProcessing = false;
+        console.log('Create booking response:', response);
+        
         if (response.status === 'Success' && response.data) {
-          // Show success message
-          this.toastr.success('Booking created successfully! Redirecting to events...', 'Booking Created');
+          // VERIFY the booking ID is valid
+          const bookingId = response.data.BookingId || response.data.bookingId;
+          console.log('Booking created with ID:', bookingId);
           
-          // Clear all local storage
-          this.clearAllLocalStorage();
-          
-          // Redirect to events listing page after 1.5 seconds (to show toast message)
-          setTimeout(() => {
-            this.router.navigate(['/events']);
-          }, 1500);
-          
+          if (bookingId && bookingId > 0) {
+            // Now confirm the booking with QR code generation
+            this.confirmBookingWithQR(bookingId);
+          } else {
+            this.isProcessing = false;
+            this.toastr.error('Invalid booking ID received', 'Error');
+          }
         } else {
+          this.isProcessing = false;
           this.toastr.error(response.message || 'Failed to create booking', 'Error');
         }
       },
       error: (error) => {
         this.isProcessing = false;
-        console.error('Booking error:', error);
+        console.error('Booking creation error:', error);
         this.toastr.error('Error creating booking. Please try again.', 'Error');
       }
     });
+  }
+
+  // New method to confirm booking with QR code
+  confirmBookingWithQR(bookingId: number): void {
+    // Add validation and logging
+    console.log('Confirming booking with ID:', bookingId);
+    console.log('Booking ID type:', typeof bookingId);
+    
+    if (!bookingId || bookingId <= 0) {
+      console.error('Invalid booking ID:', bookingId);
+      this.toastr.error('Invalid booking ID. Please try again.', 'Error');
+      this.isProcessing = false;
+      return;
+    }
+
+    this.apiService.confirmBookingWithQR(bookingId).subscribe({
+      next: (response) => {
+        console.log('QR confirmation response:', response);
+        this.isProcessing = false;
+        
+        if (response.status === 'Success' && response.data) {
+          // Store QR code data
+          this.qrCodeBase64 = response.data.qrCodeBase64;
+          this.thankYouMessage = response.data.thankYouMessage;
+          this.bookingDetails = response.data.bookingDetails;
+          this.bookingCode = response.data.BookingCode || response.data.bookingCode;
+          
+          // Show success toast
+          this.toastr.success('Booking confirmed successfully! QR code generated.', 'Success');
+          
+          // Clear all local storage
+          this.clearAllLocalStorage();
+          
+          // Show success modal
+          setTimeout(() => {
+            this.showSuccessModal = true;
+          }, 500);
+          
+        } else {
+          this.toastr.error(response.message || 'Failed to confirm booking', 'Error');
+          // Fallback: redirect to events page
+          setTimeout(() => {
+            this.router.navigate(['/events']);
+          }, 1500);
+        }
+      },
+      error: (error) => {
+        this.isProcessing = false;
+        console.error('QR confirmation error details:', {
+          error,
+          status: error.status,
+          message: error.message,
+          url: error.url
+        });
+        
+        // More specific error handling
+        if (error.status === 400) {
+          this.toastr.error('Invalid booking ID format. Please try booking again.', 'Error');
+        } else {
+          this.toastr.warning('Booking may have been created. Please check your bookings.', 'Warning');
+        }
+        
+        this.clearAllLocalStorage();
+        setTimeout(() => {
+          this.router.navigate(['/events']);
+        }, 1500);
+      }
+    });
+  }
+
+  // Method to handle success modal close
+  onSuccessModalClose(): void {
+    this.showSuccessModal = false;
+    this.router.navigate(['/events']);
   }
 
   clearAllLocalStorage(): void {
