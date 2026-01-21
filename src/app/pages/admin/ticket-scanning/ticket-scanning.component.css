@@ -1,0 +1,240 @@
+/* Add to your existing CSS */
+
+.scan-container {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #2c3e50;
+}
+
+.header h2 {
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.scan-step {
+  animation: fadeIn 0.3s ease-in;
+}
+
+.camera-section {
+  padding: 30px 0;
+}
+
+.camera-icon {
+  color: #3498db;
+  margin: 20px 0;
+}
+
+.camera-active {
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  border: 2px dashed #3498db;
+}
+
+.camera-view {
+  text-align: center;
+}
+
+.camera-frame {
+  width: 300px;
+  height: 300px;
+  margin: 0 auto;
+  border: 3px solid #3498db;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  background: #000;
+}
+
+.camera-frame .qr-target {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 200px;
+  border: 2px solid #fff;
+  border-radius: 5px;
+  animation: pulse 2s infinite;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 30px 0;
+  color: #7f8c8d;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.divider span {
+  padding: 0 15px;
+}
+
+.manual-entry {
+  background: #f8f9fa;
+  padding: 25px;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+.input-group {
+  max-width: 400px;
+  margin: 15px auto;
+}
+
+.booking-summary {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.progress-section .progress {
+  height: 15px;
+  border-radius: 10px;
+}
+
+.progress-bar {
+  border-radius: 10px;
+}
+
+.action-buttons .btn {
+  padding: 15px 20px;
+  font-size: 16px;
+  border-radius: 10px;
+}
+
+.quantity-selection .number-input {
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.quick-select-buttons .btn {
+  min-width: 100px;
+}
+
+.quick-select-buttons .btn.active {
+  background-color: #0d6efd;
+  color: white;
+}
+
+.table th {
+  font-weight: 600;
+  background-color: #f8f9fa;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+.stat-box {
+  padding: 15px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 10px;
+  border: 1px solid #dee2e6;
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.stat-label {
+  color: #6c757d;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.info-box {
+  padding: 15px;
+  border-radius: 8px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+}
+
+.info-label {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+.info-value {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.seat-stats .stat-item {
+  padding: 10px;
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .camera-frame {
+    width: 250px;
+    height: 250px;
+  }
+  
+  .camera-frame .qr-target {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .action-buttons .btn {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .quick-select-buttons .btn {
+    min-width: 80px;
+    font-size: 0.9rem;
+  }
+  
+  .info-value {
+    font-size: 1.5rem;
+  }
+  
+  .stat-number {
+    font-size: 2rem;
+  }
+}

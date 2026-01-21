@@ -613,3 +613,79 @@ export interface QRSeatDetail {
   price: number;
   subtotal: number;
 }
+
+export interface ScanTicketRequest {
+  bookingCode: string;
+  seatTypeId?: number;
+  quantityToScan: number;
+  scannedBy: string;
+  scanType: string;
+  deviceInfo: string;
+  forceScan: boolean;
+}
+
+export interface PartialScanRequest {
+  bookingId: number;
+  seatScanDetails: SeatScanDetail[];
+  scannedBy: string;
+  deviceInfo: string;
+}
+
+export interface SeatScanDetail {
+  seatTypeId: number;
+  quantityToScan: number;
+}
+
+export interface TicketScanResponse {
+  isSuccess: boolean;
+  message: string;
+  status: string;
+  bookingId: number;
+  bookingCode: string;
+  eventName: string;
+  customerName: string;
+  scanTime: string;
+  scanResults: SeatScanResult[];
+  summary: ScanSummary;
+}
+
+export interface SeatScanResult {
+  seatTypeId: number;
+  seatName: string;
+  requestedQuantity: number;
+  scannedQuantity: number;
+  remainingQuantity: number;
+  isFullyScanned: boolean;
+  status: string;
+}
+
+export interface ScanSummary {
+  totalTickets: number;
+  scannedTickets: number;
+  remainingTickets: number;
+  isFullyScanned: boolean;
+  percentageScanned: number;
+}
+
+export interface BookingScanSummaryResponse {
+  bookingId: number;
+  bookingCode: string;
+  eventName: string;
+  eventDate: string;
+  customerName: string;
+  seatScanInfo: SeatScanInfo[];
+  summary: ScanSummary;
+  firstScanTime: string;
+  lastScanTime: string;
+}
+
+export interface SeatScanInfo {
+  seatTypeId: number;
+  seatName: string;
+  totalQuantity: number;
+  scannedQuantity: number;
+  remainingQuantity: number;
+  isFullyScanned: boolean;
+  lastScanTime: string;
+  lastScannedBy: string;
+}

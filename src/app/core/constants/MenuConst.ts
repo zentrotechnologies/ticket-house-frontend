@@ -27,6 +27,18 @@ export const MENU_ITEMS: MenuItem[] = [
         title: 'Event Categories',
         route: '/admin/event-categories',
         roles: [1]
+      },
+      {
+        title: 'Ticket Scanning',
+        icon: 'qr_code_scanner',
+        route: '/admin/ticket-scanning',
+        roles: [1, 2]
+      },
+      {
+        title: 'Scan History',
+        icon: 'history',
+        route: '/admin/scan-history',
+        roles: [1, 2]
       }
     ]
   },

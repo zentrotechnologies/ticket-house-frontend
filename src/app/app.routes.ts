@@ -96,6 +96,20 @@ export const routes: Routes = [
               import('./pages/admin/admin-events/admin-events.component').then(
                 (m) => m.AdminEventsComponent
               ),
+          },
+          {
+            path: 'ticket-scanning',
+            loadComponent: () =>
+              import('./pages/admin/ticket-scanning/ticket-scanning.component').then(
+                (m) => m.TicketScanningComponent
+              ),
+          },
+          {
+            path: 'scan-history',
+            loadComponent: () =>
+              import('./pages/admin/scan-history/scan-history.component').then(
+                (m) => m.ScanHistoryComponent
+              ),
           }
         ],
       },

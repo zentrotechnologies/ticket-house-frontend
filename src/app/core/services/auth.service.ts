@@ -241,4 +241,15 @@ export class AuthService {
     // return environment.SUPERADMIN_USER_ID || 'system';
     return 'system';
   }
+
+  // Add this method to get user email
+  getCurrentUserEmail(): string | null {
+    const user = this.currentUserSubject.value;
+    return user ? user.email : null;
+  }
+
+  // Add method to get current user full object
+  getCurrentUser(): User | null {
+    return this.currentUserSubject.value;
+  }
 }

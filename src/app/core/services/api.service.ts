@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { BookingDetailsResponse, BookingQRResponse, BookingResponse, CommonResponse, CommonResponseModel, CreateBookingRequest, EventCategoryModel, EventCategoryRequest, EventCompleteResponseModel, EventCreateRequestModel, EventDetailsModel, EventPaginationRequest, EventSeatTypeInventoryModel, GenerateOTPRequest, GetShowsByArtistsRequest, MyBookingsResponse, OrganizerModel, OrganizerPagedResponse, OrganizerRequest, OTPResponse, PagedResponse, PaginationRequest, QRCodeDataResponse, ResendOTPRequest, ResendOTPResponse, SeatAvailabilityRequest, ShowsByArtistsResponse, SignUpRequest, SignUpResponse, SimilarEventsRequest, TestimonialModel, TestimonialsResponse, UpcomingEventResponse, UpcomingEventsRequest, UpcomingEventsResponse, UpdateEventCategoryStatusRequest, UpdateOrganizerStatusRequest, UpdateTestimonialStatusRequest, UserIdRequest, VerifyOTPRequest } from '../models/auth.model';
+import { BookingDetailsResponse, BookingQRResponse, BookingResponse, BookingScanSummaryResponse, CommonResponse, CommonResponseModel, CreateBookingRequest, EventCategoryModel, EventCategoryRequest, EventCompleteResponseModel, EventCreateRequestModel, EventDetailsModel, EventPaginationRequest, EventSeatTypeInventoryModel, GenerateOTPRequest, GetShowsByArtistsRequest, MyBookingsResponse, OrganizerModel, OrganizerPagedResponse, OrganizerRequest, OTPResponse, PagedResponse, PaginationRequest, PartialScanRequest, QRCodeDataResponse, ResendOTPRequest, ResendOTPResponse, ScanTicketRequest, SeatAvailabilityRequest, ShowsByArtistsResponse, SignUpRequest, SignUpResponse, SimilarEventsRequest, TestimonialModel, TestimonialsResponse, TicketScanResponse, UpcomingEventResponse, UpcomingEventsRequest, UpcomingEventsResponse, UpdateEventCategoryStatusRequest, UpdateOrganizerStatusRequest, UpdateTestimonialStatusRequest, UserIdRequest, VerifyOTPRequest } from '../models/auth.model';
 
 @Injectable({
   providedIn: 'root',
@@ -359,5 +359,35 @@ export class ApiService {
   decodeQRCode(qrCodeBase64: string): Observable<CommonResponseModel<QRCodeDataResponse>> {
     const url = `${this.ThApi}api/Booking/DecodeQRCode`;
     return this.httpClient.post<CommonResponseModel<QRCodeDataResponse>>(url, { QRCodeBase64: qrCodeBase64 });
+  }
+
+  // Get booking for scanning
+  getBookingForScanning(bookingCode: string): Observable<CommonResponseModel<BookingDetailsResponse>> {
+    const url = `${this.ThApi}api/Booking/GetBookingForScan/${bookingCode}`;
+    return this.httpClient.get<CommonResponseModel<BookingDetailsResponse>>(url);
+  }
+
+  // Scan ticket
+  scanTicket(request: ScanTicketRequest): Observable<CommonResponseModel<TicketScanResponse>> {
+    const url = `${this.ThApi}api/Booking/ScanTicket`;
+    return this.httpClient.post<CommonResponseModel<TicketScanResponse>>(url, request);
+  }
+
+  // Partial scan
+  partialScan(request: PartialScanRequest): Observable<CommonResponseModel<TicketScanResponse>> {
+    const url = `${this.ThApi}api/Booking/PartialScan`;
+    return this.httpClient.post<CommonResponseModel<TicketScanResponse>>(url, request);
+  }
+
+  // Get scan summary
+  getScanSummary(bookingId: number): Observable<CommonResponseModel<BookingScanSummaryResponse>> {
+    const url = `${this.ThApi}api/Booking/GetScanSummary/${bookingId}`;
+    return this.httpClient.get<CommonResponseModel<BookingScanSummaryResponse>>(url);
+  }
+
+  // Reset scan count
+  resetScanCount(bookingId: number): Observable<CommonResponseModel<boolean>> {
+    const url = `${this.ThApi}api/Booking/ResetScan/${bookingId}`;
+    return this.httpClient.post<CommonResponseModel<boolean>>(url, {});
   }
 }

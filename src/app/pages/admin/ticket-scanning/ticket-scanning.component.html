@@ -1,0 +1,299 @@
+<div class="scan-container">
+  <!-- HEADER -->
+  <div class="header">
+    <h2><i class="fa fa-ticket"></i> Ticket Scanner</h2>
+    <!-- <p class="text-muted">Simple Ticket Entry System</p> -->
+  </div>
+
+  <!-- STEP 1: ENTER BOOKING CODE -->
+  <div class="scan-step" *ngIf="step === 1">
+    <div class="card">
+      <div class="card-body text-center">
+        <h4>Enter Booking Code</h4>
+        <p>Scan QR or enter booking code manually</p>
+        
+        <!-- QR Scan Button (Simplified) -->
+        <button class="btn btn-primary btn-lg mb-4" (click)="startCamera()">
+          <i class="fa fa-camera"></i> Scan QR Code
+        </button>
+        
+        <div class="divider">
+          <span>OR</span>
+        </div>
+        
+        <!-- Manual Entry -->
+        <div class="manual-entry">
+          <h5>Manual Entry</h5>
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" 
+                   [(ngModel)]="bookingCode" 
+                   placeholder="Enter booking code"
+                   (keyup.enter)="loadBooking()">
+            <button class="btn btn-primary" (click)="loadBooking()" [disabled]="!bookingCode || isLoading">
+              <i class="fa fa-search"></i> {{ isLoading ? 'Loading...' : 'Find' }}
+            </button>
+          </div>
+          <button class="btn btn-outline-secondary btn-sm" (click)="debugBooking()" *ngIf="booking">
+            <i class="fa fa-bug"></i> Debug
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: BOOKING DETAILS -->
+  <div class="scan-step" *ngIf="step === 2 && booking">
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">
+          <i class="fa fa-check-circle"></i> Booking: {{ booking.booking_code }}
+          <button class="btn btn-sm btn-light float-end" (click)="backToStep1()">
+            <i class="fa fa-times"></i>
+          </button>
+        </h5>
+      </div>
+      
+      <div class="card-body">
+        <!-- Customer Info -->
+        <div class="customer-info mb-4">
+          <h5>{{ booking.first_name }} {{ booking.last_name }}</h5>
+          <p class="mb-1"><strong>Event:</strong> {{ booking.event_name }}</p>
+          <p class="mb-1"><strong>Email:</strong> {{ booking.email }}</p>
+          <p class="mb-0"><strong>Mobile:</strong> {{ booking.mobile }}</p>
+        </div>
+
+        <!-- Tickets Summary -->
+        <div class="tickets-summary mb-4">
+          <div class="row text-center">
+            <div class="col-4">
+              <div class="stat-box">
+                <div class="stat-number">{{ getTotalTickets() }}</div>
+                <div class="stat-label">Total</div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="stat-box">
+                <div class="stat-number">{{ getScannedTickets() }}</div>
+                <div class="stat-label">Scanned</div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="stat-box">
+                <div class="stat-number">{{ getTotalTickets() - getScannedTickets() }}</div>
+                <div class="stat-label">Remaining</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ticket Types -->
+        <div class="ticket-types mb-4" *ngIf="getSeats().length > 0">
+          <h6>Ticket Types:</h6>
+          <div class="list-group">
+            <div class="list-group-item" *ngFor="let seat of getSeats()">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <strong>{{ seat.seat_name }}</strong><br>
+                  <small>Quantity: {{ seat.quantity }} | Scanned: {{ seat.scanned_quantity || 0 }} | Remaining: {{ getRemaining(seat) }}</small>
+                </div>
+                <button class="btn btn-sm btn-outline-primary" 
+                        (click)="openSeatScan(seat)"
+                        [disabled]="isSeatFullyScanned(seat)">
+                  {{ isSeatFullyScanned(seat) ? 'Fully Scanned' : 'Scan' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Action Buttons -->
+        <div class="action-buttons text-center">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <button class="btn btn-success btn-lg w-100 py-3" 
+                      (click)="fullScan()" 
+                      [disabled]="isFullyScanned() || isLoading">
+                <i class="fa fa-check-circle"></i> 
+                <div>SCAN ALL</div>
+                <small>Scan all remaining tickets</small>
+              </button>
+            </div>
+            <div class="col-md-6 mb-3">
+              <button class="btn btn-warning btn-lg w-100 py-3" 
+                      (click)="openBulkPartialScan()" 
+                      [disabled]="isFullyScanned() || isLoading">
+                <i class="fa fa-edit"></i> 
+                <div>PARTIAL SCAN</div>
+                <small>Select quantities</small>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: SINGLE TICKET TYPE SCAN -->
+  <div class="scan-step" *ngIf="step === 3 && partialScanSeat">
+    <div class="card">
+      <div class="card-header bg-info text-white">
+        <h5 class="mb-0">
+          <i class="fa fa-qrcode"></i> Scan {{ partialScanSeat.seat_name }}
+          <button class="btn btn-sm btn-light float-end" (click)="step = 2">
+            <i class="fa fa-arrow-left"></i> Back
+          </button>
+        </h5>
+      </div>
+      
+      <div class="card-body">
+        <div class="text-center mb-4">
+          <h4>{{ partialScanSeat.seat_name }}</h4>
+          <p>Remaining: <strong class="text-success">{{ getRemaining(partialScanSeat) }}</strong> tickets</p>
+        </div>
+
+        <!-- Quantity Selection -->
+        <div class="quantity-selection">
+          <h5 class="text-center mb-3">How many to scan?</h5>
+          
+          <div class="input-group input-group-lg mb-3 justify-content-center">
+            <button class="btn btn-outline-secondary btn-lg" 
+                    (click)="decreaseQuantity()"
+                    [disabled]="partialScanQuantity <= 1">
+              <i class="fa fa-minus"></i>
+            </button>
+            <input type="number" class="form-control form-control-lg text-center" 
+                   style="width: 100px;"
+                   [(ngModel)]="partialScanQuantity"
+                   [min]="1"
+                   [max]="getRemaining(partialScanSeat)">
+            <button class="btn btn-outline-secondary btn-lg" 
+                    (click)="increaseQuantity()"
+                    [disabled]="partialScanQuantity >= getRemaining(partialScanSeat)">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+
+          <!-- Quick Buttons -->
+          <div class="text-center mb-4">
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-outline-primary" 
+                      (click)="partialScanQuantity = 1">1</button>
+              <button type="button" class="btn btn-outline-primary" 
+                      (click)="setScanFive()">5</button>
+              <button type="button" class="btn btn-outline-primary" 
+                      (click)="scanHalf()">Half</button>
+              <button type="button" class="btn btn-outline-success" 
+                      (click)="partialScanQuantity = getRemaining(partialScanSeat)">
+                All ({{ getRemaining(partialScanSeat) }})
+              </button>
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <div class="text-center">
+            <button class="btn btn-success btn-lg px-5" 
+                    (click)="submitSeatScan()"
+                    [disabled]="partialScanQuantity <= 0 || 
+                               partialScanQuantity > getRemaining(partialScanSeat) || 
+                               isLoading">
+              <i class="fa fa-check"></i> 
+              SCAN {{ partialScanQuantity }} TICKET(S)
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3.5: BULK SCAN -->
+  <div class="scan-step" *ngIf="step === 3.5">
+    <div class="card">
+      <div class="card-header bg-warning">
+        <h5 class="mb-0">
+          <i class="fa fa-edit"></i> Bulk Scan
+          <button class="btn btn-sm btn-light float-end" (click)="step = 2">
+            <i class="fa fa-arrow-left"></i> Back
+          </button>
+        </h5>
+      </div>
+      
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Ticket Type</th>
+                <th>Total</th>
+                <th>Scanned</th>
+                <th>Remaining</th>
+                <th>Scan Qty</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let seat of booking.BookingSeats">
+                <td>{{ seat.seat_name }}</td>
+                <td>{{ seat.quantity }}</td>
+                <td>{{ seat.scanned_quantity || 0 }}</td>
+                <td>{{ getRemaining(seat) }}</td>
+                <td>
+                  <input type="number" class="form-control" 
+                         [(ngModel)]="bulkPartialScanQuantities[seat.event_seat_type_inventory_id]"
+                         [min]="0"
+                         [max]="getRemaining(seat)"
+                         [disabled]="getRemaining(seat) <= 0"
+                         style="width: 80px;">
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="text-center">
+          <button class="btn btn-primary btn-lg" 
+                  (click)="submitBulkPartialScan()"
+                  [disabled]="!hasBulkScanQuantities() || isLoading">
+            <i class="fa fa-check"></i> 
+            SUBMIT SCAN
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4: RESULT -->
+  <div class="scan-step" *ngIf="step === 4 && scanResult">
+    <div class="card" [ngClass]="{'border-success': scanResult.isSuccess}">
+      <div class="card-header" [ngClass]="{'bg-success': scanResult.isSuccess}">
+        <h5 class="mb-0 text-white">
+          <i class="fa fa-check-circle"></i> Scan Result
+        </h5>
+      </div>
+      
+      <div class="card-body text-center">
+        <div class="mb-3">
+          <i class="fa fa-5x text-success" *ngIf="scanResult.isSuccess">✓</i>
+          <i class="fa fa-5x text-warning" *ngIf="!scanResult.isSuccess">⚠</i>
+        </div>
+        
+        <h4>{{ scanResult.message }}</h4>
+        
+        <div class="mt-4">
+          <button class="btn btn-primary" (click)="step = 1; scanResult = null">
+            <i class="fa fa-redo"></i> Scan Another
+          </button>
+          <button class="btn btn-outline-secondary" (click)="step = 2">
+            <i class="fa fa-eye"></i> View Booking
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="text-center">
+      <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;"></div>
+      <p class="mt-3">Processing...</p>
+    </div>
+  </div>
+</div>
