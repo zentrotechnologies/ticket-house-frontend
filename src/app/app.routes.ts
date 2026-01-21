@@ -104,13 +104,13 @@ export const routes: Routes = [
                 (m) => m.TicketScanningComponent
               ),
           },
-          {
-            path: 'scan-history',
-            loadComponent: () =>
-              import('./pages/admin/scan-history/scan-history.component').then(
-                (m) => m.ScanHistoryComponent
-              ),
-          }
+          // {
+          //   path: 'scan-history',
+          //   loadComponent: () =>
+          //     import('./pages/admin/scan-history/scan-history.component').then(
+          //       (m) => m.ScanHistoryComponent
+          //     ),
+          // }
         ],
       },
       {

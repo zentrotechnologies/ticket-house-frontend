@@ -34,12 +34,12 @@ export const MENU_ITEMS: MenuItem[] = [
         route: '/admin/ticket-scanning',
         roles: [1, 2]
       },
-      {
-        title: 'Scan History',
-        icon: 'history',
-        route: '/admin/scan-history',
-        roles: [1, 2]
-      }
+      // {
+      //   title: 'Scan History',
+      //   icon: 'history',
+      //   route: '/admin/scan-history',
+      //   roles: [1, 2]
+      // }
     ]
   },
   {
