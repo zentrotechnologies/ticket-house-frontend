@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { BookingDetailsResponse, BookingQRResponse, BookingResponse, BookingScanSummaryResponse, CommonResponse, CommonResponseModel, CreateBookingRequest, EventCategoryModel, EventCategoryRequest, EventCompleteResponseModel, EventCreateRequestModel, EventDetailsModel, EventPaginationRequest, EventSeatTypeInventoryModel, GenerateOTPRequest, GetShowsByArtistsRequest, MyBookingsResponse, OrganizerModel, OrganizerPagedResponse, OrganizerRequest, OTPResponse, PagedResponse, PaginationRequest, PartialScanRequest, QRCodeDataResponse, ResendOTPRequest, ResendOTPResponse, ScanTicketRequest, SeatAvailabilityRequest, ShowsByArtistsResponse, SignUpRequest, SignUpResponse, SimilarEventsRequest, TestimonialModel, TestimonialsResponse, TicketScanResponse, UpcomingEventResponse, UpcomingEventsRequest, UpcomingEventsResponse, UpdateEventCategoryStatusRequest, UpdateOrganizerStatusRequest, UpdateTestimonialStatusRequest, UserIdRequest, VerifyOTPRequest } from '../models/auth.model';
+import { BookingDetailsResponse, BookingQRResponse, BookingResponse, BookingScanSummaryResponse, CommonResponse, CommonResponseModel, CreateBookingRequest, EventCategoryModel, EventCategoryRequest, EventCompleteResponseModel, EventCreateRequestModel, EventDetailsModel, EventPaginationRequest, EventSeatTypeInventoryModel, GenerateOTPRequest, GetShowsByArtistsRequest, MyBookingsResponse, OrganizerModel, OrganizerPagedResponse, OrganizerRequest, OTPResponse, PagedResponse, PaginationRequest, PartialScanRequest, PaymentOrderResponse, PaymentStatusResponse, PaymentVerificationResponse, QRCodeDataResponse, ResendOTPRequest, ResendOTPResponse, ScanTicketRequest, SeatAvailabilityRequest, ShowsByArtistsResponse, SignUpRequest, SignUpResponse, SimilarEventsRequest, TestimonialModel, TestimonialsResponse, TicketScanResponse, UpcomingEventResponse, UpcomingEventsRequest, UpcomingEventsResponse, UpdateEventCategoryStatusRequest, UpdateOrganizerStatusRequest, UpdateTestimonialStatusRequest, UserIdRequest, VerifyOTPRequest } from '../models/auth.model';
 
 @Injectable({
   providedIn: 'root',
@@ -14,6 +14,32 @@ export class ApiService {
 
   constructor(private httpClient: HttpClient) {
     this.ThApi = this.apiurl; // API base URL for the application
+  }
+
+  // Helper method to get authentication headers
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('jwt_token');
+    if (token) {
+      return new HttpHeaders({
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      });
+    }
+    return new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+  }
+
+  // Helper method to get auth headers for FormData (different content-type)
+  private getAuthHeadersFormData(): HttpHeaders {
+    const token = localStorage.getItem('jwt_token');
+    if (token) {
+      return new HttpHeaders({
+        'Authorization': `Bearer ${token}`
+        // Note: No Content-Type for FormData - browser sets it automatically with boundary
+      });
+    }
+    return new HttpHeaders();
   }
 
   //Login API
@@ -389,5 +415,27 @@ export class ApiService {
   resetScanCount(bookingId: number): Observable<CommonResponseModel<boolean>> {
     const url = `${this.ThApi}api/Booking/ResetScan/${bookingId}`;
     return this.httpClient.post<CommonResponseModel<boolean>>(url, {});
+  }
+
+  // Payment APIs
+  createPaymentOrder(request: any): Observable<CommonResponseModel<PaymentOrderResponse>> {
+    const url = `${this.ThApi}api/Payment/CreateOrder`;
+    return this.httpClient.post<CommonResponseModel<PaymentOrderResponse>>(url, request);
+  }
+
+  verifyPayment(request: any): Observable<CommonResponseModel<PaymentVerificationResponse>> {
+    const url = `${this.ThApi}api/Payment/VerifyPayment`;
+    return this.httpClient.post<CommonResponseModel<PaymentVerificationResponse>>(url, request);
+  }
+
+  getPaymentStatus(bookingId: number): Observable<CommonResponseModel<PaymentStatusResponse>> {
+    const url = `${this.ThApi}api/Payment/GetPaymentStatus/${bookingId}`;
+    return this.httpClient.get<CommonResponseModel<PaymentStatusResponse>>(url);
+  }
+
+  createBookingWithPayment(request: any): Observable<any> {
+    return this.httpClient.post<any>(`${this.ThApi}api/Payment/CreateBookingWithPayment`, request, {
+        headers: this.getAuthHeaders()
+    });
   }
 }

@@ -689,3 +689,41 @@ export interface SeatScanInfo {
   lastScanTime: string;
   lastScannedBy: string;
 }
+
+// Add interfaces for payment responses
+export interface PaymentOrderResponse {
+  OrderId: string;
+  KeyId: string;
+  Amount: number;
+  Currency: string;
+  CompanyName: string;
+  CustomerName: string;
+  CustomerEmail: string;
+  Notes: { [key: string]: string };
+}
+
+export interface PaymentVerificationResponse {
+  IsSuccess: boolean;
+  Message: string;
+  PaymentId: string;
+  OrderId: string;
+  PaymentMethod: string;
+  CardLast4: string;
+  CardNetwork: string;
+  BankName: string;
+  Wallet: string;
+  VPA: string;
+  PaymentStatus: string;
+  PaymentDate: string;
+  PaymentDetails?: { [key: string]: string };
+}
+
+export interface PaymentStatusResponse {
+  PaymentId: string;
+  Status: string;
+  Amount: number;
+  Currency: string;
+  Method: string;
+  CreatedAt: string;
+  Notes?: { [key: string]: string };
+}
