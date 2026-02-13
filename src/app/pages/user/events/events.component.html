@@ -1,22 +1,13 @@
 <div class="audience-page audience-body">
   <!-- Events Header with Column Structure -->
-  <header class="audience-header">
+  <!-- <header class="audience-header">
     <div class="container">
       <div class="header-row">
-        <!-- Logo + Search Combined Column - 70% -->
         <div class="header-col left-section-col">
           <div class="left-section-content">
-            <!-- Logo -->
-            <!-- <div class="logo-wrapper">
-              <img class="logo"
-                src="https://zentrotechnologies.com/wp-content/uploads/2025/02/Zentro_Final-Logo-05-scaled-e1753251642526.png"
-                alt="Zentro Logo" />
-            </div> -->
             <div class="logo-wrapper">
                 <img class="logo" src="/assets/ticket-house-logo.jpeg" alt="ticket-house-logo" />
             </div>
-
-            <!-- Search -->
             <div class="search-wrapper">
               <div class="search">
                 <input placeholder="Search for Events, Artists, Location..." aria-label="search" />
@@ -24,19 +15,13 @@
             </div>
           </div>
         </div>
-
-        <!-- Actions Column - 30% -->
         <div class="header-col actions-col">
           <div class="user-actions">
             <div class="location muted">Pune ▼</div>
-
-            <!-- Show user welcome with dropdown when logged in -->
             <div *ngIf="isUserLoggedIn" class="user-welcome-dropdown">
               <div class="user-welcome-trigger" (click)="toggleDropdown()">
                 Welcome, {{ getUserDisplayName() }}! ▼
               </div>
-
-              <!-- Dropdown menu -->
               <div *ngIf="showUserDropdown" class="user-dropdown-menu">
                 <div class="dropdown-item" (click)="onViewProfile()">
                   View Profile
@@ -51,14 +36,12 @@
                 </div>
               </div>
             </div>
-
-            <!-- Show Sign In button when not logged in -->
             <div *ngIf="!isUserLoggedIn" class="pill" (click)="onSignIn()">Sign In</div>
           </div>
         </div>
       </div>
     </div>
-  </header>
+  </header> -->
 
   <!-- events-page.component.html -->
   <div class="events-page">

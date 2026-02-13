@@ -1,7 +1,6 @@
-<!-- layout.component.html -->
 <div class="layout">
-  <!-- For Admin/Super Admin (role_id 1 & 2) -->
-  <ng-container *ngIf="!isAudienceUser()">
+  <!-- CASE 1: ADMIN/ORGANIZER USERS (role_id 1 or 2) - Show sidebar + admin header -->
+  <ng-container *ngIf="isAdminUser()">
     <app-sidebar (toggle)="onSidebarToggle($event)"></app-sidebar>
     <app-header [isSidebarCollapsed]="isSidebarCollapsed"></app-header>
     
@@ -12,49 +11,14 @@
     </main>
   </ng-container>
 
-  <!-- For Audience/User (role_id 3) -->
-  <ng-container *ngIf="isAudienceUser()">
-    <!-- Apply audience styles to the entire audience section -->
+  <!-- CASE 2: EVERYONE ELSE - Audience users (role_id 3) AND Public users (not logged in) -->
+  <!-- Show user header for ALL non-admin users (NO sidebar) -->
+  <ng-container *ngIf="isAudienceOrPublic()">
     <div class="audience-page audience-body">
-      <!-- Events Header with Column Structure -->
-      <header class="audience-header">
-        <div class="container">
-          <div class="header-row">
-            <!-- Logo + Search Combined Column - 70% -->
-            <div class="header-col left-section-col">
-              <div class="left-section-content">
-                <!-- Logo -->
-                <!-- <div class="logo-wrapper">
-                  <img class="logo"
-                      src="https://zentrotechnologies.com/wp-content/uploads/2025/02/Zentro_Final-Logo-05-scaled-e1753251642526.png"
-                      alt="Zentro Logo">
-                </div> -->
-                <div class="logo-wrapper">
-                    <img class="logo" src="/assets/ticket-house-logo.jpeg" alt="ticket-house-logo" />
-                </div>
-                
-                <!-- Search -->
-                <div class="search-wrapper">
-                  <div class="search">
-                    <input placeholder="Search for Events, Artists, Location..."
-                        aria-label="search">
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Actions Column - 30% -->
-            <div class="header-col actions-col">
-              <div class="user-actions">
-                <div class="location muted">Pune ▼</div>
-                <div class="pill">Sign In</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <!-- Main content without sidebar -->
+      <!-- Common User Header - ALWAYS visible for non-admin users -->
+      <app-user-header></app-user-header>
+      
+      <!-- Main content WITHOUT any header (header removed from individual components) -->
       <main class="audience-main-content">
         <div class="content-wrapper">
           <router-outlet></router-outlet>

@@ -1,29 +1,18 @@
 <div class="audience-page audience-body">
   <!-- HEADER -->
-  <header class="audience-header">
+  <!-- <header class="audience-header">
     <div class="container">
       <div class="header-row">
-        <!-- Left Section (Logo + Breadcrumbs) -->
         <div class="header-col left-section-col">
           <div class="left-section-content">
-            <!-- Logo -->
-            <!-- <div class="logo-wrapper">
-              <img class="logo"
-                src="https://zentrotechnologies.com/wp-content/uploads/2025/02/Zentro_Final-Logo-05-scaled-e1753251642526.png"
-                alt="Zentro Logo" />
-            </div> -->
             <div class="logo-wrapper">
                 <img class="logo" src="/assets/ticket-house-logo.jpeg" alt="ticket-house-logo" />
             </div>
-
-            <!-- Updated Breadcrumbs with proper navigation -->
             <nav class="breadcrumbs">
               <span class="back-arrow" [routerLink]="['/events']">←</span>
 
               <span class="crumb" [routerLink]="['/events']">Events</span>
               <span class="separator">›</span>
-
-              <!-- Link back to the event booking page -->
               <span class="crumb" [routerLink]="['/event-booking', eventId, eventNameSlug]">{{ getEventTitle() }}</span>
               <span class="separator">›</span>
 
@@ -34,28 +23,13 @@
             </nav>
           </div>
         </div>
-
-        <!-- Right Column -->
-        <!-- <div class="header-col actions-col">
-          <div class="user-actions">
-            <div class="location muted">Pune ▼</div>
-            <div *ngIf="isUserLoggedIn" class="user-welcome">
-              Welcome, {{ getUserDisplayName() }}!
-            </div>
-            <div *ngIf="!isUserLoggedIn" class="pill" (click)="onSignIn()">Sign In</div>
-          </div>
-        </div> -->
         <div class="header-col actions-col">
           <div class="user-actions">
             <div class="location muted">Pune ▼</div>
-
-            <!-- Show user welcome with dropdown when logged in -->
             <div *ngIf="isUserLoggedIn" class="user-welcome-dropdown">
               <div class="user-welcome-trigger" (click)="toggleDropdown()">
                 Welcome, {{ getUserDisplayName() }}! ▼
               </div>
-
-              <!-- Dropdown menu -->
               <div *ngIf="showUserDropdown" class="user-dropdown-menu">
                 <div class="dropdown-item" (click)="onViewProfile()">
                   View Profile
@@ -70,21 +44,12 @@
                 </div>
               </div>
             </div>
-
-            <!-- Simple user welcome without dropdown (alternative) -->
-            <!-- <div *ngIf="isUserLoggedIn" class="user-welcome-with-logout">
-                    <span>Welcome, {{ getUserDisplayName() }}!</span>
-                    <span class="logout-link" (click)="onLogout()">Logout</span>
-                  </div> 
-            -->
-
-            <!-- Show Sign In button when not logged in -->
             <div *ngIf="!isUserLoggedIn" class="pill" (click)="onSignIn()">Sign In</div>
           </div>
         </div>
       </div>
     </div>
-  </header>
+  </header> -->
 
   <!-- Loading State -->
   <div *ngIf="isSeatLoading" class="loading-container">
@@ -158,7 +123,7 @@
   </div>
 
   <!-- Updated Login/Signup Modal -->
-  <div *ngIf="showAuthModal" class="modal-overlay">
+  <!-- <div *ngIf="showAuthModal" class="modal-overlay">
     <div class="modal-content auth-modal">
       <div class="modal-header">
         <h3>{{ isLoginMode ? 'Sign In' : 'Create Account' }}</h3>
@@ -166,7 +131,6 @@
       </div>
 
       <div class="modal-body">
-        <!-- Progress Steps for Signup -->
         <div *ngIf="!isLoginMode" class="signup-steps">
           <div class="step" [class.active]="signupStep === 1">
             <span class="step-number">1</span>
@@ -177,8 +141,6 @@
             <span class="step-text">Verify Email</span>
           </div>
         </div>
-
-        <!-- Login Form -->
         <div *ngIf="isLoginMode && !showOTPVerification" class="login-section">
           <div class="form-group">
             <input type="email" [(ngModel)]="loginEmail" placeholder="Email" [disabled]="isLoading">
@@ -198,9 +160,6 @@
             </p>
           </div>
         </div>
-
-        <!-- Step 1: Signup Form -->
-        <!-- In the signup section of your modal -->
         <div *ngIf="!isLoginMode && signupStep === 1" class="signup-section">
           <div class="form-group">
             <input type="text" [(ngModel)]="signupFirstName" placeholder="First Name" [disabled]="isLoading">
@@ -242,8 +201,6 @@
             </p>
           </div>
         </div>
-
-        <!-- Step 2: OTP Verification -->
         <div *ngIf="signupStep === 2 || showOTPVerification" class="otp-verification-section">
           <div class="verification-header">
             <h4>Verify Your Email</h4>
@@ -281,5 +238,5 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 </div>

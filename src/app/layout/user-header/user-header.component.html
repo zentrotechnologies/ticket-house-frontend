@@ -1,0 +1,207 @@
+<header class="audience-header">
+  <div class="container">
+    <div class="header-row">
+      <!-- Left Section - CONDITIONAL: Show Search OR Breadcrumbs -->
+      <div class="header-col left-section-col">
+        <div class="left-section-content">
+          <!-- Logo - ALWAYS VISIBLE -->
+          <div class="logo-wrapper">
+            <a [routerLink]="['/events']">
+              <img class="logo" src="/assets/ticket-house-logo.jpeg" alt="ticket-house-logo" />
+            </a>
+          </div>
+
+          <!-- CONDITION 1: SHOW SEARCH + CITY on home/events page and default pages -->
+          <div *ngIf="showSearchSection()" class="search-breadcrumb-container">
+            <!-- Search -->
+            <div class="search-wrapper">
+              <div class="search">
+                <input 
+                  placeholder="Search for Events, Artists, Location..." 
+                  aria-label="search"
+                  (input)="onSearch($event)">
+              </div>
+            </div>
+          </div>
+
+          <!-- CONDITION 2: SHOW BREADCRUMBS on seat booking and payment pages -->
+          <div *ngIf="!showSearchSection()" class="search-breadcrumb-container">
+            <!-- Breadcrumbs -->
+            <nav class="breadcrumbs">
+              <span class="back-arrow" (click)="navigateBack()">←</span>
+
+              <span class="crumb" [routerLink]="['/events']">Events</span>
+              <span class="separator">›</span>
+              
+              <!-- Event Name (if available) -->
+              <span *ngIf="eventId && eventNameSlug" 
+                    class="crumb" 
+                    (click)="navigateToEventBooking()">
+                {{ eventTitle }}
+              </span>
+              <span *ngIf="eventId && eventNameSlug" class="separator">›</span>
+              
+              <!-- Current Page -->
+              <span class="crumb active">{{ getCurrentPageName() }}</span>
+              
+              <!-- Next Step (only on seat booking page) -->
+              <ng-container *ngIf="isSeatBookingPage()">
+                <span class="separator">›</span>
+                <span class="crumb muted">Review & Pay</span>
+              </ng-container>
+            </nav>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column - ALWAYS SAME: User Actions -->
+      <div class="header-col actions-col">
+        <div class="user-actions">
+          <!-- City Selector - ALWAYS VISIBLE (except maybe on payment) -->
+          <div class="location muted" (click)="onCityChange('Pune')">Pune ▼</div>
+
+          <!-- User Welcome Dropdown - When Logged In -->
+          <div *ngIf="isUserLoggedIn" class="user-welcome-dropdown">
+            <div class="user-welcome-trigger" (click)="toggleDropdown()">
+              Welcome, {{ getUserDisplayName() }}! ▼
+            </div>
+            <div *ngIf="showUserDropdown" class="user-dropdown-menu">
+              <div class="dropdown-item" (click)="onViewProfile()">
+                View Profile
+              </div>
+              <div class="dropdown-item" (click)="onViewBookings()">
+                My Bookings
+              </div>
+              <div class="dropdown-divider"></div>
+              <div class="dropdown-item logout-item" (click)="onLogout()">
+                <span class="logout-icon">🚪</span>
+                Logout
+              </div>
+            </div>
+          </div>
+
+          <!-- Sign In Button - When Not Logged In -->
+          <div *ngIf="!isUserLoggedIn" class="pill" (click)="onSignIn()">Sign In</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Auth Modal -->
+<div *ngIf="showAuthModal" class="modal-overlay">
+  <div class="modal-content auth-modal">
+    <div class="modal-header">
+      <h3>{{ isLoginMode ? 'Sign In' : 'Create Account' }}</h3>
+      <button class="modal-close" (click)="onCloseAuthModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <!-- Progress Steps for Signup -->
+      <div *ngIf="!isLoginMode" class="signup-steps">
+        <div class="step" [class.active]="signupStep === 1">
+          <span class="step-number">1</span>
+          <span class="step-text">Account Details</span>
+        </div>
+        <div class="step" [class.active]="signupStep === 2">
+          <span class="step-number">2</span>
+          <span class="step-text">Verify Email</span>
+        </div>
+      </div>
+
+      <!-- Login Form -->
+      <div *ngIf="isLoginMode && !showOTPVerification" class="login-section">
+        <div class="form-group">
+          <input type="email" [(ngModel)]="loginEmail" placeholder="Email" [disabled]="isLoading">
+        </div>
+        <div class="form-group">
+          <input type="password" [(ngModel)]="loginPassword" placeholder="Password" [disabled]="isLoading">
+        </div>
+        <button class="auth-btn" (click)="onLogin()" [disabled]="isLoading || !loginEmail || !loginPassword">
+          <span *ngIf="!isLoading">Sign In</span>
+          <span *ngIf="isLoading">Signing In...</span>
+        </button>
+        <div class="auth-footer">
+          <p>Don't have an account?
+            <a (click)="switchToSignup()">Sign Up</a>
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 1: Signup Form -->
+      <div *ngIf="!isLoginMode && signupStep === 1" class="signup-section">
+        <div class="form-group">
+          <input type="text" [(ngModel)]="signupFirstName" placeholder="First Name" [disabled]="isLoading">
+        </div>
+        <div class="form-group">
+          <input type="text" [(ngModel)]="signupLastName" placeholder="Last Name" [disabled]="isLoading">
+        </div>
+        <div class="form-group">
+          <input type="email" [(ngModel)]="signupEmail" placeholder="Email" [disabled]="isLoading">
+        </div>
+        <div class="form-group">
+          <input type="password" [(ngModel)]="signupPassword" placeholder="Password (min. 8 characters)"
+            [disabled]="isLoading">
+        </div>
+        <div class="form-row">
+          <div class="form-group country-code">
+            <select [(ngModel)]="signupCountryCode" [disabled]="isLoading">
+              <option value="+91">+91 IN</option>
+              <option value="+1">+1 US</option>
+              <option value="+44">+44 UK</option>
+              <option value="+61">+61 AU</option>
+              <option value="+65">+65 SG</option>
+            </select>
+          </div>
+          <div class="form-group phone-number">
+            <input type="text" [(ngModel)]="signupPhone" placeholder="Phone Number (optional)" [disabled]="isLoading">
+          </div>
+        </div>
+        <button class="auth-btn" (click)="onSignupStep1()"
+          [disabled]="isLoading || !signupFirstName || !signupEmail || !signupPassword || !isValidSignupStep1()">
+          <span *ngIf="!isLoading">Send OTP</span>
+          <span *ngIf="isLoading">Sending OTP...</span>
+        </button>
+        <div class="auth-footer">
+          <p>Already have an account?
+            <a (click)="switchToLogin()">Sign In</a>
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 2: OTP Verification -->
+      <div *ngIf="signupStep === 2 || showOTPVerification" class="otp-verification-section">
+        <div class="verification-header">
+          <h4>Verify Your Email</h4>
+          <p>Enter the 4-digit code sent to<br>
+            <strong>{{ signupEmail || loginEmail }}</strong>
+          </p>
+        </div>
+        <div class="otp-input-container">
+          <div class="otp-inputs">
+            <input *ngFor="let i of [0,1,2,3]; let idx = index" type="text" maxlength="1" [(ngModel)]="otpDigits[idx]"
+              (input)="onOtpInput($event, idx)" (keydown)="onOtpKeyDown($event, idx)" [disabled]="isLoading"
+              class="otp-digit">
+          </div>
+        </div>
+        <div class="otp-timer" *ngIf="otpTimer > 0">
+          OTP expires in: {{ formatOtpTimer() }}
+        </div>
+        <div class="otp-actions">
+          <button class="resend-btn" (click)="resendOTP()" [disabled]="otpTimer > 0 || isLoading">
+            Resend OTP
+          </button>
+          <button class="verify-btn" (click)="verifyOTP()" [disabled]="!isOtpComplete() || isLoading">
+            <span *ngIf="!isLoading">Verify & Continue</span>
+            <span *ngIf="isLoading">Verifying...</span>
+          </button>
+        </div>
+        <div class="auth-footer" *ngIf="signupStep === 2">
+          <a (click)="goBackToStep1()">← Back to Signup</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay for dropdown -->
+<div *ngIf="showUserDropdown" class="overlay" (click)="closeDropdownOnClickOutside($event)"></div>

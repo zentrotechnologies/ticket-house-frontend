@@ -12,7 +12,7 @@ declare var Razorpay: any;
 @Component({
   selector: 'app-event-payment',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, ReactiveFormsModule, BookingSuccessModalComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, BookingSuccessModalComponent],
   templateUrl: './event-payment.component.html',
   styleUrl: './event-payment.component.css',
 })

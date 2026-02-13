@@ -46,7 +46,10 @@ export class AuthService {
     localStorage.removeItem(environment.USERDATA_KEY);
     localStorage.removeItem('jwt_token');
     localStorage.removeItem('refresh_token');
+    localStorage.removeItem('token_expiry');
+    localStorage.removeItem('refresh_token_expiry');
     this.currentUserSubject.next(null);
+    console.log('User logged out, all auth data cleared');
   }
 
   isLoggedIn(): boolean {

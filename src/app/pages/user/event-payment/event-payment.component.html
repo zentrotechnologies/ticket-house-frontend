@@ -1,29 +1,18 @@
 <div class="audience-page audience-body">
   <!-- HEADER -->
-  <header class="audience-header">
+  <!-- <header class="audience-header">
     <div class="container">
       <div class="header-row">
-        <!-- Left Section (Logo + Breadcrumbs) -->
         <div class="header-col left-section-col">
           <div class="left-section-content">
-            <!-- Logo -->
-            <!-- <div class="logo-wrapper">
-              <img class="logo"
-                src="https://zentrotechnologies.com/wp-content/uploads/2025/02/Zentro_Final-Logo-05-scaled-e1753251642526.png"
-                alt="Zentro Logo" />
-            </div> -->
             <div class="logo-wrapper">
                 <img class="logo" src="/assets/ticket-house-logo.jpeg" alt="ticket-house-logo" />
             </div>
-
-            <!-- Updated Breadcrumbs with proper navigation -->
             <nav class="breadcrumbs">
               <span class="back-arrow" [routerLink]="['/events']">←</span>
 
               <span class="crumb" [routerLink]="['/events']">Events</span>
               <span class="separator">›</span>
-
-              <!-- Link back to the event booking page -->
               <span class="crumb" [routerLink]="['/event-booking', eventId, eventNameSlug]">{{ getFormattedEventTitle() }}</span>
               <span class="separator">›</span>
 
@@ -34,19 +23,13 @@
             </nav>
           </div>
         </div>
-
-        <!-- Right Column -->
         <div class="header-col actions-col">
           <div class="user-actions">
             <div class="location muted">Pune ▼</div>
-
-            <!-- Show user welcome with dropdown when logged in -->
             <div *ngIf="isUserLoggedIn" class="user-welcome-dropdown">
               <div class="user-welcome-trigger" (click)="toggleDropdown()">
                 Welcome, {{ getUserDisplayName() }}! ▼
               </div>
-
-              <!-- Dropdown menu -->
               <div *ngIf="showUserDropdown" class="user-dropdown-menu">
                 <div class="dropdown-item" (click)="onViewProfile()">
                   View Profile
@@ -61,14 +44,12 @@
                 </div>
               </div>
             </div>
-
-            <!-- Show Sign In button when not logged in -->
             <div *ngIf="!isUserLoggedIn" class="pill" (click)="onSignIn()">Sign In</div>
           </div>
         </div>
       </div>
     </div>
-  </header>
+  </header> -->
 
   <!-- PAGE CONTENT -->
   <main class="payment-page">

@@ -20,7 +20,7 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-seats-booking',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './seats-booking.component.html',
   styleUrl: './seats-booking.component.css',
 })
@@ -68,6 +68,9 @@ export class SeatsBookingComponent implements OnInit {
   private pendingSeatSelections: any[] = [];
   private pendingTotalAmount: number = 0;
   private isProceedClicked = false; // Track if Proceed was clicked
+
+  // Store seat selection for later use
+  private authSubscription: Subscription = new Subscription()
 
   constructor(
     private router: Router,
@@ -207,18 +210,37 @@ export class SeatsBookingComponent implements OnInit {
     // Set flag to indicate Proceed was clicked
     this.isProceedClicked = true;
 
-    if (this.isUserLoggedIn) {
-      // User is logged in, proceed directly to payment
+    // if (this.isUserLoggedIn) {
+    //   // User is logged in, proceed directly to payment
+    //   this.navigateToPayment();
+    // } else {
+    //   // User not logged in, show auth modal
+    //   this.showAuthModal = true;
+    //   this.resetAuthForms();
+      
+    //   // Pre-fill email from seat selections if available
+    //   if (this.loginEmail) {
+    //     this.signupEmail = this.loginEmail;
+    //   }
+    // }
+
+    // CRITICAL FIX: Always check the CURRENT auth state from the service
+    const isLoggedIn = this.authService.isLoggedIn();
+    
+    if (isLoggedIn) {
+      // User is logged in, proceed to payment
       this.navigateToPayment();
     } else {
-      // User not logged in, show auth modal
-      this.showAuthModal = true;
-      this.resetAuthForms();
+      // User is NOT logged in - show toast and let header handle login
+      this.toastr.warning('Please sign in to continue with booking', 'Authentication Required');
       
-      // Pre-fill email from seat selections if available
-      if (this.loginEmail) {
-        this.signupEmail = this.loginEmail;
-      }
+      // Store the fact that user wants to proceed after login
+      localStorage.setItem('pending_booking_action', 'proceed_to_payment');
+      localStorage.setItem('pending_event_id', this.eventId.toString());
+      localStorage.setItem('pending_event_name', this.eventNameSlug);
+      
+      // Trigger the header's sign-in modal by emitting an event or using a service
+      // For now, we'll just show the toast and let user click Sign In button in header
     }
   }
 
@@ -730,8 +752,16 @@ export class SeatsBookingComponent implements OnInit {
   }
 
   // Clean up event listener when component is destroyed
+  // ngOnDestroy(): void {
+  //   document.removeEventListener('click', this.closeDropdownOnClickOutside.bind(this));
+  //   this.clearOtpTimer();
+  // }
+
+  // Clean up
   ngOnDestroy(): void {
-    document.removeEventListener('click', this.closeDropdownOnClickOutside.bind(this));
-    this.clearOtpTimer();
+    // Don't clear pending selections here - they're needed after login
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
   }
 }
