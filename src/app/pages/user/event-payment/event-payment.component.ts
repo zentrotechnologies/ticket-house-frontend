@@ -172,7 +172,8 @@ export class EventPaymentComponent implements OnInit {
 
   calculateBookingFee(): void {
     // Calculate 6.5% convenience fee
-    this.convenienceFee = parseFloat((this.totalAmount * 0.07).toFixed(2));
+    // Calculate 6% convenience fee (changed from 7%)
+    this.convenienceFee = parseFloat((this.totalAmount * 0.06).toFixed(2));
     
     // Calculate GST on convenience fee only (18% = 9% CGST + 9% SGST)
     this.cgstAmount = parseFloat((this.convenienceFee * 0.09).toFixed(2));
@@ -360,20 +361,78 @@ export class EventPaymentComponent implements OnInit {
       });
   }
 
+  // initiateRazorpayPayment(orderData: any): void {
+  //   // FIX: Use the correct property name - it's 'keyId' not 'KeyId'
+  //   const razorpayKey = orderData.keyId || orderData.KeyId || '';
+    
+  //   if (!razorpayKey) {
+  //       this.isProcessing = false;
+  //       this.toastr.error('Payment key is missing', 'Error');
+  //       console.error('Razorpay key missing in orderData:', orderData);
+  //       return;
+  //   }
+
+  //   const options = {
+  //       key: razorpayKey, // Use the corrected key
+  //       amount: orderData.amount * 100, // Convert to paise
+  //       currency: orderData.currency || 'INR',
+  //       name: orderData.companyName || 'TicketHouse',
+  //       description: `Payment for ${this.eventTitle}`,
+  //       order_id: orderData.orderId,
+  //       handler: (response: any) => {
+  //           console.log('Payment successful:', response);
+  //           this.verifyPayment(response, orderData.bookingId);
+  //       },
+  //       prefill: {
+  //           name: orderData.customerName,
+  //           email: orderData.customerEmail,
+  //           contact: orderData.customerPhone || '' // Add phone if available
+  //       },
+  //       notes: orderData.notes,
+  //       theme: {
+  //           color: '#4896d1'
+  //       },
+  //       modal: {
+  //           ondismiss: () => {
+  //               console.log('Payment modal dismissed');
+  //               this.isProcessing = false;
+  //               this.toastr.info('Payment cancelled', 'Info');
+  //           }
+  //       }
+  //   };
+
+  //   console.log('Razorpay options:', options);
+    
+  //   try {
+  //       const rzp = new Razorpay(options);
+  //       rzp.open();
+  //   } 
+  //   catch (error) {
+  //       this.isProcessing = false;
+  //       this.toastr.error('Failed to initialize payment gateway', 'Error');
+  //       console.error('Razorpay initialization error:', error);
+  //   }
+  // }
+
   initiateRazorpayPayment(orderData: any): void {
-    // FIX: Use the correct property name - it's 'keyId' not 'KeyId'
+    // Check if Razorpay is available
+    if (typeof (window as any).Razorpay === 'undefined') {
+      this.isProcessing = false;
+      this.toastr.error('Payment gateway not loaded. Please refresh the page.', 'Error');
+      return;
+    }
+
     const razorpayKey = orderData.keyId || orderData.KeyId || '';
     
     if (!razorpayKey) {
         this.isProcessing = false;
         this.toastr.error('Payment key is missing', 'Error');
-        console.error('Razorpay key missing in orderData:', orderData);
         return;
     }
 
     const options = {
-        key: razorpayKey, // Use the corrected key
-        amount: orderData.amount * 100, // Convert to paise
+        key: razorpayKey,
+        amount: Math.round(orderData.amount * 100),
         currency: orderData.currency || 'INR',
         name: orderData.companyName || 'TicketHouse',
         description: `Payment for ${this.eventTitle}`,
@@ -385,28 +444,23 @@ export class EventPaymentComponent implements OnInit {
         prefill: {
             name: orderData.customerName,
             email: orderData.customerEmail,
-            contact: orderData.customerPhone || '' // Add phone if available
+            contact: orderData.customerPhone || ''
         },
         notes: orderData.notes,
-        theme: {
-            color: '#4896d1'
-        },
+        theme: { color: '#4896d1' },
         modal: {
             ondismiss: () => {
-                console.log('Payment modal dismissed');
                 this.isProcessing = false;
                 this.toastr.info('Payment cancelled', 'Info');
             }
         }
     };
 
-    console.log('Razorpay options:', options);
-    
     try {
-        const rzp = new Razorpay(options);
+        const RazorpayInstance = (window as any).Razorpay;
+        const rzp = new RazorpayInstance(options);
         rzp.open();
-    } 
-    catch (error) {
+    } catch (error) {
         this.isProcessing = false;
         this.toastr.error('Failed to initialize payment gateway', 'Error');
         console.error('Razorpay initialization error:', error);
