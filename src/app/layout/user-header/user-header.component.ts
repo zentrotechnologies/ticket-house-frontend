@@ -84,7 +84,12 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
       }
     });
     
-    // ========== NEW: Subscribe to route changes ==========
+    // Also check immediately after a short delay to ensure localStorage is read
+    setTimeout(() => {
+      this.checkAuthStatus();
+    }, 0);
+    
+    // Subscribe to route changes
     this.routerSubscription = this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: NavigationEnd) => {
@@ -98,12 +103,32 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
   }
 
   checkAuthStatus(): void {
+    // First check via AuthService
     this.isUserLoggedIn = this.authService.isLoggedIn();
+    
     if (this.isUserLoggedIn) {
       this.currentUserId = this.authService.getCurrentUserId();
       const user = this.authService.getCurrentUser();
       if (user) {
         this.userFirstName = user.first_name;
+      }
+    } else {
+      // Double-check localStorage directly as a fallback
+      const token = localStorage.getItem('jwt_token');
+      const userData = localStorage.getItem('user_data');
+      
+      if (token && userData) {
+        try {
+          const user = JSON.parse(userData);
+          this.isUserLoggedIn = true;
+          this.currentUserId = user.user_id;
+          this.userFirstName = user.first_name;
+          
+          // Also update the AuthService
+          this.authService.setcurrentUser(user);
+        } catch (e) {
+          console.error('Error parsing user data', e);
+        }
       }
     }
   }

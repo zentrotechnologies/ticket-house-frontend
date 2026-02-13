@@ -868,3 +868,310 @@ select:disabled {
   background: #4b5563;
   border-color: #4b5563;
 }
+
+/* Event Summary Modal Styles */
+
+/* Info Icon Button */
+.icon-btn.info {
+  color: #2c2e72;
+}
+
+.icon-btn.info:hover {
+  background: #e8eaff;
+  color: #1a1c4d;
+}
+
+/* Modal Styles */
+.summary-section {
+  padding: 0.5rem 0;
+}
+
+.event-title-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.event-name-summary {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #2c2e72;
+  margin: 0;
+}
+
+.event-id-badge {
+  background: #f1f5f9;
+  color: #475569;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Info Grid */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  background: #f8fafc;
+  padding: 1rem;
+  border-radius: 10px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.info-label {
+  font-size: 0.8rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-label i {
+  margin-right: 0.25rem;
+  font-size: 0.75rem;
+}
+
+.info-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* Stats Cards */
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 10px;
+  background: white;
+  border: 1px solid #eef2f6;
+  transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card.total {
+  border-left: 4px solid #2c2e72;
+}
+
+.stat-card.booked {
+  border-left: 4px solid #eab308;
+}
+
+.stat-card.available {
+  border-left: 4px solid #22c55e;
+}
+
+.stat-card.occupancy {
+  border-left: 4px solid #ec4899;
+}
+
+.stat-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  border-radius: 8px;
+  color: #64748b;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.2;
+}
+
+/* Summary Subsection */
+.summary-subsection {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.subsection-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #2c2e72;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+/* Summary Table */
+.summary-table {
+  font-size: 0.9rem;
+}
+
+.summary-table thead th {
+  background: #f8fafc;
+  color: #475569;
+  font-weight: 600;
+  padding: 0.75rem;
+  border-bottom: 2px solid #eef2f6;
+}
+
+.summary-table tbody td {
+  padding: 0.75rem;
+  vertical-align: middle;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.summary-table tbody tr:hover {
+  background: #fafcff;
+}
+
+.summary-table tfoot td {
+  background: #f8fafc;
+  padding: 0.75rem;
+  font-weight: 600;
+  border-top: 2px solid #eef2f6;
+}
+
+/* Occupancy Badge */
+.occupancy-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.occupancy-badge.low {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.occupancy-badge.medium {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.occupancy-badge.high {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+/* Payment Details Grid */
+.payment-details-grid {
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.payment-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0;
+  border-bottom: 1px dashed #eef2f6;
+}
+
+.payment-row:last-child {
+  border-bottom: none;
+}
+
+.payment-label {
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.payment-value {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.payment-value.highlight {
+  color: #2c2e72;
+  font-size: 1.1rem;
+}
+
+/* No Data Message */
+.no-data-message {
+  text-align: center;
+  padding: 3rem 1rem;
+  background: #f8fafc;
+  border-radius: 10px;
+  color: #94a3b8;
+}
+
+.no-data-message i {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+/* Loading Spinner */
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stats-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .event-title-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .summary-table {
+    font-size: 0.8rem;
+  }
+  
+  .payment-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .stats-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .stat-card {
+    padding: 0.75rem;
+  }
+}

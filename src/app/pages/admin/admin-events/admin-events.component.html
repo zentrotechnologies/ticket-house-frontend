@@ -112,6 +112,10 @@
               <button class="icon-btn danger" title="Delete" (click)="deleteEvent(event.eventDetails.event_id)">
                 <i class="fa fa-trash"></i>
               </button>
+              <!-- Info/Summary Icon Button - Add this -->
+              <button class="icon-btn info me-1" title="View Event Summary" (click)="viewEventSummary(event.eventDetails.event_id)">
+                <i class="fa fa-info-circle"></i>
+              </button>
             </td>
           </tr>
           <tr *ngIf="events.length === 0">
@@ -976,6 +980,195 @@
         </button>
         <button type="button" class="btn btn-danger" (click)="confirmDelete()" [disabled]="isDeleting">
           <i class="fa fa-trash"></i> {{ isDeleting ? 'Deleting...' : 'Yes, Delete' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EVENT SUMMARY MODAL -->
+<div class="modal fade" id="eventSummaryModal" tabindex="-1" aria-labelledby="eventSummaryLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content modal-card">
+      <div class="modal-header">
+        <h5 class="modal-title" id="eventSummaryLabel">
+          <i class="fa fa-info-circle me-2" style="color: #2c2e72;"></i>
+          Event Summary
+        </h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeModalProperly('eventSummaryModal')"></button>
+      </div>
+
+      <div class="modal-body" *ngIf="!isLoadingSummary; else loadingTemplate">
+        <!-- Event Basic Info Card -->
+        <div class="summary-section" *ngIf="eventSummary">
+          <div class="event-title-header">
+            <h4 class="event-name-summary">{{ eventSummary.eventName }}</h4>
+            <span class="event-id-badge">Event ID: #{{ eventSummary.eventId }}</span>
+          </div>
+          
+          <!-- Event Details Grid -->
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-label">
+                <i class="fa fa-calendar"></i> Date & Time
+              </div>
+              <div class="info-value">
+                {{ eventSummary.eventDate | date:'dd MMM yyyy' }}<br>
+                <small class="text-muted">{{ eventSummary.startTime }} - {{ eventSummary.endTime }}</small>
+              </div>
+            </div>
+            
+            <div class="info-item">
+              <div class="info-label">
+                <i class="fa fa-map-marker"></i> Location
+              </div>
+              <div class="info-value">{{ eventSummary.location }}</div>
+            </div>
+          </div>
+
+          <!-- Seat Statistics Cards -->
+          <div class="stats-cards">
+            <div class="stat-card total">
+              <div class="stat-icon"><i class="fa fa-chair"></i></div>
+              <div class="stat-content">
+                <div class="stat-label">Total Seats</div>
+                <div class="stat-value">{{ eventSummary.totalSeats | number }}</div>
+              </div>
+            </div>
+            
+            <div class="stat-card booked">
+              <div class="stat-icon"><i class="fa fa-ticket"></i></div>
+              <div class="stat-content">
+                <div class="stat-label">Booked Seats</div>
+                <div class="stat-value">{{ eventSummary.bookedSeats | number }}</div>
+              </div>
+            </div>
+            
+            <div class="stat-card available">
+              <div class="stat-icon"><i class="fa fa-check-circle"></i></div>
+              <div class="stat-content">
+                <div class="stat-label">Available Seats</div>
+                <div class="stat-value">{{ eventSummary.availableSeats | number }}</div>
+              </div>
+            </div>
+            
+            <div class="stat-card occupancy">
+              <div class="stat-icon"><i class="fa fa-chart-line"></i></div>
+              <div class="stat-content">
+                <div class="stat-label">Occupancy</div>
+                <div class="stat-value">{{ eventSummary.occupancyPercentage }}%</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seat Type Details Table -->
+          <div class="summary-subsection" *ngIf="eventSummary.seatTypeDetails && eventSummary.seatTypeDetails.length > 0">
+            <h6 class="subsection-title">
+              <i class="fa fa-chair me-2"></i> Seat Type Details
+            </h6>
+            <div class="table-responsive">
+              <table class="table summary-table">
+                <thead>
+                  <tr>
+                    <th>Seat Type</th>
+                    <th class="text-end">Price ({{ eventSummary.currency }})</th>
+                    <th class="text-center">Total</th>
+                    <th class="text-center">Booked</th>
+                    <th class="text-center">Available</th>
+                    <th class="text-end">Revenue</th>
+                    <th class="text-center">Occupancy</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let seat of eventSummary.seatTypeDetails">
+                    <td><strong>{{ seat.seatName }}</strong></td>
+                    <td class="text-end">{{ seat.price | currency:eventSummary.currency }}</td>
+                    <td class="text-center">{{ seat.totalSeats | number }}</td>
+                    <td class="text-center">{{ seat.bookedSeats | number }}</td>
+                    <td class="text-center">{{ seat.availableSeats | number }}</td>
+                    <td class="text-end">{{ seat.revenue | currency:eventSummary.currency }}</td>
+                    <td class="text-center">
+                      <span class="occupancy-badge" [ngClass]="{
+                        'low': seat.occupancyPercentage < 20,
+                        'medium': seat.occupancyPercentage >= 20 && seat.occupancyPercentage < 50,
+                        'high': seat.occupancyPercentage >= 50
+                      }">
+                        {{ seat.occupancyPercentage }}%
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+                <tfoot *ngIf="eventSummary.seatTypeDetails && eventSummary.seatTypeDetails.length > 0">
+                  <tr>
+                    <td colspan="5" class="text-end"><strong>Totals:</strong></td>
+                    <td class="text-end"><strong>{{ eventSummary.totalProfit | currency:eventSummary.currency }}</strong></td>
+                    <td></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+          <!-- Payment Summary -->
+          <div class="summary-subsection" *ngIf="eventSummary.paymentDetails">
+            <h6 class="subsection-title">
+              <i class="fa fa-credit-card me-2"></i> Payment Summary
+            </h6>
+            
+            <div class="payment-details-grid">
+              <div class="payment-row">
+                <div class="payment-label">Total Successful Bookings:</div>
+                <div class="payment-value">{{ eventSummary.paymentDetails.totalSuccessfulBookings }}</div>
+              </div>
+              
+              <div class="payment-row">
+                <div class="payment-label">Total Amount:</div>
+                <div class="payment-value highlight">{{ eventSummary.paymentDetails.totalAmount | currency:eventSummary.currency }}</div>
+              </div>
+              
+              <div class="payment-row">
+                <div class="payment-label">Total Convenience Fee:</div>
+                <div class="payment-value">{{ eventSummary.paymentDetails.totalConvenienceFee | currency:eventSummary.currency }}</div>
+              </div>
+              
+              <div class="payment-row">
+                <div class="payment-label">Total GST:</div>
+                <div class="payment-value">{{ eventSummary.paymentDetails.totalGST | currency:eventSummary.currency }}</div>
+              </div>
+              
+              <div class="payment-row" *ngIf="eventSummary.paymentDetails.firstBookingDate">
+                <div class="payment-label">First Booking:</div>
+                <div class="payment-value">{{ eventSummary.paymentDetails.firstBookingDate | date:'dd MMM yyyy, hh:mm a' }}</div>
+              </div>
+              
+              <div class="payment-row" *ngIf="eventSummary.paymentDetails.lastBookingDate">
+                <div class="payment-label">Last Booking:</div>
+                <div class="payment-value">{{ eventSummary.paymentDetails.lastBookingDate | date:'dd MMM yyyy, hh:mm a' }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- No Data Message -->
+          <div class="no-data-message" *ngIf="(!eventSummary.seatTypeDetails || eventSummary.seatTypeDetails.length === 0) && !eventSummary.paymentDetails">
+            <i class="fa fa-info-circle"></i>
+            <p>No booking data available for this event yet.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading Template -->
+      <ng-template #loadingTemplate>
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-3 text-muted">Loading event summary...</p>
+        </div>
+      </ng-template>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModalProperly('eventSummaryModal')">
+          <i class="fa fa-times"></i> Close
         </button>
       </div>
     </div>

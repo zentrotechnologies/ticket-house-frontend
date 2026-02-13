@@ -727,3 +727,102 @@ export interface PaymentStatusResponse {
   CreatedAt: string;
   Notes?: { [key: string]: string };
 }
+
+// Event Summary Models
+export interface EventSummaryResponse {
+  status: string;
+  success: any;
+  message: string;
+  errorCode: string;
+  data: EventSummaryData;
+}
+
+export interface EventSummaryData {
+  eventId: number;
+  eventName: string;
+  eventDate: string;
+  startTime: string;
+  endTime: string;
+  location: string;
+  totalSeats: number;
+  bookedSeats: number;
+  availableSeats: number;
+  occupancyPercentage: number;
+  totalProfit: number;
+  currency: string;
+  seatTypeDetails: SeatTypeSummary[];
+  paymentDetails: PaymentSummary;
+}
+
+export interface SeatTypeSummary {
+  seatTypeId: number;
+  seatName: string;
+  price: number;
+  totalSeats: number;
+  availableSeats: number;
+  bookedSeats: number;
+  revenue: number;
+  occupancyPercentage: number;
+}
+
+export interface PaymentSummary {
+  totalSuccessfulBookings: number;
+  totalAmount: number;
+  totalConvenienceFee: number;
+  totalGST: number;
+  firstBookingDate: string;
+  lastBookingDate: string;
+}
+
+export interface BookingHistoryRequest {
+  userId: string;
+  pageNumber: number;
+  pageSize: number;
+  filterText?: string;
+  sortBy?: string;
+  sortDirection?: string;
+}
+
+export interface BookingSeatHistoryResponse {
+  seat_name: string;
+  quantity: number;
+  scanned_quantity: number;
+  remaining_quantity: number;
+  price_per_seat: number;
+  subtotal: number;
+  last_scan_time: string | null;
+  scanned_by: string | null;
+}
+
+export interface BookingHistoryResponse {
+  booking_id: number;
+  booking_code: string;
+  event_name: string;
+  event_date: string;
+  start_time: string;
+  end_time: string;
+  location: string;
+  full_address: string;
+  final_amount: number;
+  total_amount: number;
+  convenience_fee: number;
+  gst_amount: number;
+  currency: string;
+  payment_method: string | null;
+  payment_status: string;
+  payment_date: string | null;
+  razorpay_payment_id: string | null;
+  razorpay_order_id: string | null;
+  booking_status: string;
+  created_on: string;
+  seats: BookingSeatHistoryResponse[];
+}
+
+export interface PagedBookingHistoryResponse extends CommonResponseModel<BookingHistoryResponse[]> {
+  totalCount: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+  hasPrevious: boolean;
+  hasNext: boolean;
+}

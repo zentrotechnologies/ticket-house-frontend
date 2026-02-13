@@ -19,13 +19,23 @@ export class AuthService {
   // constructor(private http: HttpClient) {
   //   this.loadUserFromStorage();
   // }
+  // constructor(private http: HttpClient) {
+  //   // Auto-clear auth data in development mode
+  //   if (!environment.production) {
+  //     this.clearAuthData();
+  //   } else {
+  //     this.loadUserFromStorage();
+  //   }
+  // }
+
   constructor(private http: HttpClient) {
-    // Auto-clear auth data in development mode
-    if (!environment.production) {
-      this.clearAuthData();
-    } else {
-      this.loadUserFromStorage();
-    }
+    // Always load user from storage first, regardless of environment
+    this.loadUserFromStorage();
+    
+    // Only clear in development if explicitly needed (remove or comment this)
+    // if (!environment.production) {
+    //   this.clearAuthData();
+    // }
   }
 
   login(loginRequest: LoginRequest): Observable<LoginResponse> {
@@ -52,21 +62,42 @@ export class AuthService {
     console.log('User logged out, all auth data cleared');
   }
 
-  isLoggedIn(): boolean {
-    // Always return false in development to force login
-    // if (!environment.production) {
-    //   return false;
-    // }
+  // isLoggedIn(): boolean {
+  //   // Always return false in development to force login
+  //   // if (!environment.production) {
+  //   //   return false;
+  //   // }
 
+  //   const token = this.getToken();
+  //   if (!token) return false;
+
+  //   // Check if token is expired
+  //   const expiry = localStorage.getItem('token_expiry');
+  //   if (expiry) {
+  //     return new Date() < new Date(expiry);
+  //   }
+  //   return false;
+  // }
+
+  isLoggedIn(): boolean {
+    // Check if we have a token
     const token = this.getToken();
     if (!token) return false;
 
     // Check if token is expired
     const expiry = localStorage.getItem('token_expiry');
     if (expiry) {
-      return new Date() < new Date(expiry);
+      const isExpired = new Date() >= new Date(expiry);
+      if (isExpired) {
+        // Token is expired, clear everything
+        this.logout();
+        return false;
+      }
+      return true;
     }
-    return false;
+    
+    // If no expiry but token exists, consider logged in
+    return true;
   }
 
   // Add this method to your existing AuthService
@@ -150,6 +181,19 @@ export class AuthService {
     this.currentUserSubject.next(user);
   }
 
+  // private loadUserFromStorage(): void {
+  //   const userData = localStorage.getItem(environment.USERDATA_KEY);
+  //   if (userData) {
+  //     try {
+  //       const loginResponse: LoginResponse = JSON.parse(userData);
+  //       this.setCurrentUser(loginResponse);
+  //     } catch (error) {
+  //       console.error('Error parsing user data from storage:', error);
+  //       this.logout();
+  //     }
+  //   }
+  // }
+
   private loadUserFromStorage(): void {
     const userData = localStorage.getItem(environment.USERDATA_KEY);
     if (userData) {
@@ -159,6 +203,17 @@ export class AuthService {
       } catch (error) {
         console.error('Error parsing user data from storage:', error);
         this.logout();
+      }
+    } else {
+      // Try to load from individual user_data key as fallback
+      const userDataAlt = localStorage.getItem('user_data');
+      if (userDataAlt) {
+        try {
+          const user: User = JSON.parse(userDataAlt);
+          this.currentUserSubject.next(user);
+        } catch (error) {
+          console.error('Error parsing alternative user data:', error);
+        }
       }
     }
   }

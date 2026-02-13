@@ -5,24 +5,36 @@
       <div class="header-row">
         <div class="header-col">
           <div class="left-section-content">
-            <!-- Logo -->
             <!-- <div class="logo-wrapper">
-              <img class="logo"
-                src="https://zentrotechnologies.com/wp-content/uploads/2025/02/Zentro_Final-Logo-05-scaled-e1753251642526.png"
-                alt="Zentro Logo" (click)="onBackToEvents()" style="cursor: pointer;" />
+              <img class="logo" src="/assets/ticket-house-logo.jpeg" alt="ticket-house-logo" (click)="onBackToEvents()"
+                style="cursor: pointer;" />
             </div> -->
-            <div class="logo-wrapper">
-                <img class="logo" src="/assets/ticket-house-logo.jpeg" alt="ticket-house-logo" (click)="onBackToEvents()" style="cursor: pointer;" />
-            </div>
-            
-            <!-- Page Title -->
+
+            <!-- Page Title with Stats -->
             <div class="page-title">
               <h1>My Bookings</h1>
-              <p *ngIf="userId">User ID: {{ userId }}</p>
+              <div class="booking-stats" *ngIf="bookings.length > 0">
+                <span class="stat-item">
+                  <span class="stat-label">Total Bookings:</span>
+                  <span class="stat-value">{{ totalCount }}</span>
+                </span>
+                <span class="stat-item">
+                  <span class="stat-label">Tickets:</span>
+                  <span class="stat-value">{{ getTotalTickets() }}</span>
+                </span>
+                <span class="stat-item">
+                  <span class="stat-label">Scanned:</span>
+                  <span class="stat-value">{{ getTotalScanned() }}</span>
+                </span>
+                <span class="stat-item">
+                  <span class="stat-label">Remaining:</span>
+                  <span class="stat-value">{{ getTotalRemaining() }}</span>
+                </span>
+              </div>
             </div>
           </div>
         </div>
-        
+
         <div class="header-col actions-col">
           <div class="user-actions">
             <button class="back-btn" (click)="onBackToEvents()">← Back to Events</button>
@@ -35,6 +47,16 @@
   <!-- Main Content -->
   <main class="bookings-main">
     <div class="container">
+      <!-- Search Bar -->
+      <!-- <div class="search-section" *ngIf="bookings.length > 0 || filterText">
+        <div class="search-container">
+          <input type="text" class="search-input" placeholder="Search by event name or booking code..."
+            [(ngModel)]="filterText" (keyup.enter)="onSearch()">
+          <button class="search-btn" (click)="onSearch()">Search</button>
+          <button class="clear-btn" *ngIf="filterText" (click)="clearSearch()">Clear</button>
+        </div>
+      </div> -->
+
       <!-- Loading State -->
       <div *ngIf="isLoading" class="loading-container">
         <div class="loading-spinner">Loading your bookings...</div>
@@ -45,55 +67,137 @@
         <div class="empty-state">
           <div class="empty-icon">📋</div>
           <h2>No Bookings Found</h2>
-          <p>You haven't made any bookings yet.</p>
+          <p *ngIf="filterText">No bookings match your search criteria.</p>
+          <p *ngIf="!filterText">You haven't made any bookings yet.</p>
           <button class="browse-events-btn" (click)="onBackToEvents()">Browse Events</button>
         </div>
       </div>
 
       <!-- Bookings List -->
       <div *ngIf="!isLoading && bookings.length > 0" class="bookings-list">
-        <h2 class="section-title">Your Bookings ({{ bookings.length }})</h2>
-        
+        <div class="list-header">
+          <h2 class="section-title">Your Booking History</h2>
+          <div class="page-size-selector">
+            <label>Show:</label>
+            <select [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+              <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+            </select>
+          </div>
+        </div>
+
         <div class="bookings-grid">
-          <div class="booking-card">
+          <div class="booking-card" *ngFor="let booking of bookings">
             <div class="booking-header">
-              <div class="booking-id">Booking #booking_id</div>
-              <div class="booking-date">booking_date</div>
+              <div class="booking-id">
+                <span class="label">Booking #</span>
+                <span class="value">{{ booking.booking_code }}</span>
+              </div>
+              <div class="booking-date ms-4">
+                <i class="calendar-icon">📅</i> {{ formatDate(booking.created_on) }}
+              </div>
             </div>
-            
+
             <div class="booking-body">
               <div class="event-info">
-                <h3 class="event-name">event_name</h3>
-                <p class="event-location">event_location</p>
-                <p class="event-date">event_date</p>
+                <h3 class="event-name">{{ booking.event_name }}</h3>
+                <p class="event-location">
+                  <i class="location-icon">📍</i> {{ booking.location }}
+                </p>
+                <p class="event-date-time">
+                  <i class="time-icon">⏰</i> {{ formatDate(booking.event_date) }} | {{ formatTime(booking.start_time) }}
+                  - {{ formatTime(booking.end_time) }}
+                </p>
               </div>
-              
+
               <div class="booking-details">
                 <div class="detail-item">
                   <span class="label">Tickets:</span>
-                  <span class="value">total_tickets</span>
+                  <span class="value">
+                    {{ getBookingTotalTickets(booking) }}
+                  </span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Scanned:</span>
+                  <span class="value">
+                    {{ getBookingScannedTickets(booking) }}
+                    / {{ getBookingTotalTickets(booking) }}
+                  </span>
                 </div>
                 <div class="detail-item">
                   <span class="label">Amount:</span>
-                  <span class="value">₹total_amount</span>
+                  <span class="value">₹{{ booking.final_amount }}</span>
                 </div>
                 <div class="detail-item">
-                  <span class="label">Status:</span>
-                  <span class="value status-badge">
-                    booking_status
+                  <span class="label">Payment Method:</span>
+                  <span class="value payment-method-badge" [ngClass]="getPaymentMethodClass(booking.payment_method)">
+                    {{ booking.payment_method ? (booking.payment_method | titlecase) : 'Not Paid' }}
+                  </span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Booking Status:</span>
+                  <span class="value status-badge" [ngClass]="getStatusClass(booking.booking_status)">
+                    {{ booking.booking_status }}
+                  </span>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Payment ID:</span>
+                  <span class="value payment-id" [class.na-text]="!booking.razorpay_payment_id">
+                    {{ booking.razorpay_payment_id || 'NA' }}
                   </span>
                 </div>
               </div>
+
+              <!-- Seat Details -->
+              <div class="seat-details" *ngIf="booking.seats && booking.seats.length > 0">
+                <h4>Seat Details</h4>
+                <div class="seat-grid">
+                  <div class="seat-item" *ngFor="let seat of booking.seats">
+                    <div class="seat-info">
+                      <span class="seat-name">{{ seat.seat_name }}</span>
+                      <span class="seat-quantity">× {{ seat.quantity }}</span>
+                    </div>
+                    <div class="seat-scan-info">
+                      <span class="scan-progress">
+                        Scanned: {{ seat.scanned_quantity }} / {{ seat.quantity }}
+                      </span>
+                      <span class="seat-price">₹{{ seat.subtotal }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            
-            <div class="booking-footer">
-              <button class="view-details-btn">
+
+            <!-- <div class="booking-footer">
+              <button class="view-details-btn" (click)="viewBookingDetails(booking.booking_id)">
                 View Details
               </button>
-              <button class="cancel-btn">
-                Cancel
+              <span class="payment-method" *ngIf="booking.payment_method">
+                Paid via {{ booking.payment_method }}
+              </span>
+            </div> -->
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-section" *ngIf="totalPages > 1">
+          <div class="pagination-info">
+            Showing page {{ currentPage }} of {{ totalPages }} ({{ totalCount }} total bookings)
+          </div>
+          <div class="pagination-controls">
+            <button class="pagination-btn" [disabled]="!hasPrevious" (click)="onPageChange(currentPage - 1)">
+              ← Previous
+            </button>
+
+            <div class="page-numbers">
+              <button *ngFor="let page of [].constructor(totalPages); let i = index" class="page-number"
+                [class.active]="currentPage === i + 1" (click)="onPageChange(i + 1)">
+                {{ i + 1 }}
               </button>
             </div>
+
+            <button class="pagination-btn" [disabled]="!hasNext" (click)="onPageChange(currentPage + 1)">
+              Next →
+            </button>
           </div>
         </div>
       </div>

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { BookingDetailsResponse, BookingQRResponse, BookingResponse, BookingScanSummaryResponse, CommonResponse, CommonResponseModel, CreateBookingRequest, EventCategoryModel, EventCategoryRequest, EventCompleteResponseModel, EventCreateRequestModel, EventDetailsModel, EventPaginationRequest, EventSeatTypeInventoryModel, GenerateOTPRequest, GetShowsByArtistsRequest, MyBookingsResponse, OrganizerModel, OrganizerPagedResponse, OrganizerRequest, OTPResponse, PagedResponse, PaginationRequest, PartialScanRequest, PaymentOrderResponse, PaymentStatusResponse, PaymentVerificationResponse, QRCodeDataResponse, ResendOTPRequest, ResendOTPResponse, ScanTicketRequest, SeatAvailabilityRequest, ShowsByArtistsResponse, SignUpRequest, SignUpResponse, SimilarEventsRequest, TestimonialModel, TestimonialsResponse, TicketScanResponse, UpcomingEventResponse, UpcomingEventsRequest, UpcomingEventsResponse, UpdateEventCategoryStatusRequest, UpdateOrganizerStatusRequest, UpdateTestimonialStatusRequest, UserIdRequest, VerifyOTPRequest } from '../models/auth.model';
+import { BookingDetailsResponse, BookingHistoryRequest, BookingQRResponse, BookingResponse, BookingScanSummaryResponse, CommonResponse, CommonResponseModel, CreateBookingRequest, EventCategoryModel, EventCategoryRequest, EventCompleteResponseModel, EventCreateRequestModel, EventDetailsModel, EventPaginationRequest, EventSeatTypeInventoryModel, EventSummaryData, GenerateOTPRequest, GetShowsByArtistsRequest, MyBookingsResponse, OrganizerModel, OrganizerPagedResponse, OrganizerRequest, OTPResponse, PagedBookingHistoryResponse, PagedResponse, PaginationRequest, PartialScanRequest, PaymentOrderResponse, PaymentStatusResponse, PaymentVerificationResponse, QRCodeDataResponse, ResendOTPRequest, ResendOTPResponse, ScanTicketRequest, SeatAvailabilityRequest, ShowsByArtistsResponse, SignUpRequest, SignUpResponse, SimilarEventsRequest, TestimonialModel, TestimonialsResponse, TicketScanResponse, UpcomingEventResponse, UpcomingEventsRequest, UpcomingEventsResponse, UpdateEventCategoryStatusRequest, UpdateOrganizerStatusRequest, UpdateTestimonialStatusRequest, UserIdRequest, VerifyOTPRequest } from '../models/auth.model';
 
 @Injectable({
   providedIn: 'root',
@@ -436,6 +436,21 @@ export class ApiService {
   createBookingWithPayment(request: any): Observable<any> {
     return this.httpClient.post<any>(`${this.ThApi}api/Payment/CreateBookingWithPayment`, request, {
         headers: this.getAuthHeaders()
+    });
+  }
+
+  // Get Event Summary
+  getEventSummary(eventId: number): Observable<CommonResponseModel<EventSummaryData>> {
+    const url = `${this.ThApi}api/Booking/GetEventSummary/${eventId}`;
+    return this.httpClient.get<CommonResponseModel<EventSummaryData>>(url, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  getPagedBookingHistoryByUserId(request: BookingHistoryRequest): Observable<PagedBookingHistoryResponse> {
+    const url = `${this.ThApi}api/Booking/GetPagedBookingHistoryByUserId`;
+    return this.httpClient.post<PagedBookingHistoryResponse>(url, request, {
+      headers: this.getAuthHeaders()
     });
   }
 }

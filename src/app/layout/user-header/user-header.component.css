@@ -113,8 +113,10 @@
 }
 
 .pill {
-  background: var(--primary, #2c2e72);
-  color: #4896d1;
+  /* background: var(--primary, #2c2e72); */
+  background: #4896d1;
+  /* color: #4896d1; */
+  color: white;
   padding: 10px 20px;
   border-radius: 25px;
   font-weight: 600;
@@ -126,6 +128,7 @@
 
 .pill:hover {
   background: #2c2e72;
+  /* color: white; */
   color: white;
 }
 

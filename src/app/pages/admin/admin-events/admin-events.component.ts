@@ -9,6 +9,7 @@ import {
   EventPaginationRequest,
   EventCreateRequestModel,
   EventCategoryModel,
+  EventSummaryData,
 } from '../../../core/models/auth.model';
 import { ApiService } from '../../../core/services/api.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -110,6 +111,9 @@ export class AdminEventsComponent implements OnInit {
 
   eventIdToDelete: number = 0;
   isDeleting: boolean = false;
+
+  eventSummary: EventSummaryData | null = null;
+  isLoadingSummary: boolean = false;
 
   constructor(private apiService: ApiService, private authService: AuthService, private toastr: ToastrService) {}
 
@@ -1373,6 +1377,30 @@ export class AdminEventsComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading seat types:', error);
+      }
+    });
+  }
+
+  // Add this method to view event summary
+  viewEventSummary(eventId: number): void {
+    this.isLoadingSummary = true;
+    this.eventSummary = null;
+    
+    this.apiService.getEventSummary(eventId).subscribe({
+      next: (response) => {
+        if (response.status === 'Success' && response.data) {
+          this.eventSummary = response.data;
+          this.showModal('eventSummaryModal');
+        } else {
+          this.toastr.error(response.message || 'Failed to load event summary', 'Error');
+        }
+      },
+      error: (error) => {
+        console.error('Error loading event summary:', error);
+        this.toastr.error('Failed to load event summary', 'Error');
+      },
+      complete: () => {
+        this.isLoadingSummary = false;
       }
     });
   }
