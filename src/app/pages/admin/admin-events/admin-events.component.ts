@@ -12,6 +12,7 @@ import {
 } from '../../../core/models/auth.model';
 import { ApiService } from '../../../core/services/api.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-admin-events',
@@ -23,6 +24,8 @@ import { AuthService } from '../../../core/services/auth.service';
 export class AdminEventsComponent implements OnInit {
   @ViewChild('artistPhotoInput') artistPhotoInput!: ElementRef<HTMLInputElement>;
   @ViewChild('artistPhotoInputEdit') artistPhotoInputEdit!: ElementRef<HTMLInputElement>;
+  @ViewChild('closeAddModalBtn') closeAddModalBtn!: ElementRef<HTMLButtonElement>; // Add this
+  @ViewChild('closeEditModalBtn') closeEditModalBtn!: ElementRef<HTMLButtonElement>; // Add this
 
   currentUser: any = null;
   userId: string = ''; // Add this to store user ID
@@ -105,7 +108,10 @@ export class AdminEventsComponent implements OnInit {
   categories: EventCategoryModel[] = [];
   isLoadingCategories: boolean = false;
 
-  constructor(private apiService: ApiService, private authService: AuthService) {}
+  eventIdToDelete: number = 0;
+  isDeleting: boolean = false;
+
+  constructor(private apiService: ApiService, private authService: AuthService, private toastr: ToastrService) {}
 
   ngOnInit(): void {
     // Get current user from localStorage or AuthService
@@ -206,6 +212,9 @@ export class AdminEventsComponent implements OnInit {
         alert('Failed to load events');
       },
     });
+
+    // Add this to your loadEvents method temporarily to debug
+    console.log('Sending request with PageSize:', Number(this.pageSize), 'Type:', typeof Number(this.pageSize));
   }
 
   // Banner methods
@@ -699,27 +708,23 @@ export class AdminEventsComponent implements OnInit {
     }
 
     if (!this.eventForm.event_category_id) {
-      alert('Please select an event category');
+      this.toastr.warning('Please select an event category', 'Warning');
       return;
     }
 
-    // Ensure user ID is set
     if (!this.userId) {
-      alert('User not authenticated. Please login again.');
+      this.toastr.warning('User not authenticated. Please login again.', 'Warning');
       return;
     }
 
-    // Set all user-related fields
     this.eventForm.organizer_id = this.userId;
     this.eventForm.created_by = this.userId;
     this.eventForm.updated_by = this.userId;
 
     this.isSubmitting = true;
 
-    // Create FormData
     const formData = new FormData();
 
-    // Prepare event details
     const currentDate = new Date();
     const eventDetails = {
       ...this.eventForm,
@@ -737,20 +742,17 @@ export class AdminEventsComponent implements OnInit {
       max_price: this.eventForm.max_price || 0,
       age_limit: this.eventForm.age_limit || 0,
       no_of_seats: this.eventForm.no_of_seats || 0,
-      gallery_media: '[]', // Empty JSON array
-      artists: '[]', // Empty JSON array
-      // IMPORTANT: Clear banner_image field as we'll handle it separately
+      gallery_media: '[]',
+      artists: '[]',
       banner_image: '',
     };
 
     formData.append('EventDetails', JSON.stringify(eventDetails));
 
-    // Add banner image as file
     if (this.bannerImage) {
       formData.append('BannerImageFile', this.bannerImage);
     }
 
-    // Add artists data (convert photos to Base64 on backend)
     const artistsWithData = this.artists.map((artist) => {
       const artistCopy = { ...artist };
       artistCopy.created_on = new Date().toISOString();
@@ -761,7 +763,6 @@ export class AdminEventsComponent implements OnInit {
     });
     formData.append('EventArtists', JSON.stringify(artistsWithData));
 
-    // Add galleries data (convert images to Base64 on backend)
     const galleriesWithData = this.galleries.map((gallery) => {
       const galleryCopy = { ...gallery };
       galleryCopy.created_on = new Date().toISOString();
@@ -772,49 +773,41 @@ export class AdminEventsComponent implements OnInit {
     });
     formData.append('EventGalleries', JSON.stringify(galleriesWithData));
 
-    // Add seat types to formData
     const seatTypesWithUserIds = this.seatTypes.map(seatType => {
         const seatTypeCopy = { ...seatType };
         seatTypeCopy.created_on = new Date().toISOString();
         seatTypeCopy.updated_on = new Date().toISOString();
         seatTypeCopy.created_by = this.userId;
         seatTypeCopy.updated_by = this.userId;
-        seatTypeCopy.event_id = 0; // Will be set by backend
+        seatTypeCopy.event_id = 0;
         return seatTypeCopy;
     });
 
     formData.append('SeatTypes', JSON.stringify(seatTypesWithUserIds));
-
-    // In createEvent() and updateEvent() methods:
-    console.log('Seat Types being sent:', this.seatTypes);
-    console.log('Seat Types JSON:', JSON.stringify(seatTypesWithUserIds));
-
-    // Add createdBy field
     formData.append('createdBy', this.userId);
 
-    // Debug: Log FormData contents
     this.debugFormData(formData);
 
     this.apiService.createEventWithArtistsAndGalleries(formData).subscribe({
       next: (response) => {
         if (response.status === 'Success') {
-          alert('Event created successfully!');
+          this.toastr.success('Event created successfully!', 'Success');
           this.resetForm();
           this.loadEvents();
-          this.closeModal('addEventModal');
+          this.closeModalProperly('addEventModal'); // Use proper close method
         } else {
-          alert(response.message || 'Failed to create event');
+          this.toastr.error(response.message || 'Failed to create event', 'Error');
         }
       },
       error: (error) => {
         console.error('Error creating event:', error);
         if (error.error?.errors) {
           const errorMessages = Object.values(error.error.errors).flat().join('\n');
-          alert('Validation errors:\n' + errorMessages);
+          this.toastr.error('Validation errors:\n' + errorMessages, 'Error');
         } else if (error.error?.message) {
-          alert('Error: ' + error.error.message);
+          this.toastr.error('Error: ' + error.error.message, 'Error');
         } else {
-          alert('Failed to create event: ' + error.message);
+          this.toastr.error('Failed to create event: ' + error.message, 'Error');
         }
       },
       complete: () => {
@@ -823,62 +816,12 @@ export class AdminEventsComponent implements OnInit {
     });
   }
 
-  // Helper method to upload artist photos for new event
-  async uploadArtistPhotosForNewEvent(formData: FormData): Promise<void> {
-    // This would be called after event is created to upload photos
-    // For now, we'll handle it in the backend
-    return Promise.resolve();
-  }
-
-  // editEvent(event: EventCompleteResponseModel): void {
-  //   this.isEditMode = true;
-  //   this.selectedEvent = event;
-
-  //   // Set event form
-  //   this.eventForm = { ...event.EventDetails };
-
-  //   // Parse JSON fields if they're strings
-  //   if (typeof this.eventForm.gallery_media === 'string') {
-  //     try {
-  //       this.eventForm.gallery_media = JSON.parse(this.eventForm.gallery_media as string);
-  //     } catch (e) {
-  //       this.eventForm.gallery_media = JSON.stringify([]);
-  //     }
-  //   }
-
-  //   if (typeof this.eventForm.artists === 'string') {
-  //     try {
-  //       this.eventForm.artists = JSON.parse(this.eventForm.artists as string);
-  //     } catch (e) {
-  //       this.eventForm.artists = JSON.stringify([]);
-  //     }
-  //   }
-
-  //   // Ensure datetime fields are properly set
-  //   if (!this.eventForm.created_at) {
-  //     this.eventForm.created_at = new Date().toISOString();
-  //   }
-
-  //   // Set artists and galleries
-  //   this.artists = [...event.EventArtists];
-  //   this.galleries = [...event.EventGalleries];
-
-  //   // Clear temporary files
-  //   this.bannerImage = null;
-  //   this.bannerPreviewUrl = null;
-
-  //   // Show edit modal
-  //   this.showModal('editEventModal');
-  // }
-
   editEvent(event: EventCompleteResponseModel): void {
     this.isEditMode = true;
     this.selectedEvent = event;
 
-    // Set event form - use eventDetails instead of EventDetails
     this.eventForm = { ...event.eventDetails };
 
-    // Parse JSON fields if they're strings
     if (typeof this.eventForm.gallery_media === 'string') {
       try {
         this.eventForm.gallery_media = JSON.parse(this.eventForm.gallery_media as string);
@@ -895,152 +838,43 @@ export class AdminEventsComponent implements OnInit {
       }
     }
 
-    // Ensure datetime fields are properly set
     if (!this.eventForm.created_at) {
       this.eventForm.created_at = new Date().toISOString();
     }
 
-    // Set artists and galleries - use eventArtists and eventGalleries
     this.artists = [...event.eventArtists];
     this.galleries = [...event.eventGalleries];
+    this.seatTypes = [...(event.seatTypes || [])];
 
-    // Set seat types
-    this.seatTypes = [...(event.seatTypes || [])]; // Add this line
-
-    // Clear temporary files
     this.bannerImage = null;
     this.bannerPreviewUrl = null;
 
-    // Load seat types for the event
     this.loadEventSeatTypes(event.eventDetails.event_id);
-
-    // Show edit modal
     this.showModal('editEventModal');
   }
 
-  // Update the updateEvent() method:
-  // updateEvent(): void {
-  //   if (!this.validateEventForm()) {
-  //     return;
-  //   }
-
-  //   if (!this.eventForm.event_category_id) {
-  //     alert('Please select an event category');
-  //     return;
-  //   }
-
-  //   // Set updated_by with current user ID
-  //   this.eventForm.updated_by = this.userId;
-
-  //   this.isSubmitting = true;
-
-  //   // Create FormData with proper formatting
-  //   const formData = new FormData();
-
-  //   // Add event details as JSON string with correct key name
-  //   const eventDetails = {
-  //     ...this.eventForm,
-  //     event_date: this.eventForm.event_date.toString(),
-  //     start_time: this.eventForm.start_time.toString(),
-  //     end_time: this.eventForm.end_time.toString(),
-  //     updated_by: this.userId // Pass user_id as updated_by
-  //   };
-
-  //   formData.append('EventDetails', JSON.stringify(eventDetails));
-
-  //   // Add banner image if selected
-  //   if (this.bannerImage) {
-  //     formData.append('BannerImageFile', this.bannerImage);
-  //   }
-
-  //   // Add artists data
-  //   if (this.artists.length > 0) {
-  //     const artistsData = this.artists.map(artist => {
-  //       // Remove temporary file reference if exists
-  //       const artistCopy = { ...artist };
-  //       if ((artistCopy as any).photoFile) {
-  //         delete (artistCopy as any).photoFile;
-  //       }
-  //       return artistCopy;
-  //     });
-  //     formData.append('EventArtists', JSON.stringify(artistsData));
-  //   } else {
-  //     formData.append('EventArtists', '[]');
-  //   }
-
-  //   // Add galleries data
-  //   if (this.galleries.length > 0) {
-  //     const galleriesData = this.galleries.map(gallery => {
-  //       // Remove temporary file reference if exists
-  //       const galleryCopy = { ...gallery };
-  //       if ((galleryCopy as any).imageFile) {
-  //         delete (galleryCopy as any).imageFile;
-  //       }
-  //       return galleryCopy;
-  //     });
-  //     formData.append('EventGalleries', JSON.stringify(galleriesData));
-  //   } else {
-  //     formData.append('EventGalleries', '[]');
-  //   }
-
-  //   // Add updated_by user
-  //   const userEmail = this.currentUser?.email || 'system';
-  //   formData.append('updatedBy', userEmail);
-
-  //   this.apiService.updateEventWithArtistsAndGalleries(formData).subscribe({
-  //     next: (response) => {
-  //       if (response.status === 'Success') {
-  //         alert('Event updated successfully!');
-  //         this.resetForm();
-  //         this.loadEvents();
-  //         this.closeModal('editEventModal');
-  //       } else {
-  //         alert(response.message || 'Failed to update event');
-  //       }
-  //     },
-  //     error: (error) => {
-  //       console.error('Error updating event:', error);
-  //       if (error.error?.errors) {
-  //         // Display validation errors
-  //         const errorMessages = Object.values(error.error.errors).flat().join('\n');
-  //         alert('Validation errors:\n' + errorMessages);
-  //       } else {
-  //         alert('Failed to update event: ' + error.message);
-  //       }
-  //     },
-  //     complete: () => {
-  //       this.isSubmitting = false;
-  //     }
-  //   });
-  // }
-
-  // **UPDATED updateEvent() method**
   updateEvent(): void {
     if (!this.validateEventForm()) {
       return;
     }
 
     if (!this.eventForm.event_category_id) {
-      alert('Please select an event category');
+      this.toastr.warning('Please select an event category', 'Warning');
       return;
     }
 
-    // Ensure user ID is set
     if (!this.userId) {
-      alert('User not authenticated. Please login again.');
+      this.toastr.warning('User not authenticated. Please login again.', 'Warning');
       return;
     }
 
-    // Set updated_by with current user ID
     this.eventForm.updated_by = this.userId;
     this.eventForm.updated_at = new Date().toISOString();
 
     this.isSubmitting = true;
 
-    // Create FormData
     const formData = new FormData();
 
-    // Prepare event details with JSON handling
     const eventDetails = {
       ...this.eventForm,
       event_date: new Date(this.eventForm.event_date).toISOString().split('T')[0],
@@ -1054,7 +888,6 @@ export class AdminEventsComponent implements OnInit {
       max_price: this.eventForm.max_price || 0,
       age_limit: this.eventForm.age_limit || 0,
       no_of_seats: this.eventForm.no_of_seats || 0,
-      // Handle JSON fields properly
       gallery_media:
         this.galleries.length > 0
           ? JSON.stringify(this.galleries.map((g) => ({ image: g.event_img })))
@@ -1072,12 +905,10 @@ export class AdminEventsComponent implements OnInit {
 
     formData.append('EventDetails', JSON.stringify(eventDetails));
 
-    // Add banner image if selected
     if (this.bannerImage) {
       formData.append('BannerImageFile', this.bannerImage);
     }
 
-    // Add artists data
     const currentDateTime = new Date().toISOString();
     const artistsWithUserIds = this.artists.map((artist) => ({
       ...artist,
@@ -1086,7 +917,6 @@ export class AdminEventsComponent implements OnInit {
     }));
     formData.append('EventArtists', JSON.stringify(artistsWithUserIds));
 
-    // Add galleries data
     const galleriesWithUserIds = this.galleries.map((gallery) => ({
       ...gallery,
       updated_by: this.userId,
@@ -1094,7 +924,6 @@ export class AdminEventsComponent implements OnInit {
     }));
     formData.append('EventGalleries', JSON.stringify(galleriesWithUserIds));
 
-    // Add seat types to formData
     const seatTypesWithUserIds = this.seatTypes.map(seatType => {
         const seatTypeCopy = { ...seatType };
         seatTypeCopy.updated_by = this.userId;
@@ -1103,12 +932,6 @@ export class AdminEventsComponent implements OnInit {
     });
 
     formData.append('SeatTypes', JSON.stringify(seatTypesWithUserIds));
-
-    // In createEvent() and updateEvent() methods:
-    console.log('Seat Types being sent:', this.seatTypes);
-    console.log('Seat Types JSON:', JSON.stringify(seatTypesWithUserIds));
-
-    // Add updatedBy field
     formData.append('updatedBy', this.userId);
 
     this.debugFormData(formData);
@@ -1116,23 +939,23 @@ export class AdminEventsComponent implements OnInit {
     this.apiService.updateEventWithArtistsAndGalleries(formData).subscribe({
       next: (response) => {
         if (response.status === 'Success') {
-          alert('Event updated successfully!');
+          this.toastr.success('Event updated successfully!', 'Success');
           this.resetForm();
           this.loadEvents();
-          this.closeModal('editEventModal');
+          this.closeModalProperly('editEventModal'); // Use proper close method
         } else {
-          alert(response.message || 'Failed to update event');
+          this.toastr.error(response.message || 'Failed to update event', 'Error');
         }
       },
       error: (error) => {
         console.error('Error updating event:', error);
         if (error.error?.errors) {
           const errorMessages = Object.values(error.error.errors).flat().join('\n');
-          alert('Validation errors:\n' + errorMessages);
+          this.toastr.error('Validation errors:\n' + errorMessages, 'Error');
         } else if (error.error?.message) {
-          alert('Error: ' + error.error.message);
+          this.toastr.error('Error: ' + error.error.message, 'Error');
         } else {
-          alert('Failed to update event: ' + error.message);
+          this.toastr.error('Failed to update event: ' + error.message, 'Error');
         }
       },
       complete: () => {
@@ -1141,46 +964,40 @@ export class AdminEventsComponent implements OnInit {
     });
   }
 
-  // deleteEvent(eventId: number): void {
-  //   if (confirm('Are you sure you want to delete this event?')) {
-  //     const updatedBy = this.userId || 'system';
-
-  //     this.apiService.deleteEventWithArtistsAndGalleries(eventId, updatedBy).subscribe({
-  //       next: (response) => {
-  //         if (response.status === 'Success' && response.data) {
-  //           alert('Event deleted successfully!');
-  //           this.loadEvents();
-  //         } else {
-  //           alert(response.message || 'Failed to delete event');
-  //         }
-  //       },
-  //       error: (error) => {
-  //         console.error('Error deleting event:', error);
-  //         alert('Failed to delete event');
-  //       }
-  //     });
-  //   }
-  // }
-
   deleteEvent(eventId: number): void {
-    if (confirm('Are you sure you want to delete this event?')) {
-      const updatedBy = this.userId || 'system';
+    this.eventIdToDelete = eventId;
+    this.showModal('deleteConfirmModal');
+  }
 
-      this.apiService.deleteEventWithArtistsAndGalleries(eventId, updatedBy).subscribe({
-        next: (response) => {
-          if (response.status === 'Success' && response.data) {
-            alert('Event deleted successfully!');
-            this.loadEvents();
-          } else {
-            alert(response.message || 'Failed to delete event');
-          }
-        },
-        error: (error) => {
-          console.error('Error deleting event:', error);
-          alert('Failed to delete event');
-        },
-      });
+  confirmDelete(): void {
+    if (!this.eventIdToDelete) {
+      this.toastr.error('No event selected for deletion', 'Error');
+      this.closeModalProperly('deleteConfirmModal');
+      return;
     }
+
+    this.isDeleting = true;
+    const updatedBy = this.userId || 'system';
+
+    this.apiService.deleteEventWithArtistsAndGalleries(this.eventIdToDelete, updatedBy).subscribe({
+      next: (response) => {
+        if (response.status === 'Success' && response.data) {
+          this.toastr.success('Event deleted successfully!', 'Success');
+          this.loadEvents();
+          this.closeModalProperly('deleteConfirmModal');
+        } else {
+          this.toastr.error(response.message || 'Failed to delete event', 'Error');
+        }
+      },
+      error: (error) => {
+        console.error('Error deleting event:', error);
+        this.toastr.error('Failed to delete event', 'Error');
+      },
+      complete: () => {
+        this.isDeleting = false;
+        this.eventIdToDelete = 0;
+      }
+    });
   }
 
   viewEvent(eventId: number): void {
@@ -1188,41 +1005,41 @@ export class AdminEventsComponent implements OnInit {
       next: (response) => {
         if (response.status === 'Success' && response.data) {
           this.selectedEvent = response.data;
-          alert(`Viewing event: ${response.data.eventDetails.event_name}`);
+          this.toastr.info(`Viewing event: ${response.data.eventDetails.event_name}`, 'Info');
         } else {
-          alert(response.message || 'Event not found');
+          this.toastr.error(response.message || 'Event not found', 'Error');
         }
       },
       error: (error) => {
         console.error('Error loading event:', error);
-        alert('Failed to load event details');
+        this.toastr.error('Failed to load event details', 'Error');
       },
     });
   }
 
   validateEventForm(): boolean {
     if (!this.eventForm.event_name.trim()) {
-      alert('Event name is required');
+      this.toastr.warning('Event name is required', 'Warning');
       return false;
     }
 
     if (!this.eventForm.event_description.trim()) {
-      alert('Event description is required');
+      this.toastr.warning('Event description is required', 'Warning');
       return false;
     }
 
     if (!this.eventForm.event_date) {
-      alert('Event date is required');
+      this.toastr.warning('Event date is required', 'Warning');
       return false;
     }
 
     if (!this.eventForm.location.trim()) {
-      alert('Location is required');
+      this.toastr.warning('Location is required', 'Warning');
       return false;
     }
 
     if (!this.eventForm.full_address.trim()) {
-      alert('Full address is required');
+      this.toastr.warning('Full address is required', 'Warning');
       return false;
     }
 
@@ -1248,11 +1065,9 @@ export class AdminEventsComponent implements OnInit {
       language: 'hindi',
       event_category_id: 0,
       banner_image: '',
-      // gallery_media: '',
-      gallery_media: '[]', // Simple JSON string
+      gallery_media: '[]',
       age_limit: null,
-      // artists: '',
-      artists: '[]', // Simple JSON string
+      artists: '[]',
       terms_and_conditions: '',
       min_price: null,
       max_price: null,
@@ -1260,7 +1075,7 @@ export class AdminEventsComponent implements OnInit {
       status: 'draft',
       no_of_seats: null,
       created_by: this.eventForm.created_by || 'system',
-      created_at: currentDate.toISOString(), // Set current datetime
+      created_at: currentDate.toISOString(),
       updated_by: '',
       updated_at: currentDate.toISOString(),
       active: 1,
@@ -1275,12 +1090,10 @@ export class AdminEventsComponent implements OnInit {
     this.newArtistPreviewUrl = null;
     this.isEditMode = false;
     this.selectedEvent = null;
-
     this.seatTypes = [];
     this.resetSeatTypeForm();
   }
 
-  // Helper methods (pagination, duration calculation, etc.)
   calculateDuration(): void {
     if (this.eventForm.start_time && this.eventForm.end_time) {
       const start = new Date(`2000-01-01T${this.eventForm.start_time}`);
@@ -1296,8 +1109,15 @@ export class AdminEventsComponent implements OnInit {
     }
   }
 
+  // goToPage(page: number): void {
+  //   if (page >= 1 && page <= this.totalPages) {
+  //     this.currentPage = page;
+  //     this.loadEvents();
+  //   }
+  // }
+
   goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages) {
+    if (page >= 1 && (!this.totalPages || page <= this.totalPages)) {
       this.currentPage = page;
       this.loadEvents();
     }
@@ -1321,10 +1141,39 @@ export class AdminEventsComponent implements OnInit {
     return Math.min(a, b);
   }
 
+  // getPageNumbers(): number[] {
+  //   const pages: number[] = [];
+  //   const maxVisiblePages = 5;
+
+  //   if (this.totalPages <= maxVisiblePages) {
+  //     for (let i = 1; i <= this.totalPages; i++) {
+  //       pages.push(i);
+  //     }
+  //   } else {
+  //     let startPage = Math.max(1, this.currentPage - 2);
+  //     let endPage = Math.min(this.totalPages, startPage + maxVisiblePages - 1);
+
+  //     if (endPage - startPage + 1 < maxVisiblePages) {
+  //       startPage = Math.max(1, endPage - maxVisiblePages + 1);
+  //     }
+
+  //     for (let i = startPage; i <= endPage; i++) {
+  //       pages.push(i);
+  //     }
+  //   }
+
+  //   return pages;
+  // }
+
   getPageNumbers(): number[] {
     const pages: number[] = [];
+    
+    if (this.totalPages <= 0) {
+      return [1]; // Show page 1 when no pages yet
+    }
+    
     const maxVisiblePages = 5;
-
+    
     if (this.totalPages <= maxVisiblePages) {
       for (let i = 1; i <= this.totalPages; i++) {
         pages.push(i);
@@ -1332,17 +1181,34 @@ export class AdminEventsComponent implements OnInit {
     } else {
       let startPage = Math.max(1, this.currentPage - 2);
       let endPage = Math.min(this.totalPages, startPage + maxVisiblePages - 1);
-
+      
       if (endPage - startPage + 1 < maxVisiblePages) {
         startPage = Math.max(1, endPage - maxVisiblePages + 1);
       }
-
+      
       for (let i = startPage; i <= endPage; i++) {
         pages.push(i);
       }
     }
-
+    
     return pages;
+  }
+
+  onPageSizeChange(): void {
+    // Ensure pageSize is a number
+    const newSize = Number(this.pageSize);
+    console.log('=== PAGE SIZE CHANGE ===');
+    console.log('Previous pageSize:', this.pageSize, 'Type:', typeof this.pageSize);
+    console.log('New pageSize (converted):', newSize, 'Type:', typeof newSize);
+    
+    // Update with numeric value
+    this.pageSize = newSize;
+    this.currentPage = 1; // Reset to first page
+    
+    console.log('Updated pageSize property:', this.pageSize, 'Type:', typeof this.pageSize);
+    console.log('Current page reset to:', this.currentPage);
+    
+    this.loadEvents();
   }
 
   triggerFileInput(): void {
@@ -1357,22 +1223,65 @@ export class AdminEventsComponent implements OnInit {
     }
   }
 
+  // IMPROVED MODAL METHODS - FIXED CLOSING ISSUES
   showModal(modalId: string): void {
     const modalElement = document.getElementById(modalId);
     if (modalElement) {
-      const modal = new (window as any).bootstrap.Modal(modalElement);
-      modal.show();
+      modalElement.classList.add('show');
+      modalElement.style.display = 'block';
+      modalElement.setAttribute('aria-modal', 'true');
+      modalElement.setAttribute('role', 'dialog');
+      document.body.classList.add('modal-open');
+      
+      // Add backdrop
+      let backdrop = document.querySelector('.modal-backdrop');
+      if (!backdrop) {
+        backdrop = document.createElement('div');
+        backdrop.className = 'modal-backdrop fade show';
+        document.body.appendChild(backdrop);
+      }
     }
   }
 
-  closeModal(modalId: string): void {
+  closeModalProperly(modalId: string): void {
     const modalElement = document.getElementById(modalId);
     if (modalElement) {
-      const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
-      if (modal) {
-        modal.hide();
+      // Use Bootstrap's modal API if available
+      try {
+        // @ts-ignore
+        const bootstrapModal = bootstrap.Modal.getInstance(modalElement);
+        if (bootstrapModal) {
+          bootstrapModal.hide();
+        } else {
+          // Fallback to manual closing
+          this.manualCloseModal(modalElement);
+        }
+      } catch (error) {
+        // If Bootstrap is not available, use manual close
+        this.manualCloseModal(modalElement);
       }
+      
+      // Clear any pending modal backdrops
+      setTimeout(() => {
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('padding-right');
+        document.body.style.removeProperty('overflow');
+      }, 150);
     }
+  }
+
+  private manualCloseModal(modalElement: HTMLElement): void {
+    modalElement.classList.remove('show');
+    modalElement.style.display = 'none';
+    modalElement.setAttribute('aria-hidden', 'true');
+    modalElement.removeAttribute('aria-modal');
+    modalElement.removeAttribute('role');
+  }
+
+  closeModal(modalId: string): void {
+    this.closeModalProperly(modalId);
   }
 
   resetFormAndOpenModal(): void {
@@ -1380,7 +1289,6 @@ export class AdminEventsComponent implements OnInit {
     this.showModal('addEventModal');
   }
 
-  // Add this helper method to convert file to Base64
   convertFileToBase64(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -1396,7 +1304,8 @@ export class AdminEventsComponent implements OnInit {
       if (
         pair[0] === 'EventArtists' ||
         pair[0] === 'EventGalleries' ||
-        pair[0] === 'EventDetails'
+        pair[0] === 'EventDetails' ||
+        pair[0] === 'SeatTypes'
       ) {
         try {
           console.log(pair[0] + ': ', JSON.parse(pair[1]));
@@ -1413,7 +1322,7 @@ export class AdminEventsComponent implements OnInit {
   // Add seat type methods
   addSeatType(): void {
     if (!this.isValidSeatType()) {
-      alert('Please fill all seat type fields correctly');
+      this.toastr.warning('Please fill all seat type fields correctly', 'Warning');
       return;
     }
 
@@ -1431,6 +1340,7 @@ export class AdminEventsComponent implements OnInit {
 
     this.seatTypes.push(seatType);
     this.resetSeatTypeForm();
+    this.toastr.success('Seat type added successfully', 'Success');
   }
 
   isValidSeatType(): boolean {
@@ -1451,6 +1361,7 @@ export class AdminEventsComponent implements OnInit {
 
   removeSeatType(index: number): void {
     this.seatTypes.splice(index, 1);
+    this.toastr.info('Seat type removed', 'Info');
   }
 
   loadEventSeatTypes(eventId: number): void {

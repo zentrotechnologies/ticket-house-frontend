@@ -325,6 +325,19 @@ export class EventCategoryComponent implements OnInit {
       const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
       if (modal) {
         modal.hide();
+        
+        // Remove modal backdrop manually
+        const backdrops = document.getElementsByClassName('modal-backdrop');
+        while (backdrops.length > 0) {
+          backdrops[0].remove();
+        }
+        
+        // Remove modal-open class from body
+        document.body.classList.remove('modal-open');
+        
+        // Reset body styles
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
       }
     }
     this.resetForm();

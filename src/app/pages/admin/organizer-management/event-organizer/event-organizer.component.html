@@ -23,7 +23,7 @@
   <div class="card card-white" *ngIf="!isLoading">
     <!-- search / controls row -->
     <div class="table-controls">
-      <div class="left-controls">
+      <!-- <div class="left-controls">
         <label class="show-label">Show</label>
         <select class="per-page-select" [(ngModel)]="itemsPerPage" (change)="onItemsPerPageChange()">
           <option [value]="10">10</option>
@@ -33,7 +33,7 @@
         <span class="ms-2 text-muted">
           Total: {{ totalCount }} organizers
         </span>
-      </div>
+      </div> -->
       <div class="right-controls">
         <div class="input-group">
           <input class="form-control search-input" placeholder="Search by name, email, or organization..." 
@@ -137,7 +137,7 @@
     </div>
 
     <!-- pagination footer -->
-    <div class="table-footer" *ngIf="totalPages > 1">
+    <!-- <div class="table-footer" *ngIf="totalPages > 1">
       <div class="rows-info">
         Showing {{ getDisplayRange().start }} to {{ getDisplayRange().end }} of
         {{ getDisplayRange().total }} entries
@@ -159,6 +159,57 @@
           </li>
         </ul>
       </nav>
+    </div> -->
+    <!-- pagination footer - REPLACE your existing table-footer div with this -->
+    <div class="table-footer">
+      <!-- Left side: Per page options and entries count -->
+      <div class="per-page-options">
+        <span class="show-label">Show:</span>
+        <select class="per-page-select" [(ngModel)]="itemsPerPage" (change)="onItemsPerPageChange()">
+          <option [value]="10">10 entries</option>
+          <option [value]="25">25 entries</option>
+          <option [value]="50">50 entries</option>
+          <option [value]="100">100 entries</option>
+        </select>
+        <span class="entries-count" *ngIf="totalCount > 0">
+          Showing {{ getDisplayRange().start }} to {{ getDisplayRange().end }} of {{ totalCount }} entries
+        </span>
+        <span class="entries-count" *ngIf="totalCount === 0">
+          Showing 0 entries
+        </span>
+      </div>
+
+      <!-- Right side: Pagination - Always show if there are organizers -->
+      <nav aria-label="Page navigation" *ngIf="organizers.length > 0">
+        <ul class="pagination">
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <a class="page-link" href="javascript:void(0)" (click)="goToPage(currentPage - 1)">
+              Prev
+            </a>
+          </li>
+          
+          <!-- Handle ellipsis in page numbers -->
+          <ng-container *ngFor="let page of getPageNumbers()">
+            <li class="page-item" *ngIf="page > 0" [class.active]="page === currentPage">
+              <a class="page-link" href="javascript:void(0)" (click)="goToPage(page)">{{ page }}</a>
+            </li>
+            <li class="page-item disabled" *ngIf="page < 0">
+              <span class="page-link">...</span>
+            </li>
+          </ng-container>
+          
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <a class="page-link" href="javascript:void(0)" (click)="goToPage(currentPage + 1)">
+              Next 
+            </a>
+          </li>
+        </ul>
+      </nav>
+      
+      <!-- Show placeholder when no organizers -->
+      <div class="pagination-placeholder" *ngIf="organizers.length === 0">
+        <span class="text-muted">No organizers to display</span>
+      </div>
     </div>
   </div>
 </div>
