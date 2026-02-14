@@ -86,7 +86,8 @@
             <h4>Your Booking Details</h4>
             <div class="summary-item" *ngFor="let seat of seatSelections">
               <div class="seat-info">
-                <span class="seat-name">Seat Type {{ seat.SeatTypeId }}</span>
+                <!-- <span class="seat-name">Seat Type {{ seat.SeatTypeId }}</span> -->
+                 <span class="seat-name">{{ seat.SeatName || 'Seat Type ' + seat.SeatTypeId }}</span>
                 <span class="seat-quantity">× {{ seat.Quantity }}</span>
               </div>
             </div>
@@ -114,7 +115,8 @@
 
             <!-- Show seat details -->
             <div *ngFor="let seat of seatSelections" class="seat-detail">
-              <p>Seat Type {{ seat.SeatTypeId }} · {{ seat.Quantity }} ticket(s)</p>
+              <!-- <p>Seat Type {{ seat.SeatTypeId }} · {{ seat.Quantity }} ticket(s)</p> -->
+               <p>{{ seat.SeatName || 'Seat Type ' + seat.SeatTypeId }} · {{ seat.Quantity }} ticket(s)</p>
             </div>
           </div>
         </div>

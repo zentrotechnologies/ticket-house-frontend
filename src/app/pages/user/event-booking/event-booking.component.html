@@ -78,6 +78,12 @@
                                 Language: {{ eventDetails.language || 'English' }} •
                                 Age: {{ eventDetails.age_limit ? eventDetails.age_limit + '+' : 'All age groups' }}
                             </p>
+
+                            <!-- Terms & Conditions Row - Add this new section -->
+                            <div class="terms-row" (click)="openTermsModal()">
+                                <span class="terms-label">Terms & Conditions</span>
+                                <!-- <span class="terms-icon">📋</span> -->
+                            </div>
                         </div>
 
                         <!-- Similar Shows Section -->
@@ -169,13 +175,13 @@
                             <div class="seat-selection-section" *ngIf="seatTypes.length > 0">
                                 <h4 class="seat-section-title">Select Seats</h4>
                                 <p class="seat-section-sub">Check seats you want to book (max 10 tickets)</p>
-                                
+
                                 <!-- Seat Type Cards with Checkboxes and Counters -->
-                                <div *ngFor="let seatType of seatTypes" class="seat-card" [class.selected]="isSeatSelected(seatType.event_seat_type_inventory_id)">
+                                <div *ngFor="let seatType of seatTypes" class="seat-card"
+                                    [class.selected]="isSeatSelected(seatType.event_seat_type_inventory_id)">
                                     <div class="seat-checkbox-info">
                                         <label class="checkbox-container">
-                                            <input 
-                                                type="checkbox" 
+                                            <input type="checkbox"
                                                 [checked]="isSeatSelected(seatType.event_seat_type_inventory_id)"
                                                 (change)="toggleSeatSelection(seatType.event_seat_type_inventory_id, $event)">
                                             <span class="checkmark"></span>
@@ -188,15 +194,19 @@
                                             </div> -->
                                         </div>
                                     </div>
-                                    
+
                                     <!-- Quantity Counter - Only visible when checkbox is checked -->
-                                    <div *ngIf="selectedSeats[seatType.event_seat_type_inventory_id] > 0" class="seat-qty">
-                                        <button class="qty-btn" (click)="decreaseSeats(seatType.event_seat_type_inventory_id)">−</button>
-                                        <span class="qty-count">{{ selectedSeats[seatType.event_seat_type_inventory_id] }}</span>
-                                        <button class="qty-btn" (click)="increaseSeats(seatType.event_seat_type_inventory_id)">+</button>
+                                    <div *ngIf="selectedSeats[seatType.event_seat_type_inventory_id] > 0"
+                                        class="seat-qty">
+                                        <button class="qty-btn"
+                                            (click)="decreaseSeats(seatType.event_seat_type_inventory_id)">−</button>
+                                        <span class="qty-count">{{ selectedSeats[seatType.event_seat_type_inventory_id]
+                                            }}</span>
+                                        <button class="qty-btn"
+                                            (click)="increaseSeats(seatType.event_seat_type_inventory_id)">+</button>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Selected Seats Summary -->
                                 <div *ngIf="hasSelectedSeats()" class="selected-summary">
                                     <h4>Selected Seats Summary</h4>
@@ -210,7 +220,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Seat Types Loading -->
                             <div *ngIf="isSeatLoading" class="seat-loading">
                                 <div class="loading-spinner-small">Loading seat options...</div>
@@ -231,10 +241,7 @@
                                     <div class="fill">Filling Fast</div>
                                 </div>
                                 <div class="book-action">
-                                    <button 
-                                        class="book-btn" 
-                                        (click)="onBookNow()"
-                                        [disabled]="!hasSelectedSeats()">
+                                    <button class="book-btn" (click)="onBookNow()" [disabled]="!hasSelectedSeats()">
                                         Book Now
                                     </button>
                                 </div>
@@ -255,8 +262,7 @@
         <footer class="events-footer">
             <div class="events-container">
                 <div class="footer-content">
-                    <img src="/assets/Zentro-logo.png"
-                        class="footer-logo" alt="Zentro Logo">
+                    <img src="/assets/Zentro-logo.png" class="footer-logo" alt="Zentro Logo">
                     <div class="footer-links">
                         <span>List Your Event</span>
                         <span>|</span>
@@ -284,5 +290,24 @@
         <div class="modal-close" id="modalClose" title="Close">✕</div>
         <div class="modal-inner" role="document">
             <img id="modalImage" src alt="Preview">
+        </div>
+    </div>
+
+    <!-- Terms & Conditions Modal -->
+    <div class="modal terms-modal" [class.open]="isTermsModalOpen" (click)="closeTermsModalOnBackdrop($event)">
+        <div class="modal-content terms-modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Terms & Conditions</h3>
+                <button class="modal-close-btn" (click)="closeTermsModal()">✕</button>
+            </div>
+            <div class="modal-body terms-modal-body">
+                <!-- Fixed: Added safe navigation operator and null check -->
+                <div *ngIf="eventDetails?.terms_and_conditions; else noTerms" class="terms-content">
+                    {{ eventDetails?.terms_and_conditions }}
+                </div>
+                <ng-template #noTerms>
+                    <div class="terms-na">NA</div>
+                </ng-template>
+            </div>
         </div>
     </div>

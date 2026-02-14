@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { EventCategoryModel, EventDetailsModel, EventSeatTypeInventoryModel, UpcomingEventResponse } from '../../../core/models/auth.model';
 import { ApiService } from '../../../core/services/api.service';
@@ -32,6 +32,8 @@ export class EventBookingComponent implements OnInit {
   isSimilarLoading = false;
   priceInRange: number | null = null;
   isPriceLoading = false;
+
+  isTermsModalOpen: boolean = false; // Add this property
 
   constructor(
     private route: ActivatedRoute,
@@ -353,80 +355,80 @@ export class EventBookingComponent implements OnInit {
 
   // In event-booking.component.ts - Replace the onBookNow method with this simpler version
 
-onBookNow(): void {
-  const selectedSeatCount = this.getSelectedSeatCount();
+  onBookNow(): void {
+    const selectedSeatCount = this.getSelectedSeatCount();
 
-  if (selectedSeatCount === 0) {
-    this.toastr.warning('Please select at least one seat', 'Selection Required');
-    return;
+    if (selectedSeatCount === 0) {
+      this.toastr.warning('Please select at least one seat', 'Selection Required');
+      return;
+    }
+
+    if (selectedSeatCount > 10) {
+      this.toastr.warning('You can select maximum 10 tickets only', 'Limit Exceeded');
+      return;
+    }
+
+    console.log('Book Now clicked - Seat selections:', this.getSelectedSeatsList());
+    console.log('Total amount:', this.totalAmount);
+
+    // Save seat selections to sessionStorage (not localStorage)
+    // sessionStorage clears when tab is closed, which is better for this flow
+    sessionStorage.setItem('temp_seat_selections', JSON.stringify(this.getSelectedSeatsList().map(item => ({
+      SeatTypeId: item.seatType.event_seat_type_inventory_id,
+      Quantity: item.quantity,
+      SeatName: item.seatType.seat_name,
+      Price: item.seatType.price
+    }))));
+    sessionStorage.setItem('temp_total_amount', this.totalAmount.toString());
+    sessionStorage.setItem('temp_event_id', this.eventId.toString());
+    sessionStorage.setItem('temp_event_name', this.eventNameSlug);
+
+    // Check if user is logged in
+    const isLoggedIn = this.authService.isLoggedIn();
+    console.log('User logged in?', isLoggedIn);
+
+    if (isLoggedIn) {
+      // User is logged in, redirect to payment page
+      console.log('User logged in - redirecting to payment');
+      this.navigateToPayment();
+    } else {
+      // User not logged in - open auth modal WITHOUT clearing selections
+      console.log('User not logged in - opening auth modal');
+
+      // Simply open the auth modal - selections remain in component state
+      this.openAuthModal();
+    }
   }
 
-  if (selectedSeatCount > 10) {
-    this.toastr.warning('You can select maximum 10 tickets only', 'Limit Exceeded');
-    return;
+  // Method to open auth modal
+  private openAuthModal(): void {
+    // Dispatch a simple event to open the modal
+    window.dispatchEvent(new CustomEvent('openAuthModal'));
   }
 
-  console.log('Book Now clicked - Seat selections:', this.getSelectedSeatsList());
-  console.log('Total amount:', this.totalAmount);
+  // Navigate to payment page - use selections from component state, not sessionStorage
+  private navigateToPayment(): void {
+    const seatSelections = this.getSelectedSeatsList().map((item) => ({
+      SeatTypeId: item.seatType.event_seat_type_inventory_id,
+      Quantity: item.quantity,
+      SeatName: item.seatType.seat_name,
+      Price: item.seatType.price
+    }));
 
-  // Save seat selections to sessionStorage (not localStorage)
-  // sessionStorage clears when tab is closed, which is better for this flow
-  sessionStorage.setItem('temp_seat_selections', JSON.stringify(this.getSelectedSeatsList().map(item => ({
-    SeatTypeId: item.seatType.event_seat_type_inventory_id,
-    Quantity: item.quantity,
-    SeatName: item.seatType.seat_name,
-    Price: item.seatType.price
-  }))));
-  sessionStorage.setItem('temp_total_amount', this.totalAmount.toString());
-  sessionStorage.setItem('temp_event_id', this.eventId.toString());
-  sessionStorage.setItem('temp_event_name', this.eventNameSlug);
+    const userId = this.authService.getCurrentUserId();
 
-  // Check if user is logged in
-  const isLoggedIn = this.authService.isLoggedIn();
-  console.log('User logged in?', isLoggedIn);
+    console.log('Navigating to payment with current selections:', seatSelections);
 
-  if (isLoggedIn) {
-    // User is logged in, redirect to payment page
-    console.log('User logged in - redirecting to payment');
-    this.navigateToPayment();
-  } else {
-    // User not logged in - open auth modal WITHOUT clearing selections
-    console.log('User not logged in - opening auth modal');
-    
-    // Simply open the auth modal - selections remain in component state
-    this.openAuthModal();
+    // Navigate to payment page with state
+    this.router.navigate(['/event-payment', this.eventId, this.eventNameSlug], {
+      state: {
+        seatSelections: seatSelections,
+        totalAmount: this.totalAmount,
+        userId: userId,
+        eventTitle: this.eventDetails?.event_name || this.formatEventTitle(this.eventNameSlug)
+      },
+    });
   }
-}
-
-// Method to open auth modal
-private openAuthModal(): void {
-  // Dispatch a simple event to open the modal
-  window.dispatchEvent(new CustomEvent('openAuthModal'));
-}
-
-// Navigate to payment page - use selections from component state, not sessionStorage
-private navigateToPayment(): void {
-  const seatSelections = this.getSelectedSeatsList().map((item) => ({
-    SeatTypeId: item.seatType.event_seat_type_inventory_id,
-    Quantity: item.quantity,
-    SeatName: item.seatType.seat_name,
-    Price: item.seatType.price
-  }));
-
-  const userId = this.authService.getCurrentUserId();
-
-  console.log('Navigating to payment with current selections:', seatSelections);
-
-  // Navigate to payment page with state
-  this.router.navigate(['/event-payment', this.eventId, this.eventNameSlug], {
-    state: {
-      seatSelections: seatSelections,
-      totalAmount: this.totalAmount,
-      userId: userId,
-      eventTitle: this.eventDetails?.event_name || this.formatEventTitle(this.eventNameSlug)
-    },
-  });
-}
 
   // Save seat selections to localStorage
   private saveSeatSelections(): void {
@@ -593,5 +595,33 @@ private navigateToPayment(): void {
 
   navigateToSignUp(): void {
     this.router.navigate(['/auth/sign-up']);
+  }
+
+  // Add these new methods
+  openTermsModal(): void {
+    this.isTermsModalOpen = true;
+    // Optional: Prevent body scrolling when modal is open
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeTermsModal(): void {
+    this.isTermsModalOpen = false;
+    // Re-enable body scrolling
+    document.body.style.overflow = 'auto';
+  }
+
+  closeTermsModalOnBackdrop(event: MouseEvent): void {
+    // Close only if clicking on the backdrop (not the modal content)
+    if ((event.target as HTMLElement).classList.contains('terms-modal')) {
+      this.closeTermsModal();
+    }
+  }
+
+  // Fixed: Changed parameter type to any to avoid type mismatch
+  @HostListener('document:keydown.escape', ['$event'])
+  onEscapePress(event: any): void {
+    if (this.isTermsModalOpen) {
+      this.closeTermsModal();
+    }
   }
 }
