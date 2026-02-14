@@ -1360,3 +1360,321 @@ booking-page {
   align-items: center;
   gap: 4px;
 }
+
+/* Add these styles to your existing booking-page.component.css */
+
+/* Seat Selection Section */
+.seat-selection-section {
+    margin: 20px 0;
+    padding: 16px 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.seat-section-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 4px;
+}
+
+.seat-section-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+}
+
+/* Seat Card */
+.seat-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    margin-bottom: 12px;
+    background: #fff;
+    transition: all 0.3s ease;
+}
+
+.seat-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 4px 12px rgba(72, 150, 209, 0.1);
+}
+
+.seat-card.selected {
+    border-color: var(--accent);
+    background-color: rgba(72, 150, 209, 0.02);
+}
+
+/* Checkbox Container */
+.checkbox-container {
+    display: block;
+    position: relative;
+    padding-left: 30px;
+    cursor: pointer;
+    font-size: 16px;
+    user-select: none;
+    margin-right: 12px;
+}
+
+.checkbox-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: #fff;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.checkbox-container:hover input ~ .checkmark {
+    border-color: var(--accent);
+}
+
+.checkbox-container input:checked ~ .checkmark {
+    background-color: var(--accent);
+    border-color: var(--accent);
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+.checkbox-container .checkmark:after {
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* Seat Info */
+.seat-checkbox-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    flex: 1;
+}
+
+.seat-info {
+    flex: 1;
+}
+
+.seat-name {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--primary);
+    margin-bottom: 2px;
+}
+
+.seat-price {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 2px;
+}
+
+.seat-availability {
+    font-size: 12px;
+    color: #28a745;
+}
+
+.seat-availability.low {
+    color: #e67e22;
+}
+
+/* Quantity Counter */
+.seat-qty {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 6px 12px;
+    margin-left: 8px;
+}
+
+.qty-btn {
+    border: none;
+    background: none;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.qty-btn:hover:not(:disabled) {
+    background-color: rgba(72, 150, 209, 0.1);
+}
+
+.qty-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.qty-count {
+    font-weight: 700;
+    font-size: 14px;
+    min-width: 20px;
+    text-align: center;
+}
+
+/* Selected Summary */
+.selected-summary {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 16px;
+    border: 1px solid #e9ecef;
+}
+
+.selected-summary h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 12px;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 13px;
+    border-bottom: 1px dashed #dee2e6;
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0 0;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--primary);
+    margin-top: 6px;
+}
+
+/* Seat Loading */
+.seat-loading {
+    padding: 20px;
+    text-align: center;
+}
+
+.loading-spinner-small {
+    font-size: 14px;
+    color: var(--muted);
+}
+
+/* Disabled Book Button */
+.book-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #ccc;
+}
+
+.book-btn:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .seat-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .seat-qty {
+        align-self: flex-end;
+        margin-left: 0;
+    }
+    
+    .seat-checkbox-info {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .seat-section-title {
+        font-size: 16px;
+    }
+    
+    .seat-name {
+        font-size: 14px;
+    }
+    
+    .seat-price {
+        font-size: 13px;
+    }
+    
+    .seat-availability {
+        font-size: 11px;
+    }
+    
+    .seat-qty {
+        padding: 4px 8px;
+    }
+    
+    .qty-btn {
+        font-size: 16px;
+    }
+}
+
+/* Fix for checkbox tick mark */
+.checkbox-container input:checked ~ .checkmark:after {
+    display: block;
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+/* Ensure checkmark has proper positioning */
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: #fff;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+/* Checked state background */
+.checkbox-container input:checked ~ .checkmark {
+    background-color: var(--accent, #4896d1);
+    border-color: var(--accent, #4896d1);
+}

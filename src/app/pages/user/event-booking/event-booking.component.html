@@ -103,7 +103,7 @@
                     </div>
                 </div>
 
-                <!-- RIGHT: Sidebar with FIXED TIME DISPLAY -->
+                <!-- RIGHT: Sidebar with Seat Selection -->
                 <aside class="booking-sidebar">
                     <div class="sidebar-card" role="region" aria-label="ticket booking">
                         <div class="sidebar-header">
@@ -124,7 +124,7 @@
                                 <div class="info-text">{{ formatDisplayDate(eventDetails.event_date) }}</div>
                             </div>
 
-                            <!-- Time - FIXED: Directly use start_time and end_time -->
+                            <!-- Time -->
                             <div class="info-row">
                                 <div class="info-icon">⏱</div>
                                 <div class="info-text">
@@ -165,22 +165,78 @@
                                 <div class="info-text">{{ eventDetails.full_address || eventDetails.location }}</div>
                             </div>
 
+                            <!-- SEAT SELECTION SECTION - ABOVE PRICE ROW -->
+                            <div class="seat-selection-section" *ngIf="seatTypes.length > 0">
+                                <h4 class="seat-section-title">Select Seats</h4>
+                                <p class="seat-section-sub">Check seats you want to book (max 10 tickets)</p>
+                                
+                                <!-- Seat Type Cards with Checkboxes and Counters -->
+                                <div *ngFor="let seatType of seatTypes" class="seat-card" [class.selected]="isSeatSelected(seatType.event_seat_type_inventory_id)">
+                                    <div class="seat-checkbox-info">
+                                        <label class="checkbox-container">
+                                            <input 
+                                                type="checkbox" 
+                                                [checked]="isSeatSelected(seatType.event_seat_type_inventory_id)"
+                                                (change)="toggleSeatSelection(seatType.event_seat_type_inventory_id, $event)">
+                                            <span class="checkmark"></span>
+                                        </label>
+                                        <div class="seat-info">
+                                            <div class="seat-name">{{ seatType.seat_name }}</div>
+                                            <div class="seat-price">₹{{ seatType.price }}</div>
+                                            <!-- <div class="seat-availability" [class.low]="seatType.available_seats < 10">
+                                                {{ seatType.available_seats }} seats available
+                                            </div> -->
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Quantity Counter - Only visible when checkbox is checked -->
+                                    <div *ngIf="selectedSeats[seatType.event_seat_type_inventory_id] > 0" class="seat-qty">
+                                        <button class="qty-btn" (click)="decreaseSeats(seatType.event_seat_type_inventory_id)">−</button>
+                                        <span class="qty-count">{{ selectedSeats[seatType.event_seat_type_inventory_id] }}</span>
+                                        <button class="qty-btn" (click)="increaseSeats(seatType.event_seat_type_inventory_id)">+</button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Selected Seats Summary -->
+                                <div *ngIf="hasSelectedSeats()" class="selected-summary">
+                                    <h4>Selected Seats Summary</h4>
+                                    <div *ngFor="let item of getSelectedSeatsList()" class="summary-item">
+                                        <span>{{ item.seatType.seat_name }} × {{ item.quantity }}</span>
+                                        <span>₹{{ item.seatType.price * item.quantity }}</span>
+                                    </div>
+                                    <div class="summary-total">
+                                        <span>Total</span>
+                                        <span>₹{{ totalAmount }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Seat Types Loading -->
+                            <div *ngIf="isSeatLoading" class="seat-loading">
+                                <div class="loading-spinner-small">Loading seat options...</div>
+                            </div>
+
                             <!-- Price and Book Button -->
                             <div class="price-row">
                                 <div class="price-info">
                                     <div class="price">
-                                        <!-- Display price based on priority -->
-                                        <span *ngIf="!isPriceLoading">
-                                            {{ getDisplayPrice() }}{{ getPriceRangeDisplay() }}
+                                        <!-- Display price based on selection or event price -->
+                                        <span *ngIf="hasSelectedSeats()">
+                                            ₹{{ totalAmount }}
                                         </span>
-                                        <span *ngIf="isPriceLoading" class="price-loading">
-                                            Loading price...
+                                        <span *ngIf="!hasSelectedSeats()">
+                                            {{ getDisplayPrice() }}{{ getPriceRangeDisplay() }}
                                         </span>
                                     </div>
                                     <div class="fill">Filling Fast</div>
                                 </div>
                                 <div class="book-action">
-                                    <button class="book-btn" (click)="onBookNow()">Book Now</button>
+                                    <button 
+                                        class="book-btn" 
+                                        (click)="onBookNow()"
+                                        [disabled]="!hasSelectedSeats()">
+                                        Book Now
+                                    </button>
                                 </div>
                             </div>
                         </div>

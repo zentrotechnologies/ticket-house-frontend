@@ -78,7 +78,35 @@ export class EventPaymentComponent implements OnInit {
     private apiService: ApiService,
     public authService: AuthService,
     private toastr: ToastrService
-  ) {}
+  ) { }
+
+  // ngOnInit(): void {
+  //   this.route.params.subscribe(params => {
+  //     this.eventId = +params['event_id'] || 0;
+  //     this.eventNameSlug = params['event_name'] || '';
+
+  //     // Get data from navigation state
+  //     const navigation = this.router.getCurrentNavigation();
+  //     if (navigation?.extras.state) {
+  //       this.seatSelections = navigation.extras.state['seatSelections'] || [];
+  //       this.totalAmount = navigation.extras.state['totalAmount'] || 0;
+  //       this.userId = navigation.extras.state['userId'] || this.userId;
+  //       this.eventTitle = navigation.extras.state['eventTitle'] || '';
+
+  //       console.log('Payment - Received seat selections from state:', this.seatSelections);
+  //       console.log('Payment - Total amount:', this.totalAmount);
+
+  //       this.calculateBookingFee();
+  //       this.loadEventDetails();
+
+  //       // Clear pending selections from localStorage since we used them
+  //       this.clearLocalStorage();
+  //     } else {
+  //       // Try to get data from localStorage if state is missing (e.g., after login redirect)
+  //       this.restoreFromLocalStorage();
+  //     }
+  //   });
+  // }
 
   ngOnInit(): void {
     // Check if user is logged in
@@ -87,17 +115,17 @@ export class EventPaymentComponent implements OnInit {
       this.route.params.subscribe(params => {
         this.eventId = +params['event_id'] || 0;
         this.eventNameSlug = params['event_name'] || '';
-        this.router.navigate(['/seats-booking', this.eventId, this.eventNameSlug]);
+        this.router.navigate(['/event-booking', this.eventId, this.eventNameSlug]);
       });
       return;
     }
 
     this.userId = this.authService.getCurrentUserId();
-    
+
     this.route.params.subscribe(params => {
       this.eventId = +params['event_id'] || 0;
       this.eventNameSlug = params['event_name'] || '';
-      
+
       // Get data from navigation state
       const navigation = this.router.getCurrentNavigation();
       if (navigation?.extras.state) {
@@ -105,39 +133,51 @@ export class EventPaymentComponent implements OnInit {
         this.totalAmount = navigation.extras.state['totalAmount'] || 0;
         this.userId = navigation.extras.state['userId'] || this.userId;
         this.eventTitle = navigation.extras.state['eventTitle'] || '';
+
+        console.log('Payment - Received seat selections from state:', this.seatSelections);
+
         this.calculateBookingFee();
-        
-        // Load event details for display
         this.loadEventDetails();
+
+        // Clear sessionStorage since we have state
+        this.clearSessionStorage();
       } else {
-        // Try to get data from localStorage if state is missing
-        this.restoreFromLocalStorage();
+        // Try to get data from sessionStorage if state is missing
+        this.restoreFromSessionStorage();
       }
     });
   }
 
-  // Restore seat selections from localStorage if navigation state is lost
   restoreFromLocalStorage(): void {
     const pendingSelections = localStorage.getItem('pending_seat_selections');
     const pendingAmount = localStorage.getItem('pending_total_amount');
     const pendingEventId = localStorage.getItem('pending_event_id');
     const pendingEventName = localStorage.getItem('pending_event_name');
-    
+
+    console.log('Payment - Attempting to restore from localStorage:', {
+      hasSelections: !!pendingSelections,
+      pendingEventId,
+      pendingEventName
+    });
+
     if (pendingSelections && pendingAmount && pendingEventId === this.eventId.toString()) {
       this.seatSelections = JSON.parse(pendingSelections);
       this.totalAmount = parseFloat(pendingAmount);
-      this.eventTitle = pendingEventName 
+      this.eventTitle = pendingEventName
         ? pendingEventName.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
         : '';
+
+      console.log('Payment - Restored seat selections:', this.seatSelections);
+
       this.calculateBookingFee();
       this.loadEventDetails();
-      
+
       // Clear localStorage after restoring
       this.clearLocalStorage();
-    } else {
-      // If no state or localStorage data, redirect back to seat selection
+    } else if (!this.seatSelections.length) {
+      // If no state or localStorage data, redirect back to event booking
       this.toastr.warning('Please select seats first', 'Selection Required');
-      this.router.navigate(['/seats-booking', this.eventId, this.eventNameSlug]);
+      this.router.navigate(['/event-booking', this.eventId, this.eventNameSlug]);
     }
   }
 
@@ -146,6 +186,48 @@ export class EventPaymentComponent implements OnInit {
     localStorage.removeItem('pending_total_amount');
     localStorage.removeItem('pending_event_id');
     localStorage.removeItem('pending_event_name');
+  }
+
+  // In event-payment.component.ts - Update restoreFromLocalStorage to use sessionStorage
+
+  restoreFromSessionStorage(): void {
+    const tempSelections = sessionStorage.getItem('temp_seat_selections');
+    const tempAmount = sessionStorage.getItem('temp_total_amount');
+    const tempEventId = sessionStorage.getItem('temp_event_id');
+    const tempEventName = sessionStorage.getItem('temp_event_name');
+
+    console.log('Payment - Attempting to restore from sessionStorage:', {
+      hasSelections: !!tempSelections,
+      tempEventId,
+      tempEventName
+    });
+
+    if (tempSelections && tempAmount && tempEventId === this.eventId.toString()) {
+      this.seatSelections = JSON.parse(tempSelections);
+      this.totalAmount = parseFloat(tempAmount);
+      this.eventTitle = tempEventName
+        ? tempEventName.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+        : '';
+
+      console.log('Payment - Restored seat selections:', this.seatSelections);
+
+      this.calculateBookingFee();
+      this.loadEventDetails();
+
+      // Clear sessionStorage after restoring
+      this.clearSessionStorage();
+    } else if (!this.seatSelections.length) {
+      // If no state or sessionStorage data, redirect back to event booking
+      this.toastr.warning('Please select seats first', 'Selection Required');
+      this.router.navigate(['/event-booking', this.eventId, this.eventNameSlug]);
+    }
+  }
+
+  clearSessionStorage(): void {
+    sessionStorage.removeItem('temp_seat_selections');
+    sessionStorage.removeItem('temp_total_amount');
+    sessionStorage.removeItem('temp_event_id');
+    sessionStorage.removeItem('temp_event_name');
   }
 
   loadEventDetails(): void {
@@ -174,15 +256,15 @@ export class EventPaymentComponent implements OnInit {
     // Calculate 6.5% convenience fee
     // Calculate 6% convenience fee (changed from 7%)
     this.convenienceFee = parseFloat((this.totalAmount * 0.06).toFixed(2));
-    
+
     // Calculate GST on convenience fee only (18% = 9% CGST + 9% SGST)
     this.cgstAmount = parseFloat((this.convenienceFee * 0.09).toFixed(2));
     this.sgstAmount = parseFloat((this.convenienceFee * 0.09).toFixed(2));
     this.gstTotal = parseFloat((this.cgstAmount + this.sgstAmount).toFixed(2));
-    
+
     // Calculate final amount: total + convenience fee + GST
     this.finalAmount = parseFloat((this.totalAmount + this.convenienceFee + this.gstTotal).toFixed(2));
-    
+
     // Keep the old bookingFee property for backward compatibility if needed
     this.bookingFee = parseFloat((this.convenienceFee + this.gstTotal).toFixed(2));
   }
@@ -237,15 +319,15 @@ export class EventPaymentComponent implements OnInit {
   //       if (response.status === 'Success' && response.data) {
   //         // Show success message
   //         this.toastr.success('Booking created successfully! Redirecting to events...', 'Booking Created');
-          
+
   //         // Clear all local storage
   //         this.clearAllLocalStorage();
-          
+
   //         // Redirect to events listing page after 1.5 seconds (to show toast message)
   //         setTimeout(() => {
   //           this.router.navigate(['/events']);
   //         }, 1500);
-          
+
   //       } else {
   //         this.toastr.error(response.message || 'Failed to create booking', 'Error');
   //       }
@@ -287,12 +369,12 @@ export class EventPaymentComponent implements OnInit {
   //   this.apiService.createBooking(bookingRequest).subscribe({
   //     next: (response) => {
   //       console.log('Create booking response:', response);
-        
+
   //       if (response.status === 'Success' && response.data) {
   //         // VERIFY the booking ID is valid
   //         const bookingId = response.data.BookingId || response.data.bookingId;
   //         console.log('Booking created with ID:', bookingId);
-          
+
   //         if (bookingId && bookingId > 0) {
   //           // Now confirm the booking with QR code generation
   //           this.confirmBookingWithQR(bookingId);
@@ -315,56 +397,56 @@ export class EventPaymentComponent implements OnInit {
 
   // In event-payment.component.ts
   onProceedToPay(): void {
-      if (!this.authService.isLoggedIn()) {
-          this.toastr.warning('Please sign in to complete booking', 'Authentication Required');
-          this.router.navigate(['/seats-booking', this.eventId, this.eventNameSlug]);
-          return;
+    if (!this.authService.isLoggedIn()) {
+      this.toastr.warning('Please sign in to complete booking', 'Authentication Required');
+      this.router.navigate(['/event-booking', this.eventId, this.eventNameSlug]);
+      return;
+    }
+
+    if (this.seatSelections.length === 0) {
+      this.toastr.error('No seats selected', 'Error');
+      return;
+    }
+
+    this.isProcessing = true;
+
+    // Use the new combined endpoint
+    const bookingWithPaymentRequest = {
+      EventId: this.eventId,
+      SeatSelections: this.seatSelections.map(seat => ({
+        SeatTypeId: seat.SeatTypeId,
+        Quantity: seat.Quantity
+      }))
+    };
+
+    console.log('Creating booking with payment:', bookingWithPaymentRequest);
+
+    this.apiService.createBookingWithPayment(bookingWithPaymentRequest).subscribe({
+      next: (response) => {
+        // console.log('Create booking with payment response:', response);
+        console.log('Create booking with payment response:', response);
+        console.log('Order data structure:', JSON.stringify(response.data, null, 2));
+
+        if (response.status === 'Success' && response.data) {
+          // Initialize Razorpay payment
+          this.initiateRazorpayPayment(response.data);
+        } else {
+          this.isProcessing = false;
+          this.toastr.error(response.message || 'Failed to create booking with payment', 'Error');
+        }
+      },
+      error: (error) => {
+        this.isProcessing = false;
+        console.error('Booking with payment error:', error);
+        this.toastr.error('Error creating booking with payment. Please try again.', 'Error');
       }
-
-      if (this.seatSelections.length === 0) {
-          this.toastr.error('No seats selected', 'Error');
-          return;
-      }
-
-      this.isProcessing = true;
-
-      // Use the new combined endpoint
-      const bookingWithPaymentRequest = {
-          EventId: this.eventId,
-          SeatSelections: this.seatSelections.map(seat => ({
-              SeatTypeId: seat.SeatTypeId,
-              Quantity: seat.Quantity
-          }))
-      };
-
-      console.log('Creating booking with payment:', bookingWithPaymentRequest);
-
-      this.apiService.createBookingWithPayment(bookingWithPaymentRequest).subscribe({
-          next: (response) => {
-              // console.log('Create booking with payment response:', response);
-              console.log('Create booking with payment response:', response);
-              console.log('Order data structure:', JSON.stringify(response.data, null, 2));
-              
-              if (response.status === 'Success' && response.data) {
-                  // Initialize Razorpay payment
-                  this.initiateRazorpayPayment(response.data);
-              } else {
-                  this.isProcessing = false;
-                  this.toastr.error(response.message || 'Failed to create booking with payment', 'Error');
-              }
-          },
-          error: (error) => {
-              this.isProcessing = false;
-              console.error('Booking with payment error:', error);
-              this.toastr.error('Error creating booking with payment. Please try again.', 'Error');
-          }
-      });
+    });
   }
 
   // initiateRazorpayPayment(orderData: any): void {
   //   // FIX: Use the correct property name - it's 'keyId' not 'KeyId'
   //   const razorpayKey = orderData.keyId || orderData.KeyId || '';
-    
+
   //   if (!razorpayKey) {
   //       this.isProcessing = false;
   //       this.toastr.error('Payment key is missing', 'Error');
@@ -402,7 +484,7 @@ export class EventPaymentComponent implements OnInit {
   //   };
 
   //   console.log('Razorpay options:', options);
-    
+
   //   try {
   //       const rzp = new Razorpay(options);
   //       rzp.open();
@@ -423,181 +505,181 @@ export class EventPaymentComponent implements OnInit {
     }
 
     const razorpayKey = orderData.keyId || orderData.KeyId || '';
-    
+
     if (!razorpayKey) {
-        this.isProcessing = false;
-        this.toastr.error('Payment key is missing', 'Error');
-        return;
+      this.isProcessing = false;
+      this.toastr.error('Payment key is missing', 'Error');
+      return;
     }
 
     const options = {
-        key: razorpayKey,
-        amount: Math.round(orderData.amount * 100),
-        currency: orderData.currency || 'INR',
-        name: orderData.companyName || 'TicketHouse',
-        description: `Payment for ${this.eventTitle}`,
-        order_id: orderData.orderId,
-        handler: (response: any) => {
-            console.log('Payment successful:', response);
-            this.verifyPayment(response, orderData.bookingId);
-        },
-        prefill: {
-            name: orderData.customerName,
-            email: orderData.customerEmail,
-            contact: orderData.customerPhone || ''
-        },
-        notes: orderData.notes,
-        theme: { color: '#4896d1' },
-        modal: {
-            ondismiss: () => {
-                this.isProcessing = false;
-                this.toastr.info('Payment cancelled', 'Info');
-            }
+      key: razorpayKey,
+      amount: Math.round(orderData.amount * 100),
+      currency: orderData.currency || 'INR',
+      name: orderData.companyName || 'TicketHouse',
+      description: `Payment for ${this.eventTitle}`,
+      order_id: orderData.orderId,
+      handler: (response: any) => {
+        console.log('Payment successful:', response);
+        this.verifyPayment(response, orderData.bookingId);
+      },
+      prefill: {
+        name: orderData.customerName,
+        email: orderData.customerEmail,
+        contact: orderData.customerPhone || ''
+      },
+      notes: orderData.notes,
+      theme: { color: '#4896d1' },
+      modal: {
+        ondismiss: () => {
+          this.isProcessing = false;
+          this.toastr.info('Payment cancelled', 'Info');
         }
+      }
     };
 
     try {
-        const RazorpayInstance = (window as any).Razorpay;
-        const rzp = new RazorpayInstance(options);
-        rzp.open();
+      const RazorpayInstance = (window as any).Razorpay;
+      const rzp = new RazorpayInstance(options);
+      rzp.open();
     } catch (error) {
-        this.isProcessing = false;
-        this.toastr.error('Failed to initialize payment gateway', 'Error');
-        console.error('Razorpay initialization error:', error);
+      this.isProcessing = false;
+      this.toastr.error('Failed to initialize payment gateway', 'Error');
+      console.error('Razorpay initialization error:', error);
     }
   }
 
   verifyPayment(paymentResponse: any, bookingId: number): void {
     const verifyRequest = {
-        BookingId: bookingId,
-        RazorpayOrderId: paymentResponse.razorpay_order_id,
-        RazorpayPaymentId: paymentResponse.razorpay_payment_id,
-        RazorpaySignature: paymentResponse.razorpay_signature
+      BookingId: bookingId,
+      RazorpayOrderId: paymentResponse.razorpay_order_id,
+      RazorpayPaymentId: paymentResponse.razorpay_payment_id,
+      RazorpaySignature: paymentResponse.razorpay_signature
     };
 
     console.log('Verifying payment with:', verifyRequest);
 
     this.apiService.verifyPayment(verifyRequest).subscribe({
-        next: (response) => {
-            console.log('Payment verification response:', response);
-            
-            // FIX: Check the correct response structure
-            if (response.status === 'Success') {
-                // Payment successful - show success toast
-                this.toastr.success('Payment successful! Booking confirmed.', 'Success');
-                
-                // Store booking ID for QR generation
-                this.bookingId = bookingId;
-                
-                // Show QR code modal directly
-                this.showQRCodeModal(bookingId);
-                
-            } else {
-                // Payment verification failed
-                this.toastr.error(response.message || 'Payment verification failed', 'Error');
-                this.isProcessing = false;
-                
-                // Redirect to bookings page
-                setTimeout(() => {
-                    this.router.navigate(['/my-bookings']);
-                }, 1500);
-            }
-        },
-        error: (error) => {
-            this.isProcessing = false;
-            console.error('Payment verification error:', error);
-            this.toastr.error('Payment verification failed. Please contact support.', 'Error');
-            
-            // Still try to show QR code if payment was successful
-            // But first check if we have bookingId
-            if (bookingId) {
-                this.showQRCodeModal(bookingId);
-            } else {
-                setTimeout(() => {
-                    this.router.navigate(['/my-bookings']);
-                }, 1500);
-            }
+      next: (response) => {
+        console.log('Payment verification response:', response);
+
+        // FIX: Check the correct response structure
+        if (response.status === 'Success') {
+          // Payment successful - show success toast
+          this.toastr.success('Payment successful! Booking confirmed.', 'Success');
+
+          // Store booking ID for QR generation
+          this.bookingId = bookingId;
+
+          // Show QR code modal directly
+          this.showQRCodeModal(bookingId);
+
+        } else {
+          // Payment verification failed
+          this.toastr.error(response.message || 'Payment verification failed', 'Error');
+          this.isProcessing = false;
+
+          // Redirect to bookings page
+          setTimeout(() => {
+            this.router.navigate(['/my-bookings']);
+          }, 1500);
         }
+      },
+      error: (error) => {
+        this.isProcessing = false;
+        console.error('Payment verification error:', error);
+        this.toastr.error('Payment verification failed. Please contact support.', 'Error');
+
+        // Still try to show QR code if payment was successful
+        // But first check if we have bookingId
+        if (bookingId) {
+          this.showQRCodeModal(bookingId);
+        } else {
+          setTimeout(() => {
+            this.router.navigate(['/my-bookings']);
+          }, 1500);
+        }
+      }
     });
   }
 
   showQRCodeModal(bookingId: number): void {
     this.isProcessing = false;
-    
+
     console.log('Starting QR code modal for booking:', bookingId);
-    
+
     // Check if user is still logged in
     if (!this.authService.isLoggedIn()) {
-        console.error('User not logged in');
-        this.toastr.error('Session expired. Please login again.', 'Authentication Error');
-        this.router.navigate(['/login']);
-        return;
+      console.error('User not logged in');
+      this.toastr.error('Session expired. Please login again.', 'Authentication Error');
+      this.router.navigate(['/login']);
+      return;
     }
-    
+
     console.log('Calling confirmBookingWithQR API...');
-    
+
     this.apiService.confirmBookingWithQR(bookingId).subscribe({
-        next: (response) => {
-            console.log('QR generation API response:', response);
-            
-            if (response.status === 'Success' && response.data) {
-                console.log('QR data received:', {
-                    hasQR: !!response.data.qrCodeBase64,
-                    qrLength: response.data.qrCodeBase64?.length || 0,
-                    thankYouMsg: response.data.thankYouMessage,
-                    bookingCode: response.data.bookingCode || response.data.BookingCode
-                });
-                
-                this.qrCodeBase64 = response.data.qrCodeBase64;
-                this.thankYouMessage = response.data.thankYouMessage;
-                this.bookingDetails = response.data.bookingDetails;
-                this.bookingCode = response.data.bookingCode || response.data.BookingCode || '';
-                
-                // Clear all local storage
-                this.clearAllLocalStorage();
-                
-                console.log('Setting showSuccessModal to true');
-                
-                // Use ChangeDetectorRef to ensure view updates
-                setTimeout(() => {
-                    this.showSuccessModal = true;
-                    console.log('showSuccessModal is now:', this.showSuccessModal);
-                    
-                    // Force show toast success
-                    this.toastr.success('Booking confirmed! Your QR code is ready.', 'Success');
-                }, 100);
-                
-            } else {
-                console.warn('QR generation failed with response:', response);
-                this.toastr.success('Payment successful! Please check your bookings for ticket.', 'Success');
-                this.clearAllLocalStorage();
-                
-                // Redirect to bookings page
-                setTimeout(() => {
-                  this.router.navigate(['/events']);
-                }, 2000);
-            }
-        },
-        error: (error) => {
-            console.error('QR generation API error:', {
-                error,
-                status: error?.status,
-                message: error?.message,
-                url: error?.url
-            });
-            
-            // Even if QR generation fails, payment was successful
-            this.toastr.success('Payment successful! Please check your bookings for ticket.', 'Success');
-            this.clearAllLocalStorage();
-            
-            // Redirect to bookings page
-            setTimeout(() => {
-              this.router.navigate(['/events']);
-            }, 2000);
-        },
-        complete: () => {
-            console.log('QR generation API call completed');
+      next: (response) => {
+        console.log('QR generation API response:', response);
+
+        if (response.status === 'Success' && response.data) {
+          console.log('QR data received:', {
+            hasQR: !!response.data.qrCodeBase64,
+            qrLength: response.data.qrCodeBase64?.length || 0,
+            thankYouMsg: response.data.thankYouMessage,
+            bookingCode: response.data.bookingCode || response.data.BookingCode
+          });
+
+          this.qrCodeBase64 = response.data.qrCodeBase64;
+          this.thankYouMessage = response.data.thankYouMessage;
+          this.bookingDetails = response.data.bookingDetails;
+          this.bookingCode = response.data.bookingCode || response.data.BookingCode || '';
+
+          // Clear all local storage
+          this.clearAllLocalStorage();
+
+          console.log('Setting showSuccessModal to true');
+
+          // Use ChangeDetectorRef to ensure view updates
+          setTimeout(() => {
+            this.showSuccessModal = true;
+            console.log('showSuccessModal is now:', this.showSuccessModal);
+
+            // Force show toast success
+            this.toastr.success('Booking confirmed! Your QR code is ready.', 'Success');
+          }, 100);
+
+        } else {
+          console.warn('QR generation failed with response:', response);
+          this.toastr.success('Payment successful! Please check your bookings for ticket.', 'Success');
+          this.clearAllLocalStorage();
+
+          // Redirect to bookings page
+          setTimeout(() => {
+            this.router.navigate(['/events']);
+          }, 2000);
         }
+      },
+      error: (error) => {
+        console.error('QR generation API error:', {
+          error,
+          status: error?.status,
+          message: error?.message,
+          url: error?.url
+        });
+
+        // Even if QR generation fails, payment was successful
+        this.toastr.success('Payment successful! Please check your bookings for ticket.', 'Success');
+        this.clearAllLocalStorage();
+
+        // Redirect to bookings page
+        setTimeout(() => {
+          this.router.navigate(['/events']);
+        }, 2000);
+      },
+      complete: () => {
+        console.log('QR generation API call completed');
+      }
     });
   }
 
@@ -606,7 +688,7 @@ export class EventPaymentComponent implements OnInit {
   //   // Add validation and logging
   //   console.log('Confirming booking with ID:', bookingId);
   //   console.log('Booking ID type:', typeof bookingId);
-    
+
   //   if (!bookingId || bookingId <= 0) {
   //     console.error('Invalid booking ID:', bookingId);
   //     this.toastr.error('Invalid booking ID. Please try again.', 'Error');
@@ -618,25 +700,25 @@ export class EventPaymentComponent implements OnInit {
   //     next: (response) => {
   //       console.log('QR confirmation response:', response);
   //       this.isProcessing = false;
-        
+
   //       if (response.status === 'Success' && response.data) {
   //         // Store QR code data
   //         this.qrCodeBase64 = response.data.qrCodeBase64;
   //         this.thankYouMessage = response.data.thankYouMessage;
   //         this.bookingDetails = response.data.bookingDetails;
   //         this.bookingCode = response.data.BookingCode || response.data.bookingCode;
-          
+
   //         // Show success toast
   //         this.toastr.success('Booking confirmed successfully! QR code generated.', 'Success');
-          
+
   //         // Clear all local storage
   //         this.clearAllLocalStorage();
-          
+
   //         // Show success modal
   //         setTimeout(() => {
   //           this.showSuccessModal = true;
   //         }, 500);
-          
+
   //       } else {
   //         this.toastr.error(response.message || 'Failed to confirm booking', 'Error');
   //         // Fallback: redirect to events page
@@ -653,14 +735,14 @@ export class EventPaymentComponent implements OnInit {
   //         message: error.message,
   //         url: error.url
   //       });
-        
+
   //       // More specific error handling
   //       if (error.status === 400) {
   //         this.toastr.error('Invalid booking ID format. Please try booking again.', 'Error');
   //       } else {
   //         this.toastr.warning('Booking may have been created. Please check your bookings.', 'Warning');
   //       }
-        
+
   //       this.clearAllLocalStorage();
   //       setTimeout(() => {
   //         this.router.navigate(['/events']);

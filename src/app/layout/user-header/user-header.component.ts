@@ -77,6 +77,9 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
         this.isUserLoggedIn = true;
         this.currentUserId = user.user_id;
         this.userFirstName = user.first_name;
+        
+        // Check if we have pending booking after login
+        this.checkPendingBookingAfterLogin();
       } else {
         this.isUserLoggedIn = false;
         this.currentUserId = null;
@@ -100,6 +103,49 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
     // Initial route extraction
     this.currentRoute = this.router.url;
     this.extractRouteParams();
+    
+    // Listen for custom event to open auth modal
+    // window.addEventListener('openAuthModal', this.handleOpenAuthModal.bind(this));
+    
+    // Listen for custom event to open auth modal
+    window.addEventListener('openAuthModal', () => {
+      console.log('Opening auth modal');
+      this.showAuthModal = true;
+      this.resetAuthForms();
+    });
+  }
+
+  // Add this new method to handle the custom event
+  private handleOpenAuthModal(event: any): void {
+    console.log('Received openAuthModal event', event.detail);
+    
+    // Store return URL if provided
+    if (event.detail?.returnUrl) {
+      localStorage.setItem('pending_return_url', event.detail.returnUrl);
+    }
+    
+    // Open the auth modal
+    this.showAuthModal = true;
+    this.resetAuthForms();
+  }
+
+  // Add this new method to check for pending booking after login
+  private checkPendingBookingAfterLogin(): void {
+    // Check if we have temp data in sessionStorage
+    const tempSelections = sessionStorage.getItem('temp_seat_selections');
+    const tempEventId = sessionStorage.getItem('temp_event_id');
+    const tempEventName = sessionStorage.getItem('temp_event_name');
+    
+    console.log('Checking pending booking:', { tempSelections: !!tempSelections, tempEventId, tempEventName });
+    
+    if (tempSelections && tempEventId && tempEventName) {
+      // We have a pending booking - redirect to payment
+      console.log('Redirecting to payment page');
+      this.router.navigate([`/event-payment/${tempEventId}/${tempEventName}`]);
+      
+      // Clear sessionStorage after navigation (payment page will use it)
+      // Don't clear here - payment page will clear after using
+    }
   }
 
   checkAuthStatus(): void {
@@ -670,5 +716,8 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
     if (this.routerSubscription) {
       this.routerSubscription.unsubscribe();
     }
+
+    // Remove custom event listener
+    window.removeEventListener('openAuthModal', this.handleOpenAuthModal.bind(this));
   }
 }
