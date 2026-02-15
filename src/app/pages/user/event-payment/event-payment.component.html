@@ -316,6 +316,21 @@
     </div>
   </div>
 
+  <!-- Add this loader section before the booking success modal -->
+  <!-- Loading Overlay for QR Generation -->
+  <div *ngIf="showQRLoader" class="qr-loader-overlay">
+    <div class="qr-loader-container">
+      <div class="qr-loader-spinner"></div>
+      <div class="qr-loader-text">
+        <h3>Loading QR Code</h3>
+        <p>Please wait while we generate your ticket...</p>
+      </div>
+      <div class="qr-loader-progress">
+        <div class="progress-bar"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- Booking Success Modal -->
   <app-booking-success-modal
     *ngIf="showSuccessModal"

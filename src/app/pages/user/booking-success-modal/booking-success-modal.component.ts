@@ -130,10 +130,26 @@ export class BookingSuccessModalComponent implements OnInit, OnDestroy {
     });
   }
   
+  // viewBookingDetails(): void {
+  //   this.closeModal();
+  //   if (this.bookingDetails?.booking_id) {
+  //     this.router.navigate(['/booking-details', this.bookingDetails.booking_id]);
+  //   } else {
+  //     this.router.navigate(['/my-bookings']);
+  //   }
+  // }
+
   viewBookingDetails(): void {
     this.closeModal();
-    if (this.bookingDetails?.booking_id) {
-      this.router.navigate(['/booking-details', this.bookingDetails.booking_id]);
+    
+    if (this.bookingDetails?.user_id) {
+      // Navigate with state object (data won't appear in URL)
+      this.router.navigate(['/my-bookings', this.bookingDetails.user_id], {
+        state: { 
+          bookingCode: this.bookingCode,
+          fromSuccessModal: true 
+        }
+      });
     } else {
       this.router.navigate(['/my-bookings']);
     }

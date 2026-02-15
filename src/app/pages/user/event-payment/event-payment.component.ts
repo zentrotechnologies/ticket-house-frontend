@@ -71,6 +71,7 @@ export class EventPaymentComponent implements OnInit {
   thankYouMessage: string = '';
   bookingDetails: any = null;
   bookingCode: string = '';
+  showQRLoader = false;
 
   constructor(
     private router: Router,
@@ -605,6 +606,7 @@ export class EventPaymentComponent implements OnInit {
 
   showQRCodeModal(bookingId: number): void {
     this.isProcessing = false;
+    this.showQRLoader = true; // Show the QR loader overlay
 
     console.log('Starting QR code modal for booking:', bookingId);
 
@@ -641,16 +643,32 @@ export class EventPaymentComponent implements OnInit {
           console.log('Setting showSuccessModal to true');
 
           // Use ChangeDetectorRef to ensure view updates
-          setTimeout(() => {
-            this.showSuccessModal = true;
-            console.log('showSuccessModal is now:', this.showSuccessModal);
+          // setTimeout(() => {
+          //   this.showSuccessModal = true;
+          //   console.log('showSuccessModal is now:', this.showSuccessModal);
 
-            // Force show toast success
-            this.toastr.success('Booking confirmed! Your QR code is ready.', 'Success');
-          }, 100);
+          //   // Force show toast success
+          //   this.toastr.success('Booking confirmed! Your QR code is ready.', 'Success');
+          // }, 100);
+
+           // Hide loader and show success modal after a small delay for smooth transition
+          setTimeout(() => {
+            this.showQRLoader = false; // Hide loader first
+            
+            // Small delay before showing modal for better UX
+            setTimeout(() => {
+              this.showSuccessModal = true;
+              console.log('showSuccessModal is now:', this.showSuccessModal);
+              
+              // Force show toast success
+              this.toastr.success('Booking confirmed! Your QR code is ready.', 'Success');
+            }, 100);
+          }, 500); // Show loader for at least 500ms for better UX
+
 
         } else {
           console.warn('QR generation failed with response:', response);
+          this.showQRLoader = false;
           this.toastr.success('Payment successful! Please check your bookings for ticket.', 'Success');
           this.clearAllLocalStorage();
 
@@ -671,6 +689,7 @@ export class EventPaymentComponent implements OnInit {
         // Even if QR generation fails, payment was successful
         this.toastr.success('Payment successful! Please check your bookings for ticket.', 'Success');
         this.clearAllLocalStorage();
+        this.showQRLoader = false;
 
         // Redirect to bookings page
         setTimeout(() => {
@@ -1210,5 +1229,7 @@ export class EventPaymentComponent implements OnInit {
   ngOnDestroy(): void {
     // Clean up localStorage when leaving page
     this.clearAllLocalStorage();
+    // Ensure loader is hidden
+    this.showQRLoader = false;
   }
 }
