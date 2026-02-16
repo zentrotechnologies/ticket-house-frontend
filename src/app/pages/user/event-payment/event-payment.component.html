@@ -316,6 +316,16 @@
     </div>
   </div>
 
+  <!-- Add this right before the booking success modal -->
+  <!-- Payment Processing Modal -->
+  <div *ngIf="showProcessingModal" class="processing-modal-overlay">
+    <div class="processing-modal-content">
+      <div class="processing-spinner"></div>
+      <p class="processing-text">Please wait while we generate your ticket and QR code...</p>
+      <p class="processing-subtext">This may take a few moments</p>
+    </div>
+  </div>
+
   <!-- Booking Success Modal -->
   <app-booking-success-modal
     *ngIf="showSuccessModal"

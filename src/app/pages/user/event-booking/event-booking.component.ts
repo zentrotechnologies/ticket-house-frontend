@@ -638,4 +638,22 @@ export class EventBookingComponent implements OnInit {
   closeImageModal() {
     this.isImageModalOpen = false;
   }
+
+  openPrivacyPolicy(): void {
+    // Open privacy policy in a new tab
+    const url = this.router.createUrlTree(['/privacy-policy']).toString();
+    window.open(url, '_blank');
+  }
+
+  openTermsConditions(): void {
+    // Open terms & conditions in a new tab
+    const url = this.router.createUrlTree(['/terms-conditions']).toString();
+    window.open(url, '_blank');
+  }
+
+  openRefundPolicy(): void {
+    // Open refund policy in a new tab
+    const url = this.router.createUrlTree(['/refund-policy']).toString();
+    window.open(url, '_blank');
+  }
 }

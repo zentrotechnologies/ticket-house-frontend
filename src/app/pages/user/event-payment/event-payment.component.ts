@@ -71,6 +71,7 @@ export class EventPaymentComponent implements OnInit {
   thankYouMessage: string = '';
   bookingDetails: any = null;
   bookingCode: string = '';
+  showProcessingModal = false;
 
   constructor(
     private router: Router,
@@ -678,6 +679,9 @@ export class EventPaymentComponent implements OnInit {
           // Store booking ID for QR generation
           this.bookingId = bookingId;
 
+          // Show processing modal while generating QR
+          this.showProcessingModal = true;
+
           // Show QR code modal directly
           this.showQRCodeModal(bookingId);
 
@@ -719,6 +723,7 @@ export class EventPaymentComponent implements OnInit {
     if (!this.authService.isLoggedIn()) {
       console.error('User not logged in');
       this.toastr.error('Session expired. Please login again.', 'Authentication Error');
+      this.showProcessingModal = false; // Hide processing modal
       this.router.navigate(['/login']);
       return;
     }
@@ -749,6 +754,7 @@ export class EventPaymentComponent implements OnInit {
 
           // Use ChangeDetectorRef to ensure view updates
           setTimeout(() => {
+            this.showProcessingModal = false; // Hide processing modal
             this.showSuccessModal = true;
             console.log('showSuccessModal is now:', this.showSuccessModal);
 
@@ -758,6 +764,7 @@ export class EventPaymentComponent implements OnInit {
 
         } else {
           console.warn('QR generation failed with response:', response);
+          this.showProcessingModal = false; // Hide processing modal
           this.toastr.success('Payment successful! Please check your bookings for ticket.', 'Success');
           this.clearAllLocalStorage();
 
@@ -774,6 +781,8 @@ export class EventPaymentComponent implements OnInit {
           message: error?.message,
           url: error?.url
         });
+
+        this.showProcessingModal = false; // Hide processing modal
 
         // Even if QR generation fails, payment was successful
         this.toastr.success('Payment successful! Please check your bookings for ticket.', 'Success');
@@ -860,6 +869,7 @@ export class EventPaymentComponent implements OnInit {
 
   // Method to handle success modal close
   onSuccessModalClose(): void {
+    this.showProcessingModal = false; // Ensure processing modal is hidden
     this.showSuccessModal = false;
     this.router.navigate(['/events']);
   }
@@ -1317,5 +1327,6 @@ export class EventPaymentComponent implements OnInit {
   ngOnDestroy(): void {
     // Clean up localStorage when leaving page
     this.clearAllLocalStorage();
+    this.showProcessingModal = false; // Ensure processing modal is hidden
   }
 }

@@ -439,3 +439,109 @@
     border: 1px solid #ddd;
   }
 }
+
+/* Processing Modal Styles */
+.processing-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+}
+
+.processing-modal-content {
+  background: var(--card-dark);
+  padding: 40px;
+  border-radius: var(--radius);
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  animation: slideUp 0.3s ease;
+}
+
+.processing-spinner {
+  width: 60px;
+  height: 60px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-top-color: rgb(226, 54, 163);
+  border-right-color: rgb(146, 52, 234);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 24px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.processing-text {
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.processing-subtext {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Ensure the spinner uses your theme colors */
+.processing-spinner {
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #e236a3;  /* Pink from your theme */
+  border-right-color: #9234ea; /* Purple from your theme */
+  border-bottom-color: #ef4343; /* Red from your theme */
+  border-left-color: transparent;
+  animation: spin 1s ease-in-out infinite;
+}
+
+/* Responsive styles */
+@media (max-width: 480px) {
+  .processing-modal-content {
+    padding: 30px 20px;
+    width: 85%;
+  }
+  
+  .processing-spinner {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 20px;
+  }
+  
+  .processing-text {
+    font-size: 16px;
+  }
+  
+  .processing-subtext {
+    font-size: 13px;
+  }
+}

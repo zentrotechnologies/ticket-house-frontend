@@ -300,9 +300,12 @@
                         <h4 class="footer-title">Support</h4>
                         <ul class="footer-links-list">
                             <li><a href="#">Help & Support</a></li>
-                            <li><a href="#">Terms & Conditions</a></li>
+                            <!-- <li><a href="#">Terms & Conditions</a></li>
                             <li><a href="#">Privacy Policy</a></li>
-                            <li><a href="#">Refund Policy</a></li>
+                            <li><a href="#">Refund Policy</a></li> -->
+                            <li><a (click)="openTermsConditions()" style="cursor: pointer;">Terms & Conditions</a></li>
+                            <li><a (click)="openPrivacyPolicy()" style="cursor: pointer;">Privacy Policy</a></li>
+                            <li><a (click)="openRefundPolicy()" style="cursor: pointer;">Refund Policy</a></li>
                         </ul>
                     </div>
 
