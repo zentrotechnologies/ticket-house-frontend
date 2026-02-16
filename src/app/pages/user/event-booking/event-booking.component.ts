@@ -34,6 +34,10 @@ export class EventBookingComponent implements OnInit {
   isPriceLoading = false;
 
   isTermsModalOpen: boolean = false; // Add this property
+  eventHighlights: string[] = []; // Populate from your data
+  eventArtists: any[] = []; // Populate from your data
+  isImageModalOpen = false;
+  selectedImage = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -515,7 +519,7 @@ export class EventBookingComponent implements OnInit {
       return `₹${this.eventDetails.min_price}`;
     }
 
-    return 'Free';
+    return '';
   }
 
   getPriceRangeDisplay(): string {
@@ -623,5 +627,15 @@ export class EventBookingComponent implements OnInit {
     if (this.isTermsModalOpen) {
       this.closeTermsModal();
     }
+  }
+
+  // Add these methods
+  // openImageModal(imageUrl: string) {
+  //   this.selectedImage = imageUrl;
+  //   this.isImageModalOpen = true;
+  // }
+
+  closeImageModal() {
+    this.isImageModalOpen = false;
   }
 }

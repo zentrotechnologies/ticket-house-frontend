@@ -1,616 +1,1082 @@
+/* signup.component.css - Rock Night Theme - COMPACT VERSION with column gaps */
+
+/* Import Rock Night variables if not already in global scope */
+:root {
+  --bg-dark: #0f0f14;
+  --card-dark: #17171f;
+  --text-light: #ffffff;
+  --text-muted: #b3b3c6;
+  --text-muted-secondary: #8a8aa3;
+  --gradient-main: linear-gradient(135deg, rgb(146, 52, 234) 0%, rgb(226, 54, 163) 50%, rgb(239, 67, 67) 100%);
+  --gradient-hover: linear-gradient(135deg, rgb(166, 72, 254) 0%, rgb(246, 74, 183) 50%, rgb(255, 87, 87) 100%);
+  --radius: 16px;
+  --radius-sm: 8px;
+  --transition: 0.3s ease;
+  --shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  --shadow-hover: 0 30px 50px rgba(146, 52, 234, 0.3);
+}
+
 * {
-    /* margin: 0;
-    padding: 0; */
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f9fa;
-    color: #333;
-    line-height: 1.6;
-    overflow-x: hidden;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-dark);
+  color: var(--text-light);
+  line-height: 1.5;
+  overflow-x: hidden;
 }
 
 .container-fluid {
-    padding: 0;
-    height: 100vh;
-    overflow: hidden;
+  padding: 0;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-dark);
 }
 
 .row {
-    height: 100%;
-    margin: 0;
+  height: 100%;
+  margin: 0;
 }
 
-/* Left Panel */
+/* Left Panel - Dark background with gradient overlay (MATCHES LOGIN) */
 .left-panel {
-    background: linear-gradient(135deg, #2c2e72 0%, #4896d1 100%);
-    color: white;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    padding: 0;
+  background: #0a0a12;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(146, 52, 234, 0.15) 0%, transparent 30%),
+    radial-gradient(circle at 90% 70%, rgba(226, 54, 163, 0.15) 0%, transparent 35%),
+    radial-gradient(circle at 30% 80%, rgba(239, 67, 67, 0.1) 0%, transparent 40%),
+    repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 2px, transparent 2px, transparent 6px);
+  color: white;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Animated gradient overlay */
+.left-panel::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 60%);
+  animation: rotate 25s linear infinite;
+  pointer-events: none;
+}
+
+/* Subtle gradient border */
+.left-panel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  pointer-events: none;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .main-img {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Logo container with enhanced visibility (MATCHES LOGIN) */
+.sign-logo {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.sign-logo::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 3px;
+  background: var(--gradient-main);
+  border-radius: 3px;
 }
 
 .sign-logo img {
-    max-width: 200px;
-    height: auto;
-    background-color: white;
+  max-width: 220px;
+  height: auto;
+  filter: 
+    drop-shadow(0 15px 25px rgba(0, 0, 0, 0.5))
+    brightness(1.2);
+  animation: float 4s ease-in-out infinite;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 10px 20px;
+  border-radius: 50px;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+
+/* Decorative elements (MATCHES LOGIN) */
+.decorative-illustration {
+  position: relative;
+  margin-top: 2rem;
+}
+
+/* Decorative circles */
+.decorative-illustration::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  left: -20px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(146, 52, 234, 0.2), transparent 70%);
+  z-index: -1;
+}
+
+.decorative-illustration::after {
+  content: '';
+  position: absolute;
+  bottom: -20px;
+  right: -20px;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(226, 54, 163, 0.15), transparent 70%);
+  z-index: -1;
+}
+
+/* Welcome text with better contrast (MATCHES LOGIN) */
+.img-text {
+  position: relative;
+  z-index: 2;
+  background: rgba(10, 10, 18, 0.6);
+  backdrop-filter: blur(8px);
+  padding: 18px 25px;
+  border-radius: 60px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+.img-text h5 {
+  font-size: 26px;
+  font-weight: 800;
+  margin-bottom: 5px;
+  text-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(135deg, #ffffff, #f0f0f0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.img-text p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.3px;
 }
 
 /* Right Panel */
 .sign-up {
-    padding: 35rem 2rem; /* Fixed: Changed from 35rem to 2rem */
-    max-width: 600px;
-    margin: 0 auto;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    overflow-y: auto; /* Allow scrolling only if content exceeds viewport */
+  padding: 1.5rem;
+  max-width: 600px;
+  margin: 0 auto;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: var(--bg-dark);
+  position: relative;
+  overflow-y: auto;
 }
 
-/* Hide scrollbar for Chrome, Safari and Opera */
+/* Hide scrollbar */
 .sign-up::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 
-/* Hide scrollbar for IE, Edge and Firefox */
 .sign-up {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
+/* Form Heading (MATCHES LOGIN) */
 .form-heading-text {
-    text-align: center;
-    margin-bottom: 2rem;
+  text-align: center;
+  margin-bottom: 1.25rem;
 }
 
 .form-heading-text h4 {
-    font-weight: 700;
-    color: #2c2e72;
-    font-size: 1.8rem;
+  font-weight: 800;
+  font-size: 1.6rem;
+  margin-bottom: 0.25rem;
+  background: var(--gradient-main);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .form-heading-text p {
-    color: #6c757d;
-    margin-top: 0.5rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
 }
 
-/* Step Indicator */
+/* Step Indicator - Rock Night Themed */
 .step-indicator {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 2rem;
-    position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  position: relative;
 }
 
 .step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
 }
 
 .step .circle {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: #EBEDF1;
-    color: #6E6E6E;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    transition: all 0.3s ease;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--card-dark);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+  transition: var(--transition);
+  border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
 .step.active .circle {
-    background: #4896d1;
-    color: white;
+  background: var(--gradient-main);
+  color: white;
+  border-color: transparent;
+  box-shadow: var(--shadow);
 }
 
 .step-details {
-    font-size: 0.85rem;
-    color: #6c757d;
-    text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
 }
 
 .step.active .step-details {
-    color: #4896d1;
-    font-weight: 500;
+  color: white;
+  font-weight: 500;
 }
 
 .step-line {
-    flex: 1;
-    height: 2px;
-    background: #EBEDF1;
-    margin: 0 1rem;
-    position: relative;
-    top: -20px;
+  flex: 1;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0 0.75rem;
+  position: relative;
+  top: -15px;
 }
 
 .step.active + .step-line {
-    background: #4896d1;
+  background: var(--gradient-main);
 }
 
 /* Form Steps */
 .form-step {
-    display: none;
+  display: none;
 }
 
 .form-step.active {
-    display: block;
-    animation: fadeIn 0.5s ease;
+  display: block;
+  animation: fadeIn 0.5s ease;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* Form Inputs */
+/* COMPACT FORM INPUTS - with gaps between columns */
+.row {
+  margin-right: -8px;
+  margin-left: -8px;
+}
+
+.row > [class*="col-"] {
+  padding-right: 8px;
+  padding-left: 8px;
+}
+
 .input_wrap {
-    position: relative;
-    margin-bottom: 1rem;
+  position: relative;
+  margin-bottom: 0.75rem;
 }
 
 .sign-form-input {
-    width: 100%;
-    padding: 12px 16px;
-    border: 1px solid #DEE2E9;
-    border-radius: 12px;
-    font-size: 16px;
-    background-color: #fff;
-    transition: all 0.3s ease;
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  background: var(--card-dark);
+  color: var(--text-light);
+  transition: var(--transition);
+  height: 44px;
 }
 
 .sign-form-input:focus {
-    border-color: #4896d1;
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(72, 150, 209, 0.1);
+  border-color: rgb(146, 52, 234);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(146, 52, 234, 0.2);
+}
+
+.sign-form-input::placeholder {
+  color: transparent;
 }
 
 .input_wrap label {
-    position: absolute;
-    top: 12px;
-    left: 16px;
-    font-size: 16px;
-    color: #67779A;
-    pointer-events: none;
-    transition: all 0.3s ease;
-    background-color: #fff;
-    padding: 0 4px;
+  position: absolute;
+  top: 10px;
+  left: 14px;
+  font-size: 14px;
+  color: var(--text-muted);
+  pointer-events: none;
+  transition: var(--transition);
+  background: var(--card-dark);
+  padding: 0 4px;
+  border-radius: 4px;
 }
 
 .sign-form-input:focus + label,
 .sign-form-input:not(:placeholder-shown) + label {
-    top: -10px;
-    font-size: 14px;
-    color: #4896d1;
+  top: -8px;
+  font-size: 11px;
+  color: rgb(146, 52, 234);
+  background: var(--card-dark);
+  line-height: 1;
 }
 
+/* Required field asterisk */
 .text-danger {
-    color: #4896d1;
+  color: rgb(239, 67, 67) !important;
+  margin-left: 2px;
 }
 
-/* Error Messages - Change from blue to red */
+/* Error Messages */
 .error-message {
-    color: #dc3545; /* Changed from #4896d1 to red */
-    font-size: 0.85rem;
-    margin-top: 5px;
-    display: none;
+  color: rgb(239, 67, 67);
+  font-size: 0.7rem;
+  margin-top: 2px;
+  display: none;
+  padding-left: 5px;
 }
 
 .sign-form-input.invalid {
-    border-color: #dc3545; /* Changed from #4896d1 to red */
+  border-color: rgb(239, 67, 67);
 }
 
 .sign-form-input.invalid + label {
-    color: #dc3545; /* Changed from #4896d1 to red */
+  color: rgb(239, 67, 67);
 }
 
 .sign-form-input.invalid ~ .error-message {
-    display: block;
+  display: block;
 }
 
-/* Required field asterisk color */
-.text-danger {
-    color: #dc3545 !important; /* Changed from #4896d1 to red */
-}
-
-/* Toastr error colors */
-.toast-error {
-  background-color: #dc3545;
-  border-left: 4px solid #c82333;
-}
-
-/* Focus states for invalid fields */
-.sign-form-input.invalid:focus {
-    border-color: #dc3545;
-    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.1); /* Red shadow */
-}
-
-/* Buttons */
-.form-buttons {
-    display: flex;
-    gap: 15px;
-    margin-top: 1.5rem;
-}
-
-.prev-step {
-    color: #2c2e72;
-    font-size: 16px;
-    font-weight: 500;
-    line-height: 22px;
-    padding: 12px 8px;
-    border-radius: 12px;
-    border: 1px solid #4896d1;
-    background: #FAFAFC;
-    width: 100%;
-    transition: all 0.3s ease;
-}
-
-.prev-step:hover {
-    background-color: #f0f0f0;
-    border-color: #2c2e72;
-}
-
-.next-step {
-    padding: 12px 8px;
-    border-radius: 12px;
-    background: #4896d1;
-    border: none;
-    text-align: center;
-    color: #FFF;
-    font-size: 16px;
-    font-weight: 500;
-    line-height: 22px;
-    width: 100%;
-    transition: all 0.3s ease;
-}
-
-.next-step:hover {
-    background: #3a7db3;
-}
-
-.sign-up-btn {
-    padding: 12px 8px;
-    border-radius: 12px;
-    background: #2c2e72;
-    border: none;
-    text-align: center;
-    color: #FFF;
-    font-size: 16px;
-    font-weight: 500;
-    line-height: 22px;
-    width: 100%;
-    transition: all 0.3s ease;
-}
-
-.sign-up-btn:hover {
-    background: #24255d;
-}
-
-/* Have Account Section */
-.have-acct {
-    padding-top: 1.5rem;
-    border-top: 1px solid #eee;
-    margin-top: auto; /* Push to bottom */
-}
-
-.have-acct-text {
-    color: #6c757d;
-    margin-bottom: 0.5rem;
-}
-
-.sign-IN a {
-    color: #4896d1;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.3s ease;
-}
-
-.sign-IN a:hover {
-    color: #2c2e72;
-    text-decoration: underline;
-}
-
-/* Social Links Section */
-.social-links h6 {
-    color: #2c2e72;
-    margin-bottom: 1rem;
-    font-weight: 600;
-}
-
-/* Toggle Password Icon */
+/* Toggle Password Icon (MATCHES LOGIN) */
 .toggle-eye-icon {
-    position: absolute;
-    top: 50%;
-    right: 12px;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #6c757d;
-    z-index: 2;
-    transition: color 0.3s ease;
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: var(--text-muted);
+  z-index: 2;
+  transition: var(--transition);
+  font-size: 16px;
 }
 
 .toggle-eye-icon:hover {
-    color: #4896d1;
+  color: rgb(226, 54, 163);
 }
 
 /* Dropdown Styling */
 .input-dropdown {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%234896d1' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 16px center;
-    padding-right: 40px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%23e236a3' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 35px;
 }
 
 .calender-icon {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%234896d1' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 16px center;
-    padding-right: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%23e236a3' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 35px;
 }
 
 /* Hide default calendar icon */
 .calender-icon::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+/* Buttons - Rock Night Themed */
+.form-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 1rem;
+}
+
+.prev-step {
+  width: 100%;
+  padding: 10px;
+  border-radius: 30px;
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-light);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  transition: var(--transition);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  height: 42px;
+}
+
+.prev-step::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.prev-step:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+  border-color: rgb(226, 54, 163);
+  background: rgba(226, 54, 163, 0.1);
+}
+
+.prev-step:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.prev-step:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.next-step, .sign-up-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 30px;
+  background: var(--gradient-main);
+  border: none;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  transition: var(--transition);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  height: 42px;
+}
+
+.next-step::before, .sign-up-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.next-step:hover:not(:disabled), .sign-up-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+  background: var(--gradient-hover);
+}
+
+.next-step:hover:not(:disabled)::before, .sign-up-btn:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.next-step:disabled, .sign-up-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Have Account Section (MATCHES LOGIN) */
+.have-acct {
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 1rem;
+}
+
+.have-acct-text {
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.sign-IN a {
+  color: rgb(226, 54, 163);
+  text-decoration: none;
+  font-weight: 700;
+  transition: var(--transition);
+  position: relative;
+  padding: 4px 8px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+}
+
+.sign-IN a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 8px;
+  right: 8px;
+  height: 2px;
+  background: var(--gradient-main);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.sign-IN a:hover {
+  color: rgb(146, 52, 234);
+}
+
+.sign-IN a:hover::after {
+  transform: scaleX(1);
+}
+
+/* Social Links Section */
+.social-links {
+  margin-bottom: 1rem;
+}
+
+.social-links h6 {
+  color: white;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-left: 0;
+}
+
+/* Email Verification Section - COMPACT */
+.email-verification-section {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.email-verification-section h6 {
+  color: white;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.email-verification-section .input_wrap {
+  margin-bottom: 0.5rem;
+}
+
+.verification-status .alert {
+  background: rgba(146, 52, 234, 0.1);
+  border: 1px solid rgba(146, 52, 234, 0.3);
+  color: var(--text-light);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+  margin-bottom: 0;
+}
+
+.verification-status i {
+  color: rgb(146, 52, 234);
+  font-size: 0.9rem;
+}
+
+/* OTP Modal Styles - Rock Night Themed */
+.modal-backdrop {
+  z-index: 1040;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  z-index: 1050;
+}
+
+.modal-content {
+  background: var(--card-dark);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.modal-header {
+  background: var(--gradient-main);
+  color: white;
+  border-radius: var(--radius) var(--radius) 0 0;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-header .modal-title {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.modal-header .btn-close {
+  filter: invert(1) brightness(200%);
+  opacity: 0.8;
+  transition: var(--transition);
+  font-size: 0.8rem;
+}
+
+.modal-header .btn-close:hover {
+  opacity: 1;
+  transform: rotate(90deg);
+}
+
+.modal-body {
+  padding: 1.25rem;
+  color: var(--text-light);
+}
+
+.modal-body .text-primary {
+  color: rgb(146, 52, 234) !important;
+}
+
+.modal-body .text-muted {
+  color: var(--text-muted) !important;
+}
+
+/* OTP Input Styles */
+.otp-container {
+  padding: 0 1rem;
+}
+
+.otp-input {
+  height: 45px;
+  font-size: 1.25rem;
+  font-weight: bold;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  background: var(--card-dark);
+  color: var(--text-light);
+  transition: var(--transition);
+  text-align: center;
+  padding: 0;
+}
+
+.otp-input:focus {
+  border-color: rgb(146, 52, 234);
+  box-shadow: 0 0 0 2px rgba(146, 52, 234, 0.3);
+  outline: none;
+}
+
+.otp-input:not(:placeholder-shown) {
+  border-color: rgb(226, 54, 163);
+}
+
+/* Modal Footer */
+.modal-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem 1.25rem;
+}
+
+.modal-footer .btn {
+  padding: 8px 20px;
+  border-radius: 30px;
+  font-weight: 600;
+  transition: var(--transition);
+  font-size: 0.9rem;
+}
+
+.modal-footer .btn-secondary {
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-light);
+}
+
+.modal-footer .btn-secondary:hover:not(:disabled) {
+  border-color: rgb(226, 54, 163);
+  background: rgba(226, 54, 163, 0.1);
+  transform: translateY(-2px);
+}
+
+.modal-footer .btn-primary {
+  background: var(--gradient-main);
+  border: none;
+  color: white;
+}
+
+.modal-footer .btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+  background: var(--gradient-hover);
+}
+
+.modal-footer .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Countdown timer */
+.text-warning {
+  color: #ff9800 !important;
+  animation: pulse 2s infinite;
+  font-size: 0.9rem;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+/* Loading Spinner */
+.fa-spinner {
+  animation: spin 1s linear infinite;
+  font-size: 0.9rem;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Animation for form elements */
+.sign-up form {
+  animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+  from {
     opacity: 0;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    cursor: pointer;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* Responsive Design */
-@media (max-width: 991.98px) {
-    .container-fluid {
-        height: auto;
-        overflow: visible;
-    }
-    
-    .row {
-        height: auto;
-    }
-    
-    .left-panel {
-        height: 300px;
-        min-height: 300px;
-    }
-    
-    .sign-up {
-        height: auto;
-        padding: 1.5rem;
-        justify-content: flex-start;
-    }
+/* Input animation */
+.input_wrap {
+  animation: slideIn 0.4s ease;
+  animation-fill-mode: both;
 }
 
-@media (max-width: 767.98px) {
-    .form-buttons {
-        flex-direction: column;
-    }
-    
-    .step-indicator {
-        margin-bottom: 1.5rem;
-    }
-    
-    .step .circle {
-        width: 35px;
-        height: 35px;
-        font-size: 0.9rem;
-    }
-    
-    .step-details {
-        font-size: 0.8rem;
-    }
-    
-    .sign-up {
-        padding: 1rem;
-    }
-    
-    .form-heading-text h4 {
-        font-size: 1.5rem;
-    }
-}
+.input_wrap:nth-child(1) { animation-delay: 0.05s; }
+.input_wrap:nth-child(2) { animation-delay: 0.1s; }
+.input_wrap:nth-child(3) { animation-delay: 0.15s; }
+.input_wrap:nth-child(4) { animation-delay: 0.2s; }
 
-/* Additional fixes for mobile devices */
-@media (max-height: 700px) {
-    .sign-up {
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-    }
-    
-    .form-heading-text {
-        margin-bottom: 1.5rem;
-    }
-    
-    .step-indicator {
-        margin-bottom: 1.5rem;
-    }
-}
-
-/* Loading state for buttons */
-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* Focus states for accessibility */
 button:focus,
 .sign-form-input:focus,
-.input-dropdown:focus {
-    outline: 2px solid #4896d1;
-    outline-offset: 2px;
-}
-
-/* .toast-container .ngx-toastr {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-radius: 8px;
-  padding: 16px;
-}
-
-.toast-success {
-  background-color: #28a745;
-  border-left: 4px solid #1e7e34;
-}
-
-.toast-error {
-  background-color: #dc3545;
-  border-left: 4px solid #c82333;
-}
-
-.toast-warning {
-  background-color: #ffc107;
-  border-left: 4px solid #e0a800;
-  color: #212529;
-}
-
-.toast-info {
-  background-color: #17a2b8;
-  border-left: 4px solid #138496;
-} */
-
-/* Custom toastr styles */
-.toast-container .ngx-toastr {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-radius: 8px;
-  padding: 16px 20px;
-  font-family: inherit;
-}
-
-.toast-success {
-  background-color: #28a745;
-  border-left: 4px solid #1e7e34;
-  color: white;
-}
-
-.toast-error {
-  background-color: #dc3545;
-  border-left: 4px solid #c82333;
-  color: white;
-}
-
-.toast-warning {
-  background-color: #ffc107;
-  border-left: 4px solid #e0a800;
-  color: #212529;
-}
-
-.toast-info {
-  background-color: #17a2b8;
-  border-left: 4px solid #138496;
-  color: white;
-}
-
-.toast-progress {
-  height: 3px;
-}
-
-/* OTP Modal Styles */
-.modal-backdrop {
-    z-index: 1040;
-}
-
-.modal {
-    z-index: 1050;
-}
-
-.modal-content {
-    border: none;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-}
-
-.modal-header {
-    border-bottom: 1px solid #dee2e6;
-    background: linear-gradient(135deg, #2c2e72 0%, #4896d1 100%);
-    color: white;
-    border-radius: 12px 12px 0 0;
-}
-
-.modal-header .btn-close {
-    filter: invert(1);
-}
-
-/* OTP Input Styles */
-.otp-container {
-    padding: 0 2rem;
-}
-
-.otp-input {
-    height: 60px;
-    font-size: 1.5rem;
-    font-weight: bold;
-    border: 2px solid #dee2e6;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
-
+.input-dropdown:focus,
 .otp-input:focus {
-    border-color: #4896d1;
-    box-shadow: 0 0 0 2px rgba(72, 150, 209, 0.2);
-    outline: none;
+  outline: 2px solid rgb(146, 52, 234);
+  outline-offset: 2px;
 }
 
-.otp-input:not(:placeholder-shown) {
-    border-color: #28a745;
+/* Responsive Design */
+@media (max-width: 991.98px) {
+  .container-fluid {
+    height: auto;
+    overflow: visible;
+  }
+  
+  .row {
+    height: auto;
+  }
+  
+  .left-panel {
+    height: 280px;
+    min-height: 280px;
+  }
+  
+  .sign-up {
+    height: auto;
+    padding: 1.25rem;
+    justify-content: flex-start;
+  }
+  
+  .main-img {
+    padding: 0.75rem;
+  }
+  
+  .sign-logo img {
+    max-width: 180px;
+    padding: 8px 16px;
+  }
+  
+  .img-text {
+    padding: 12px 18px;
+  }
+  
+  .img-text h5 {
+    font-size: 22px;
+  }
+  
+  .img-text p {
+    font-size: 13px;
+  }
 }
 
-/* Email Verification Section */
-.email-verification-section {
-    background-color: #f8f9fa;
-    border: 1px solid #e9ecef !important;
-}
-
-.verification-status .alert {
+@media (max-width: 767.98px) {
+  .form-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .step-indicator {
+    margin-bottom: 1rem;
+  }
+  
+  .step .circle {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+  
+  .step-details {
+    font-size: 0.7rem;
+  }
+  
+  .sign-up {
+    padding: 1rem;
+  }
+  
+  .form-heading-text h4 {
+    font-size: 1.4rem;
+  }
+  
+  .sign-form-input {
+    padding: 8px 12px;
+    font-size: 13px;
+    height: 40px;
+  }
+  
+  .input_wrap label {
+    top: 8px;
+    left: 12px;
+    font-size: 13px;
+  }
+  
+  .sign-form-input:focus + label,
+  .sign-form-input:not(:placeholder-shown) + label {
+    top: -7px;
+    font-size: 10px;
+  }
+  
+  .img-text h5 {
+    font-size: 20px;
+  }
+  
+  .img-text p {
+    font-size: 12px;
+  }
+  
+  .otp-container {
+    padding: 0 0.5rem;
+  }
+  
+  .otp-input {
+    height: 40px;
+    font-size: 1.1rem;
+  }
+  
+  .social-links .row {
     margin-bottom: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .sign-up {
+    padding: 0.75rem;
+  }
+  
+  .form-heading-text h4 {
+    font-size: 1.3rem;
+  }
+  
+  .form-heading-text p {
+    font-size: 0.8rem;
+  }
+  
+  .sign-logo img {
+    max-width: 150px;
+    padding: 6px 12px;
+  }
+  
+  .img-text {
+    padding: 10px 15px;
+  }
+  
+  .img-text h5 {
+    font-size: 18px;
+  }
+  
+  .img-text p {
+    font-size: 11px;
+  }
+  
+  .step .circle {
+    width: 24px;
+    height: 24px;
+    font-size: 0.7rem;
+  }
+  
+  .step-details {
+    font-size: 0.65rem;
+  }
+  
+  .step-line {
+    margin: 0 0.4rem;
+    top: -12px;
+  }
+  
+  .prev-step, .next-step, .sign-up-btn {
+    padding: 8px;
+    font-size: 13px;
+    height: 38px;
+  }
+  
+  .otp-container {
+    padding: 0;
+  }
+  
+  .otp-input {
+    height: 35px;
+    font-size: 1rem;
+  }
+  
+  .modal-body {
+    padding: 1rem;
+  }
+  
+  .modal-footer {
     padding: 0.75rem 1rem;
-    border-radius: 8px;
+  }
+  
+  .modal-footer .btn {
+    padding: 6px 15px;
+    font-size: 0.8rem;
+  }
+  
+  .social-links h6 {
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .email-verification-section {
+    padding: 0.75rem;
+  }
+  
+  .email-verification-section h6 {
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+  }
 }
 
-/* Responsive OTP */
-@media (max-width: 576px) {
-    .otp-input {
-        height: 50px;
-        font-size: 1.25rem;
-    }
-    
-    .otp-container {
-        padding: 0 1rem;
-    }
+/* Additional fixes for mobile devices */
+@media (max-height: 700px) {
+  .sign-up {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+  
+  .form-heading-text {
+    margin-bottom: 1rem;
+  }
+  
+  .input_wrap {
+    margin-bottom: 0.5rem;
+  }
+  
+  .step-indicator {
+    margin-bottom: 1rem;
+  }
+  
+  .sign-logo {
+    margin-bottom: 0.75rem;
+  }
+  
+  .email-verification-section {
+    margin-bottom: 0.75rem;
+    padding: 0.75rem;
+  }
+  
+  .social-links {
+    margin-bottom: 0.75rem;
+  }
 }
 
-/* Button loading states */
-.btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+/* Remove default Bootstrap focus styles */
+.form-control:focus {
+  box-shadow: none;
 }
 
-/* Countdown animation */
-@keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
-}
-
-.text-warning {
-    animation: pulse 2s infinite;
+/* Smooth transitions */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }

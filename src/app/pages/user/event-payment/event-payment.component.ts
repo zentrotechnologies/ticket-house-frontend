@@ -512,6 +512,13 @@ export class EventPaymentComponent implements OnInit {
       return;
     }
 
+    // Rock Night Theme Colors - Simple Version
+    const rockNightColors = {
+      primary: '#9234ea',      // Purple
+      secondary: '#e236a3',    // Pink  
+      accent: '#ef4343',        // Red
+    };
+
     const options = {
       key: razorpayKey,
       amount: Math.round(orderData.amount * 100),
@@ -519,6 +526,7 @@ export class EventPaymentComponent implements OnInit {
       name: orderData.companyName || 'TicketHouse',
       description: `Payment for ${this.eventTitle}`,
       order_id: orderData.orderId,
+      image: 'https://your-domain.com/assets/logo.png', // Add your logo URL here
       handler: (response: any) => {
         console.log('Payment successful:', response);
         this.verifyPayment(response, orderData.bookingId);
@@ -529,25 +537,124 @@ export class EventPaymentComponent implements OnInit {
         contact: orderData.customerPhone || ''
       },
       notes: orderData.notes,
-      theme: { color: '#4896d1' },
+
+      // Essential theme customization
+      theme: {
+        color: rockNightColors.primary // This is the main theme color
+      },
+
       modal: {
         ondismiss: () => {
           this.isProcessing = false;
           this.toastr.info('Payment cancelled', 'Info');
+        },
+        escape: true,
+        backdropclose: true,
+        redirect: true
+      },
+
+      // Method configuration for better UX
+      method: {
+        upi: {
+          flow: 'qr'
+        }
+      },
+
+      retry: {
+        enabled: true,
+        max_count: 3
+      },
+
+      timeout: 300,
+
+      // Event callbacks
+      callback: {
+        on_success: (response: any) => {
+          console.log('Payment successful callback', response);
+        },
+        on_failure: (response: any) => {
+          console.log('Payment failed callback', response);
+          this.toastr.error('Payment failed. Please try again.', 'Error');
+        },
+        on_close: () => {
+          console.log('Payment modal closed');
         }
       }
     };
 
+    console.log('Razorpay options with Rock Night theme:', options);
+
     try {
       const RazorpayInstance = (window as any).Razorpay;
       const rzp = new RazorpayInstance(options);
+
+      // Add custom event handlers
+      rzp.on('payment.failed', (response: any) => {
+        this.toastr.error(response.error.description || 'Payment failed', 'Error');
+      });
+
       rzp.open();
+
     } catch (error) {
       this.isProcessing = false;
       this.toastr.error('Failed to initialize payment gateway', 'Error');
       console.error('Razorpay initialization error:', error);
     }
   }
+
+  //---------correct before theme change-----------
+  // initiateRazorpayPayment(orderData: any): void {
+  //   // Check if Razorpay is available
+  //   if (typeof (window as any).Razorpay === 'undefined') {
+  //     this.isProcessing = false;
+  //     this.toastr.error('Payment gateway not loaded. Please refresh the page.', 'Error');
+  //     return;
+  //   }
+
+  //   const razorpayKey = orderData.keyId || orderData.KeyId || '';
+
+  //   if (!razorpayKey) {
+  //     this.isProcessing = false;
+  //     this.toastr.error('Payment key is missing', 'Error');
+  //     return;
+  //   }
+
+  //   const options = {
+  //     key: razorpayKey,
+  //     amount: Math.round(orderData.amount * 100),
+  //     currency: orderData.currency || 'INR',
+  //     name: orderData.companyName || 'TicketHouse',
+  //     description: `Payment for ${this.eventTitle}`,
+  //     order_id: orderData.orderId,
+  //     handler: (response: any) => {
+  //       console.log('Payment successful:', response);
+  //       this.verifyPayment(response, orderData.bookingId);
+  //     },
+  //     prefill: {
+  //       name: orderData.customerName,
+  //       email: orderData.customerEmail,
+  //       contact: orderData.customerPhone || ''
+  //     },
+  //     notes: orderData.notes,
+  //     theme: { color: '#4896d1' },
+  //     modal: {
+  //       ondismiss: () => {
+  //         this.isProcessing = false;
+  //         this.toastr.info('Payment cancelled', 'Info');
+  //       }
+  //     }
+  //   };
+
+  //   try {
+  //     const RazorpayInstance = (window as any).Razorpay;
+  //     const rzp = new RazorpayInstance(options);
+  //     rzp.open();
+  //   } catch (error) {
+  //     this.isProcessing = false;
+  //     this.toastr.error('Failed to initialize payment gateway', 'Error');
+  //     console.error('Razorpay initialization error:', error);
+  //   }
+  // }
 
   verifyPayment(paymentResponse: any, bookingId: number): void {
     const verifyRequest = {

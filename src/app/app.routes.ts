@@ -2,6 +2,9 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth-guard';
 import { roleGuard } from './core/guards/role-guard';
 import { LayoutComponent } from './layout/layout.component';
+import { PrivacyPolicyComponent } from './pages/Policy/privacy-policy/privacy-policy.component';
+import { TermsConditionsComponent } from './pages/Policy/terms-conditions/terms-conditions.component';
+import { RefundPolicyComponent } from './pages/Policy/refund-policy/refund-policy.component';
 
 export const routes: Routes = [
   {
@@ -61,6 +64,11 @@ export const routes: Routes = [
             (m) => m.MyBookingsComponent
           ),
       },
+
+      // Policies
+      { path: 'privacy-policy', component: PrivacyPolicyComponent },
+      { path: 'terms-conditions', component: TermsConditionsComponent },
+      { path: 'refund-policy', component: RefundPolicyComponent },
       
       // PROTECTED ADMIN ROUTES - With auth guard
       {

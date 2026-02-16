@@ -16,6 +16,8 @@ import { AuthService } from '../../core/services/auth.service';
   styleUrl: './user-header.component.css',
 })
 export class UserHeaderComponent implements OnInit, OnDestroy {
+  isScrolled = false;
+  private scrollSubscription: any;
   // Auth properties
   isUserLoggedIn = false;
   currentUserId: string | null = null;
@@ -113,6 +115,11 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
       this.showAuthModal = true;
       this.resetAuthForms();
     });
+
+    // Listen to scroll events
+    if (typeof window !== 'undefined') {
+      window.addEventListener('scroll', this.onScroll.bind(this));
+    }
   }
 
   // Add this new method to handle the custom event
@@ -278,7 +285,7 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
     } else if (this.isPaymentPage()) {
       // Navigate back to seat booking page
       if (this.eventId && this.eventNameSlug) {
-        this.router.navigate(['/seats-booking', this.eventId, this.eventNameSlug]);
+        this.router.navigate(['/event-booking', this.eventId, this.eventNameSlug]);
       } else {
         this.router.navigate(['/events']);
       }
@@ -719,5 +726,13 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
 
     // Remove custom event listener
     window.removeEventListener('openAuthModal', this.handleOpenAuthModal.bind(this));
+
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('scroll', this.onScroll.bind(this));
+    }
+  }
+
+  onScroll() {
+    this.isScrolled = window.scrollY > 10;
   }
 }

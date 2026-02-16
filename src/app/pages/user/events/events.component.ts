@@ -676,6 +676,24 @@ export class EventsComponent implements OnInit {
     this.router.navigate(['/auth/sign-up']);
   }
 
+  openPrivacyPolicy(): void {
+    // Open privacy policy in a new tab
+    const url = this.router.createUrlTree(['/privacy-policy']).toString();
+    window.open(url, '_blank');
+  }
+
+  openTermsConditions(): void {
+    // Open terms & conditions in a new tab
+    const url = this.router.createUrlTree(['/terms-conditions']).toString();
+    window.open(url, '_blank');
+  }
+
+  openRefundPolicy(): void {
+    // Open refund policy in a new tab
+    const url = this.router.createUrlTree(['/refund-policy']).toString();
+    window.open(url, '_blank');
+  }
+
   // Clean up event listener when component is destroyed
   ngOnDestroy(): void {
     document.removeEventListener('click', this.closeDropdownOnClickOutside.bind(this));

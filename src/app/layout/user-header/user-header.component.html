@@ -1,4 +1,4 @@
-<header class="audience-header">
+<header class="audience-header" [class.scrolled]="isScrolled">
   <div class="container">
     <div class="header-row">
       <!-- Left Section - CONDITIONAL: Show Search OR Breadcrumbs -->
@@ -7,7 +7,7 @@
           <!-- Logo - ALWAYS VISIBLE -->
           <div class="logo-wrapper">
             <a [routerLink]="['/events']">
-              <img class="logo" src="/assets/ticket-house-logo.jpeg" alt="ticket-house-logo" />
+              <img class="logo" src="/assets/th_transparent_logo.png" alt="ticket-house-logo" />
             </a>
           </div>
 
