@@ -37,14 +37,14 @@
                     <button class="btn-download" (click)="downloadQRCode()" [disabled]="imageError || !imageLoaded">
                         <span class="btn-icon">⬇</span> Download QR Code
                     </button>
-                    <button class="btn-share" (click)="shareQRCode()" [disabled]="imageError || !imageLoaded">
+                    <button class="btn-share d-none" (click)="shareQRCode()" [disabled]="imageError || !imageLoaded">
                         <span class="btn-icon">📤</span> Share
                     </button>
                 </div>
             </div>
 
             <!-- Booking Summary -->
-            <div class="booking-summary" *ngIf="bookingDetails">
+            <div class="booking-summary d-none" *ngIf="bookingDetails">
                 <h4>Booking Details</h4>
                 <div class="summary-grid">
                     <div class="summary-item">
@@ -124,7 +124,7 @@
             </div>
         </div>
 
-        <div class="modal-footer">
+        <div class="modal-footer d-block">
             <p>Need help? Contact support@tickethouse.in</p>
             <p class="footer-note">Thank you for choosing <strong>TicketHouse</strong>!</p>
         </div>

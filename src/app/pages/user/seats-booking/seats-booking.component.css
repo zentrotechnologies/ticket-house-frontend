@@ -9,7 +9,7 @@
 }
 
 .container {
-  max-width: 1240px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 0 20px;
 }
@@ -254,7 +254,7 @@
 }
 
 .ticket-footer-inner {
-  max-width: 1240px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 16px 20px;
   display: flex;

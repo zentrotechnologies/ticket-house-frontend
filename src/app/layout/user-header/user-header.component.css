@@ -52,7 +52,7 @@
 }
 
 .container {
-  max-width: 1240px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 0 20px;
 }
@@ -86,6 +86,7 @@
 
 .logo-wrapper {
   flex-shrink: 0;
+  width: 15%;
 }
 
 .logo-wrapper a {
@@ -106,8 +107,8 @@
 
 /* Logo Styles */
 .logo {
-  height: 40px;
-  width: auto;
+  /* height: 40px; */
+  width: 90%;
   object-fit: contain;
   cursor: pointer;
   transition: opacity 0.3s ease;
@@ -122,7 +123,7 @@
   width: 100%;
   padding: 10px 20px;
   border-radius: 30px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid rgb(0 0 0 / 30%);
   background: rgba(255, 255, 255, 0.9);
   color: var(--text-dark);
   font-size: 14px;

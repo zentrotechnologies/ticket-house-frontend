@@ -38,6 +38,8 @@ export class EventBookingComponent implements OnInit {
   eventArtists: any[] = []; // Populate from your data
   isImageModalOpen = false;
   selectedImage = '';
+  isSeatModalOpen: boolean = false;
+  private isNavigatingAway = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -55,7 +57,23 @@ export class EventBookingComponent implements OnInit {
 
       if (this.eventId > 0) {
         this.loadEventDetails();
-        this.loadEventSeats(); // Load seats immediately
+        // this.loadEventSeats(); // Load seats immediately
+        
+        // Check if we have navigation state with seat selections
+        const navigation = this.router.getCurrentNavigation();
+        const state = navigation?.extras.state as {
+          seatSelections?: any[],
+          totalAmount?: number,
+          userId?: string,
+          eventTitle?: string
+        };
+
+        // Only load seats if we don't have selections from navigation
+        // AND we're not navigating away
+        if (!state?.seatSelections && !this.isNavigatingAway) {
+          this.loadEventSeats();
+        }
+
         this.loadEventCategories();
       } else {
         this.router.navigate(['/events']);
@@ -91,7 +109,45 @@ export class EventBookingComponent implements OnInit {
   }
 
   // Load event seats (from seats-booking component)
+  // loadEventSeats(): void {
+  //   this.isSeatLoading = true;
+
+  //   this.apiService.getEventSeatTypes(this.eventId).subscribe({
+  //     next: (response) => {
+  //       if (response.status === 'Success' && response.data) {
+  //         this.seatTypes = response.data;
+
+  //         // Initialize selected seats with 0
+  //         // this.seatTypes.forEach((seat) => {
+  //         //   this.selectedSeats[seat.event_seat_type_inventory_id] = 0;
+  //         // });
+
+  //         // Initialize selected seats with 0
+  //         this.resetSeatSelections();
+
+  //         console.log('Seat types loaded:', this.seatTypes);
+  //       } else {
+  //         console.error('Error loading seat types:', response.message);
+  //         this.toastr.error('Failed to load seat types', 'Error');
+  //       }
+  //     },
+  //     error: (error) => {
+  //       console.error('Error loading event seats:', error);
+  //       this.toastr.error('Error loading seat information', 'Error');
+  //     },
+  //     complete: () => {
+  //       this.isSeatLoading = false;
+  //     }
+  //   });
+  // }
+
   loadEventSeats(): void {
+    // Don't reload seats if we're navigating away
+    if (this.isNavigatingAway) {
+      console.log('Skipping seat load - navigating away');
+      return;
+    }
+
     this.isSeatLoading = true;
 
     this.apiService.getEventSeatTypes(this.eventId).subscribe({
@@ -99,10 +155,18 @@ export class EventBookingComponent implements OnInit {
         if (response.status === 'Success' && response.data) {
           this.seatTypes = response.data;
 
-          // Initialize selected seats with 0
-          this.seatTypes.forEach((seat) => {
-            this.selectedSeats[seat.event_seat_type_inventory_id] = 0;
-          });
+          // Check if we already have selected seats (from navigation)
+          const navigation = this.router.getCurrentNavigation();
+          const state = navigation?.extras.state as {
+            seatSelections?: any[]
+          };
+
+          // Only reset selections if we don't have any from navigation
+          if (!state?.seatSelections && !this.isNavigatingAway) {
+            this.resetSeatSelections();
+          } else {
+            console.log('Restoring seat selections from navigation state:', state?.seatSelections);
+          }
 
           console.log('Seat types loaded:', this.seatTypes);
         } else {
@@ -118,6 +182,12 @@ export class EventBookingComponent implements OnInit {
         this.isSeatLoading = false;
       }
     });
+  }
+
+  @HostListener('window:focus')
+  onWindowFocus(): void {
+    // Reset navigation flag when user comes back to the page
+    this.isNavigatingAway = false;
   }
 
   loadPriceInRange(): void {
@@ -359,7 +429,128 @@ export class EventBookingComponent implements OnInit {
 
   // In event-booking.component.ts - Replace the onBookNow method with this simpler version
 
+  // onBookNow(): void {
+  //   const selectedSeatCount = this.getSelectedSeatCount();
+
+  //   if (selectedSeatCount === 0) {
+  //     this.toastr.warning('Please select at least one seat', 'Selection Required');
+  //     return;
+  //   }
+
+  //   if (selectedSeatCount > 10) {
+  //     this.toastr.warning('You can select maximum 10 tickets only', 'Limit Exceeded');
+  //     return;
+  //   }
+
+  //   console.log('Book Now clicked - Seat selections:', this.getSelectedSeatsList());
+  //   console.log('Total amount:', this.totalAmount);
+
+  //   // Save seat selections to sessionStorage (not localStorage)
+  //   // sessionStorage clears when tab is closed, which is better for this flow
+  //   sessionStorage.setItem('temp_seat_selections', JSON.stringify(this.getSelectedSeatsList().map(item => ({
+  //     SeatTypeId: item.seatType.event_seat_type_inventory_id,
+  //     Quantity: item.quantity,
+  //     SeatName: item.seatType.seat_name,
+  //     Price: item.seatType.price
+  //   }))));
+  //   sessionStorage.setItem('temp_total_amount', this.totalAmount.toString());
+  //   sessionStorage.setItem('temp_event_id', this.eventId.toString());
+  //   sessionStorage.setItem('temp_event_name', this.eventNameSlug);
+
+  //   // Check if user is logged in
+  //   const isLoggedIn = this.authService.isLoggedIn();
+  //   console.log('User logged in?', isLoggedIn);
+
+  //   if (isLoggedIn) {
+  //     // User is logged in, redirect to payment page
+  //     console.log('User logged in - redirecting to payment');
+  //     this.navigateToPayment();
+  //   } else {
+  //     // User not logged in - open auth modal WITHOUT clearing selections
+  //     console.log('User not logged in - opening auth modal');
+
+  //     // Simply open the auth modal - selections remain in component state
+  //     this.openAuthModal();
+  //   }
+  // }
+
   onBookNow(): void {
+    // Reset navigation flag when opening modal
+    this.isNavigatingAway = false;
+
+    // Check if user is logged in first
+    const isLoggedIn = this.authService.isLoggedIn();
+    console.log('User logged in?', isLoggedIn);
+
+    if (!isLoggedIn) {
+      console.log('User not logged in - opening auth modal');
+      this.openAuthModal();
+      return;
+    }
+
+    console.log('User logged in - opening seat selection modal');
+
+    // Load seats if not already loaded
+    if (this.seatTypes.length === 0) {
+      this.loadEventSeats();
+      setTimeout(() => {
+        this.openSeatModal();
+      }, 500);
+    } else {
+      this.resetSeatSelections();
+      this.openSeatModal();
+    }
+  }
+
+  resetSeatSelections(): void {
+    this.selectedSeats = {};
+    this.totalAmount = 0;
+
+    // Initialize all seats with 0 if seatTypes exist
+    if (this.seatTypes && this.seatTypes.length > 0) {
+      this.seatTypes.forEach((seat) => {
+        this.selectedSeats[seat.event_seat_type_inventory_id] = 0;
+      });
+      console.log('Seat selections reset:', this.selectedSeats);
+    } else {
+      console.log('No seat types available to reset');
+    }
+  }
+
+  /**
+ * Open seat selection modal for logged-in users
+ */
+  openSeatModal(): void {
+    this.isSeatModalOpen = true;
+    document.body.style.overflow = 'hidden';
+
+    // Initialize selected seats if not already done
+    if (Object.keys(this.selectedSeats).length === 0 && this.seatTypes.length > 0) {
+      this.resetSeatSelections();
+    }
+  }
+
+  /**
+   * Close seat selection modal
+   */
+  closeSeatModal(): void {
+    this.isSeatModalOpen = false;
+    document.body.style.overflow = 'auto';
+  }
+
+  /**
+   * Close modal on backdrop click
+   */
+  closeSeatModalOnBackdrop(event: MouseEvent): void {
+    if ((event.target as HTMLElement).classList.contains('seat-modal')) {
+      this.closeSeatModal();
+    }
+  }
+
+  /**
+   * Proceed to checkout from seat modal
+   */
+  proceedToCheckout(): void {
     const selectedSeatCount = this.getSelectedSeatCount();
 
     if (selectedSeatCount === 0) {
@@ -372,36 +563,50 @@ export class EventBookingComponent implements OnInit {
       return;
     }
 
-    console.log('Book Now clicked - Seat selections:', this.getSelectedSeatsList());
+    console.log('Proceed to Checkout - Seat selections:', this.getSelectedSeatsList());
     console.log('Total amount:', this.totalAmount);
 
-    // Save seat selections to sessionStorage (not localStorage)
-    // sessionStorage clears when tab is closed, which is better for this flow
-    sessionStorage.setItem('temp_seat_selections', JSON.stringify(this.getSelectedSeatsList().map(item => ({
-      SeatTypeId: item.seatType.event_seat_type_inventory_id,
-      Quantity: item.quantity,
-      SeatName: item.seatType.seat_name,
-      Price: item.seatType.price
-    }))));
-    sessionStorage.setItem('temp_total_amount', this.totalAmount.toString());
-    sessionStorage.setItem('temp_event_id', this.eventId.toString());
-    sessionStorage.setItem('temp_event_name', this.eventNameSlug);
+    // Set flag to prevent reset on navigation
+    this.isNavigatingAway = true;
 
-    // Check if user is logged in
-    const isLoggedIn = this.authService.isLoggedIn();
-    console.log('User logged in?', isLoggedIn);
+    // Get current selections
+    const selectedSeatsList = this.getSelectedSeatsList();
+    
+    // Save to sessionStorage as backup
+    const bookingData = {
+      seatSelections: selectedSeatsList.map(item => ({
+        SeatTypeId: item.seatType.event_seat_type_inventory_id,
+        Quantity: item.quantity,
+        SeatName: item.seatType.seat_name,
+        Price: item.seatType.price
+      })),
+      totalAmount: this.totalAmount,
+      eventId: this.eventId,
+      eventName: this.eventNameSlug,
+      timestamp: new Date().getTime()
+    };
+    
+    sessionStorage.setItem('temp_booking_data', JSON.stringify(bookingData));
 
-    if (isLoggedIn) {
-      // User is logged in, redirect to payment page
-      console.log('User logged in - redirecting to payment');
-      this.navigateToPayment();
-    } else {
-      // User not logged in - open auth modal WITHOUT clearing selections
-      console.log('User not logged in - opening auth modal');
+    // Close modal
+    this.closeSeatModal();
 
-      // Simply open the auth modal - selections remain in component state
-      this.openAuthModal();
-    }
+    // Navigate to payment with state
+    setTimeout(() => {
+      this.router.navigate(['/event-payment', this.eventId, this.eventNameSlug], {
+        state: {
+          seatSelections: selectedSeatsList.map(item => ({
+            SeatTypeId: item.seatType.event_seat_type_inventory_id,
+            Quantity: item.quantity,
+            SeatName: item.seatType.seat_name,
+            Price: item.seatType.price
+          })),
+          totalAmount: this.totalAmount,
+          userId: this.authService.getCurrentUserId(),
+          eventTitle: this.eventDetails?.event_name || this.formatEventTitle(this.eventNameSlug)
+        }
+      });
+    }, 100);
   }
 
   // Method to open auth modal
@@ -622,10 +827,23 @@ export class EventBookingComponent implements OnInit {
   }
 
   // Fixed: Changed parameter type to any to avoid type mismatch
+  // @HostListener('document:keydown.escape', ['$event'])
+  // onEscapePress(event: any): void {
+  //   if (this.isTermsModalOpen) {
+  //     this.closeTermsModal();
+  //   }
+  // }
+
   @HostListener('document:keydown.escape', ['$event'])
   onEscapePress(event: any): void {
+    if (this.isSeatModalOpen) {
+      this.closeSeatModal();
+    }
     if (this.isTermsModalOpen) {
       this.closeTermsModal();
+    }
+    if (this.isImageModalOpen) {
+      this.closeImageModal();
     }
   }
 

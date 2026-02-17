@@ -673,7 +673,8 @@ export class EventsComponent implements OnInit {
   }
 
   navigateToSignUp(): void {
-    this.router.navigate(['/auth/sign-up']);
+    // this.router.navigate(['/auth/sign-up']);
+    window.location.href = 'mailto:support@tickethouse.in';
   }
 
   openPrivacyPolicy(): void {

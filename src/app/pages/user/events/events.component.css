@@ -6,7 +6,7 @@
 }
 
 .events-container {
-  max-width: 1240px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 0 20px;
 }
@@ -793,7 +793,7 @@
 
 .footer-main {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr;
   gap: 40px;
   margin-bottom: 40px;
 }
@@ -804,8 +804,8 @@
 }
 
 .brand-col .logo {
-  height: 50%;
-  width: 50%;
+  /* height: 50%; */
+  width: 20%;
   margin-bottom: 20px;
   /* Makes logo white if it's dark */
   /* filter: brightness(0) invert(1);  */
@@ -999,4 +999,16 @@
   .social-icons {
     justify-content: center;
   }
+}
+
+.made-with {
+  margin-left: 8px;
+  /* font-weight: 500; */
+}
+
+.heart {
+  color: #ff4d6d;
+  font-size: 16px;
+  /* animation: heartbeat 1.2s infinite; */
+  display: inline-block;
 }

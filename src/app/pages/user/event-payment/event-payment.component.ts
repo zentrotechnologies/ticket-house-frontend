@@ -110,44 +110,91 @@ export class EventPaymentComponent implements OnInit {
   // }
 
   ngOnInit(): void {
-    // Check if user is logged in
-    if (!this.authService.isLoggedIn()) {
-      this.toastr.warning('Please sign in to complete booking', 'Authentication Required');
-      this.route.params.subscribe(params => {
-        this.eventId = +params['event_id'] || 0;
-        this.eventNameSlug = params['event_name'] || '';
-        this.router.navigate(['/event-booking', this.eventId, this.eventNameSlug]);
-      });
-      return;
-    }
-
-    this.userId = this.authService.getCurrentUserId();
-
+  // Check if user is logged in
+  if (!this.authService.isLoggedIn()) {
+    this.toastr.warning('Please sign in to complete booking', 'Authentication Required');
     this.route.params.subscribe(params => {
       this.eventId = +params['event_id'] || 0;
       this.eventNameSlug = params['event_name'] || '';
+      this.router.navigate(['/event-booking', this.eventId, this.eventNameSlug]);
+    });
+    return;
+  }
 
-      // Get data from navigation state
-      const navigation = this.router.getCurrentNavigation();
-      if (navigation?.extras.state) {
-        this.seatSelections = navigation.extras.state['seatSelections'] || [];
-        this.totalAmount = navigation.extras.state['totalAmount'] || 0;
-        this.userId = navigation.extras.state['userId'] || this.userId;
-        this.eventTitle = navigation.extras.state['eventTitle'] || '';
+  this.userId = this.authService.getCurrentUserId();
 
-        console.log('Payment - Received seat selections from state:', this.seatSelections);
+  this.route.params.subscribe(params => {
+    this.eventId = +params['event_id'] || 0;
+    this.eventNameSlug = params['event_name'] || '';
+
+    // Try to get data from navigation state first
+    const navigation = this.router.getCurrentNavigation();
+    if (navigation?.extras.state) {
+      this.seatSelections = navigation.extras.state['seatSelections'] || [];
+      this.totalAmount = navigation.extras.state['totalAmount'] || 0;
+      this.userId = navigation.extras.state['userId'] || this.userId;
+      this.eventTitle = navigation.extras.state['eventTitle'] || '';
+
+      console.log('Payment - Received seat selections from state:', this.seatSelections);
+
+      if (this.seatSelections.length > 0) {
+        this.calculateBookingFee();
+        this.loadEventDetails();
+        this.clearSessionStorage();
+      } else {
+        // If state has empty selections, try sessionStorage
+        this.restoreFromSessionStorage();
+      }
+    } else {
+      // Try sessionStorage
+      this.restoreFromSessionStorage();
+    }
+  });
+}
+
+restoreFromSessionStorage(): void {
+  const tempData = sessionStorage.getItem('temp_booking_data');
+  
+  console.log('Payment - Attempting to restore from sessionStorage:', { hasData: !!tempData });
+
+  if (tempData) {
+    try {
+      const bookingData = JSON.parse(tempData);
+      
+      // Check if data is for this event
+      if (bookingData.eventId === this.eventId && bookingData.seatSelections?.length > 0) {
+        this.seatSelections = bookingData.seatSelections;
+        this.totalAmount = bookingData.totalAmount;
+        this.eventTitle = bookingData.eventName 
+          ? bookingData.eventName.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())
+          : '';
+
+        console.log('Payment - Restored seat selections from temp_booking_data:', this.seatSelections);
 
         this.calculateBookingFee();
         this.loadEventDetails();
-
-        // Clear sessionStorage since we have state
-        this.clearSessionStorage();
+        
+        // Clear after restoring
+        sessionStorage.removeItem('temp_booking_data');
       } else {
-        // Try to get data from sessionStorage if state is missing
-        this.restoreFromSessionStorage();
+        this.handleNoSelections();
       }
-    });
+    } catch (error) {
+      console.error('Error parsing temp_booking_data:', error);
+      this.handleNoSelections();
+    }
+  } else {
+    this.handleNoSelections();
   }
+}
+
+private handleNoSelections(): void {
+  if (!this.seatSelections.length) {
+    console.log('No seat selections found');
+    this.toastr.warning('Please select seats first', 'Selection Required');
+    this.router.navigate(['/event-booking', this.eventId, this.eventNameSlug]);
+  }
+}
 
   restoreFromLocalStorage(): void {
     const pendingSelections = localStorage.getItem('pending_seat_selections');
@@ -191,38 +238,38 @@ export class EventPaymentComponent implements OnInit {
 
   // In event-payment.component.ts - Update restoreFromLocalStorage to use sessionStorage
 
-  restoreFromSessionStorage(): void {
-    const tempSelections = sessionStorage.getItem('temp_seat_selections');
-    const tempAmount = sessionStorage.getItem('temp_total_amount');
-    const tempEventId = sessionStorage.getItem('temp_event_id');
-    const tempEventName = sessionStorage.getItem('temp_event_name');
+  // restoreFromSessionStorage(): void {
+  //   const tempSelections = sessionStorage.getItem('temp_seat_selections');
+  //   const tempAmount = sessionStorage.getItem('temp_total_amount');
+  //   const tempEventId = sessionStorage.getItem('temp_event_id');
+  //   const tempEventName = sessionStorage.getItem('temp_event_name');
 
-    console.log('Payment - Attempting to restore from sessionStorage:', {
-      hasSelections: !!tempSelections,
-      tempEventId,
-      tempEventName
-    });
+  //   console.log('Payment - Attempting to restore from sessionStorage:', {
+  //     hasSelections: !!tempSelections,
+  //     tempEventId,
+  //     tempEventName
+  //   });
 
-    if (tempSelections && tempAmount && tempEventId === this.eventId.toString()) {
-      this.seatSelections = JSON.parse(tempSelections);
-      this.totalAmount = parseFloat(tempAmount);
-      this.eventTitle = tempEventName
-        ? tempEventName.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
-        : '';
+  //   if (tempSelections && tempAmount && tempEventId === this.eventId.toString()) {
+  //     this.seatSelections = JSON.parse(tempSelections);
+  //     this.totalAmount = parseFloat(tempAmount);
+  //     this.eventTitle = tempEventName
+  //       ? tempEventName.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+  //       : '';
 
-      console.log('Payment - Restored seat selections:', this.seatSelections);
+  //     console.log('Payment - Restored seat selections:', this.seatSelections);
 
-      this.calculateBookingFee();
-      this.loadEventDetails();
+  //     this.calculateBookingFee();
+  //     this.loadEventDetails();
 
-      // Clear sessionStorage after restoring
-      this.clearSessionStorage();
-    } else if (!this.seatSelections.length) {
-      // If no state or sessionStorage data, redirect back to event booking
-      this.toastr.warning('Please select seats first', 'Selection Required');
-      this.router.navigate(['/event-booking', this.eventId, this.eventNameSlug]);
-    }
-  }
+  //     // Clear sessionStorage after restoring
+  //     this.clearSessionStorage();
+  //   } else if (!this.seatSelections.length) {
+  //     // If no state or sessionStorage data, redirect back to event booking
+  //     this.toastr.warning('Please select seats first', 'Selection Required');
+  //     this.router.navigate(['/event-booking', this.eventId, this.eventNameSlug]);
+  //   }
+  // }
 
   clearSessionStorage(): void {
     sessionStorage.removeItem('temp_seat_selections');

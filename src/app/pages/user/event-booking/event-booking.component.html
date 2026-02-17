@@ -174,57 +174,8 @@
                             </div>
                         </div>
 
-                        <!-- Seat Selection Section -->
-                        <div class="seat-selection-section" *ngIf="seatTypes.length > 0">
-                            <h4 class="seat-section-title">Select Tickets</h4>
-
-                            <!-- Seat Type Cards -->
-                            <div *ngFor="let seatType of seatTypes" class="seat-card"
-                                [class.selected]="isSeatSelected(seatType.event_seat_type_inventory_id)">
-                                <div class="seat-info-main">
-                                    <label class="checkbox-container">
-                                        <input type="checkbox"
-                                            [checked]="isSeatSelected(seatType.event_seat_type_inventory_id)"
-                                            (change)="toggleSeatSelection(seatType.event_seat_type_inventory_id, $event)">
-                                        <span class="checkmark"></span>
-                                    </label>
-                                    <div class="seat-details">
-                                        <div class="seat-name">{{ seatType.seat_name }}</div>
-                                        <div class="seat-price">₹{{ seatType.price }}</div>
-                                    </div>
-                                </div>
-
-                                <!-- Quantity Counter -->
-                                <div *ngIf="selectedSeats[seatType.event_seat_type_inventory_id] > 0" class="seat-qty">
-                                    <button class="qty-btn"
-                                        (click)="decreaseSeats(seatType.event_seat_type_inventory_id)">−</button>
-                                    <span class="qty-count">{{ selectedSeats[seatType.event_seat_type_inventory_id]
-                                        }}</span>
-                                    <button class="qty-btn"
-                                        (click)="increaseSeats(seatType.event_seat_type_inventory_id)">+</button>
-                                </div>
-                            </div>
-
-                            <!-- Selected Seats Summary -->
-                            <div *ngIf="hasSelectedSeats()" class="selected-summary">
-                                <div *ngFor="let item of getSelectedSeatsList()" class="summary-item">
-                                    <span>{{ item.seatType.seat_name }} × {{ item.quantity }}</span>
-                                    <span>₹{{ item.seatType.price * item.quantity }}</span>
-                                </div>
-                                <div class="summary-total">
-                                    <span>Total</span>
-                                    <span>₹{{ totalAmount }}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Seat Types Loading -->
-                        <div *ngIf="isSeatLoading" class="seat-loading">
-                            <div class="loading-spinner-small">Loading seat options...</div>
-                        </div>
-
-                        <!-- Book Now Button -->
-                        <button class="book-now-btn" (click)="onBookNow()" [disabled]="!hasSelectedSeats()">
+                        <!-- Book Now Button (Only this remains - no seat selection) -->
+                        <button class="book-now-btn" (click)="onBookNow()">
                             Book Now <span class="btn-arrow">›</span>
                         </button>
 
@@ -340,6 +291,85 @@
         <div class="modal-close" id="modalClose" title="Close">✕</div>
         <div class="modal-inner" role="document">
             <img id="modalImage" src alt="Preview" />
+        </div>
+    </div>
+
+    <!-- SEAT SELECTION MODAL (for logged-in users) -->
+    <div class="modal seat-modal" [class.open]="isSeatModalOpen" (click)="closeSeatModalOnBackdrop($event)">
+        <div class="modal-content seat-modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header seat-modal-header">
+                <h3>Select Tickets</h3>
+                <button class="modal-close-btn" (click)="closeSeatModal()">✕</button>
+            </div>
+
+            <div class="modal-body seat-modal-body">
+                <!-- Seat Types Loading -->
+                <div *ngIf="isSeatLoading" class="seat-loading">
+                    <div class="loading-spinner-small">Loading seat options...</div>
+                </div>
+
+                <!-- Seat Selection Section -->
+                <div class="seat-selection-section" *ngIf="!isSeatLoading && seatTypes.length > 0">
+                    <!-- Seat Type Cards -->
+                    <div *ngFor="let seatType of seatTypes" class="seat-card"
+                        [class.selected]="isSeatSelected(seatType.event_seat_type_inventory_id)">
+                        <div class="seat-info-main">
+                            <label class="checkbox-container">
+                                <input type="checkbox" [checked]="isSeatSelected(seatType.event_seat_type_inventory_id)"
+                                    (change)="toggleSeatSelection(seatType.event_seat_type_inventory_id, $event)">
+                                <span class="checkmark"></span>
+                            </label>
+                            <div class="seat-details">
+                                <div class="seat-name">{{ seatType.seat_name }}</div>
+                                <div class="seat-price">₹{{ seatType.price }}</div>
+                                <div class="seat-available" *ngIf="seatType.available_seats > 0">
+                                    {{ seatType.available_seats }} seats available
+                                </div>
+                                <div class="seat-available sold-out" *ngIf="seatType.available_seats === 0">
+                                    Sold Out
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quantity Counter -->
+                        <div *ngIf="selectedSeats[seatType.event_seat_type_inventory_id] > 0" class="seat-qty">
+                            <button class="qty-btn"
+                                (click)="decreaseSeats(seatType.event_seat_type_inventory_id)">−</button>
+                            <span class="qty-count">{{ selectedSeats[seatType.event_seat_type_inventory_id]
+                                }}</span>
+                            <button class="qty-btn"
+                                (click)="increaseSeats(seatType.event_seat_type_inventory_id)">+</button>
+                        </div>
+                    </div>
+
+                    <!-- Selected Seats Summary -->
+                    <div *ngIf="hasSelectedSeats()" class="selected-summary">
+                        <div *ngFor="let item of getSelectedSeatsList()" class="summary-item">
+                            <span>{{ item.seatType.seat_name }} × {{ item.quantity }}</span>
+                            <span>₹{{ item.seatType.price * item.quantity }}</span>
+                        </div>
+                        <div class="summary-total">
+                            <span>Total</span>
+                            <span>₹{{ totalAmount }}</span>
+                        </div>
+                    </div>
+
+                    <div *ngIf="!hasSelectedSeats()" class="no-selection-message">
+                        <p>Please select at least one ticket to proceed</p>
+                    </div>
+                </div>
+
+                <!-- No Seat Types -->
+                <div *ngIf="!isSeatLoading && seatTypes.length === 0" class="no-seats-message">
+                    <p>No seat options available for this event</p>
+                </div>
+            </div>
+
+            <div class="modal-footer seat-modal-footer">
+                <button class="proceed-btn" (click)="proceedToCheckout()" [disabled]="!hasSelectedSeats()">
+                    Proceed to Checkout <span class="btn-arrow">›</span>
+                </button>
+            </div>
         </div>
     </div>
 
