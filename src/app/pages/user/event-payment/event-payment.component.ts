@@ -1323,6 +1323,11 @@ export class EventPaymentComponent implements OnInit {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   }
+  showFeeBreakup: boolean = false;
+
+  toggleFeeBreakup() {
+    this.showFeeBreakup = !this.showFeeBreakup;
+  }
 
   ngOnDestroy(): void {
     // Clean up localStorage when leaving page

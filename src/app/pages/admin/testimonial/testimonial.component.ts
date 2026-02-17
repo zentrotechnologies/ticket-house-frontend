@@ -189,7 +189,7 @@ export class TestimonialComponent implements OnInit {
   getImageUrl(profileImg: string): string {
     // If no profile image, return default avatar from assets
     if (!profileImg || profileImg.trim() === '') {
-      return 'assets/default-avatar.png'; // Make sure this file exists in your assets
+      return 'assets/av.jpg'; // Make sure this file exists in your assets
     }
     
     // If it's already a full URL, return as is

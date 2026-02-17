@@ -95,83 +95,117 @@
         </div>
       </section>
 
-      <!-- RIGHT SECTION -->
       <aside class="payment-right">
-        <!-- Event Summary Card -->
         <div class="summary-card" *ngIf="eventTitle">
-          <div class="summary-header">
-            <div class="summary-title">{{ eventTitle }}</div>
-            <div class="summary-amount">₹{{ totalAmount }}</div>
-          </div>
+          <div class="ticket-information">
+            <span class="ticket-information-title">Important Information</span>
+            <div class="ticket-info-div">
+              <div class="check-out-title py-2">Ticket Access & Entry Guidelines</div>
+              <div class="ticket-information-points">1) Customer(s) can access their ticket(s) from the 'My Profile' section on the app/mobile-web.</div>
+              <div class="ticket-information-points">2) It is mandatory to present the ticket(s) in my profile section via app/mobile-web at the venue.</div>
+              <div class="ticket-information-points">3) No physical ticket(s) are required to enter the venue.</div>
 
-          <div class="summary-body">
-            <p>{{ getTotalTickets() }} Tickets</p>
-            <p *ngIf="eventDate">{{ formatDate(eventDate) }}</p>
-            <p *ngIf="eventTime">{{ eventTime }}</p>
-            <p class="muted">Venue</p>
-            <p *ngIf="eventLocation">{{ eventLocation }}</p>
-
-            <hr />
-
-            <!-- Show seat details -->
-            <div *ngFor="let seat of seatSelections" class="seat-detail">
-              <!-- <p>Seat Type {{ seat.SeatTypeId }} · {{ seat.Quantity }} ticket(s)</p> -->
-               <p>{{ seat.SeatName || 'Seat Type ' + seat.SeatTypeId }} · {{ seat.Quantity }} ticket(s)</p>
             </div>
           </div>
+
+
         </div>
 
-        <!-- Price Breakdown -->
         <div class="price-breakup" *ngIf="totalAmount > 0">
-          <div class="row">
-            <span>Sub-total</span>
-            <span>₹{{ totalAmount }}</span>
+          <div class="row my-0 pb-2 border-bottom">
+            <div class="d-flex justify-content-between mb-2"><span class="check-out-title">{{ eventTitle }}</span><span class="check-out-title">₹{{ totalAmount }}</span></div>
+            <span>{{ getTotalTickets() }} Tickets</span>
+          </div>
+          
+          <div class="row my-0">
+            <span class="check-out-title" *ngIf="eventDate">{{ formatDate(eventDate) }}</span>
+            <span *ngIf="eventTime">{{ eventTime }}</span>
           </div>
 
-          <!-- <div class="row">
-            <span>Booking Fee (6.5%)</span>
-            <span>₹{{ bookingFee }}</span>
-          </div> -->
-
-          <div class="row">
-            <span>Convenience Fee (6%)</span>
-            <span>₹{{ convenienceFee | number:'1.2-2' }}</span>
+          <div class="row my-0">
+            <span class="muted">Venue</span>
+            <span  class="check-out-title" *ngIf="eventLocation">{{ eventLocation }}</span>
+          </div>
+          
+          <div class="row py-2 border-bottom">
+            <div *ngFor="let seat of seatSelections" >
+               <div class="seat-name">{{ seat.SeatName || 'Seat Type ' + seat.SeatTypeId | uppercase}}({{seat.Price || '1299'}}): {{ seat.Quantity }} ticket(s)</div>
+            </div>
           </div>
 
-          <div class="row">
-            <span>GST (18% on Convenience Fee)</span>
-            <span>₹{{ gstTotal | number:'1.2-2' }}</span>
+
+          <div class="row my-0">
+            <div class="d-flex justify-content-between">
+              <span>Sub-total</span>
+              <span class="text-black">₹{{ totalAmount }}</span>
+            </div>
           </div>
 
-          <!-- <div class="row">
-            <span>CGST (9% on Convenience Fee)</span>
-            <span>₹{{ cgstAmount | number:'1.2-2' }}</span>
+          <div class="row my-0 border-bottom">
+
+            <!-- Header -->
+            <div 
+              class="d-flex justify-content-between booking-header"
+              (click)="toggleFeeBreakup()"
+            >
+              <span>
+                Booking Fees 
+                <span class="arrow-icon" [class.rotate]="showFeeBreakup">
+                  ▼
+                </span>
+              </span>
+
+              <span class="text-black">
+                ₹{{ (convenienceFee + gstTotal) | number:'1.2-2' }}
+              </span>
+            </div>
+
+            <!-- Accordion Content -->
+            <div class="accodian-content px-4" [class.open]="showFeeBreakup">
+
+              <div class="d-flex">
+                <span class="price-distribution">Convenience Fee (6%): </span>
+                <span class="price-distribution">₹{{ convenienceFee | number:'1.2-2' }}</span>
+              </div>
+
+              <div class="d-flex mb-2">
+                <span class="price-distribution">GST (18% on Convenience Fee): </span>
+                <span class="price-distribution">₹{{ gstTotal | number:'1.2-2' }}</span>
+              </div>
+
+            </div>
+
           </div>
 
-          <div class="row">
-            <span>SGST (9% on Convenience Fee)</span>
-            <span>₹{{ sgstAmount | number:'1.2-2' }}</span>
-          </div> -->
 
-          <div class="row total">
-            <span>Total Amount</span>
-            <span>₹{{ finalAmount }}</span>
+
+
+
+
+
+          <div class="row my-0">
+   
+            <div class="d-flex justify-content-between my-2">
+              <span  class="check-out-total-title">Total Amount</span>
+              <span  class="check-out-total-amount">₹{{ finalAmount }}</span>
+            </div>
           </div>
 
-          <div class="state-select">
+          <div class="state-select my-0 d-none">
             <label>Select State</label>
             <select [(ngModel)]="selectedState">
-              <option>Maharashtra</option>
-              <option>Delhi</option>
+              <option selected>Maharashtra</option>
+              <!-- <option>Delhi</option>
               <option>Karnataka</option>
               <option>Tamil Nadu</option>
-              <option>Gujarat</option>
+              <option>Gujarat</option> -->
             </select>
           </div>
 
-          <p class="consent">By proceeding, I express my consent to complete this transaction.</p>
+          <p class="my-0 pay-consent">By proceeding, I express my consent to complete this transaction.</p>
 
-          <!-- Single Payment Button Only -->
+           <div class="mobile-pay-bar">
+
           <button 
             class="pay-btn" 
             (click)="onProceedToPay()" 
@@ -180,7 +214,9 @@
             <span *ngIf="isProcessing">Processing...</span>
           </button>
 
-          <!-- Loading State -->
+          </div>
+
+
           <div *ngIf="isProcessing" class="loading-state">
             <div class="spinner"></div>
             <p>Please wait while we process your request...</p>

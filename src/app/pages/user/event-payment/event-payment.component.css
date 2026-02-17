@@ -25,7 +25,7 @@
 .payment-right {
   grid-column: 1 / -1; /* Span full width */
   display: grid;
-  grid-template-columns: 1fr 1fr; /* Split into two columns */
+grid-template-columns: 6.5fr 3.5fr;
   gap: 30px;
   align-items: flex-start;
 }
@@ -545,3 +545,146 @@
     font-size: 13px;
   }
 }
+/* -----------------------------------------added by mahesh------------------------------- */
+.payment-container {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr; /* left bigger */
+    gap: 30px;
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+.price-breakup {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+    position: sticky;
+    top: 100px;
+}
+@media (max-width: 992px) {
+
+    .payment-container {
+        grid-template-columns: 1fr;
+    }
+
+    .price-breakup {
+        position: relative;
+        top: unset;
+    }
+
+}
+
+@media (max-width: 992px) {
+
+    .mobile-pay-bar {
+        display: block;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: #fff;
+        padding: 15px 20px;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+        z-index: 1000;
+    }
+
+    .mobile-pay-bar .pay-btn {
+        width: 100%;
+        padding: 14px;
+        border-radius: 12px;
+        font-weight: 600;
+    }
+
+    /* Prevent content from hiding behind sticky bar */
+    .payment-container {
+        padding-bottom: 100px;
+    }
+}
+.mobile-total {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+.check-out-title{
+      font-size: 15px;
+    color: hsl(240deg 9.8% 10%);
+}
+.check-out-total-amount{
+    color: hsl(240deg 9.8% 10%);
+      font-size: 20px;
+      font-weight: 600;
+
+}
+.check-out-total-title{
+    color: hsl(240deg 9.8% 10%);
+      font-size: 16px;
+      font-weight: 600;
+
+
+}
+.seat-name{
+    font-size: 15px;
+    background: var(--gradient-main);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.booking-header {
+    cursor: pointer;
+}
+
+.accordian-toggle {
+    font-weight: 600;
+    margin-left: 6px;
+}
+
+.accodian-content {
+    margin-top: 10px;
+    padding-left: 10px;
+    font-size: 14px;
+    color: #666;
+}
+.accodian-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.accodian-content.open {
+    max-height: 200px;
+}
+.price-distribution{
+  font-size: 12px;
+}
+.booking-header {
+    cursor: pointer;
+}
+
+.arrow-icon {
+    display: inline-block;
+    transition: transform 0.3s ease;
+    font-size: 12px;
+}
+
+.arrow-icon.rotate {
+    transform: rotate(180deg);
+}
+.pay-consent{
+  line-height: 1.3;
+  color: #666;
+  padding-bottom: 10px;
+  font-size: 16px;
+}
+.ticket-info-div{
+  background: #f5effb;
+  padding: 10px;
+  border-radius: 10px;
+
+}
+.ticket-information-title{
+  color: #738296;
+}
+.ticket-information-points{    color: #738296;
+    font-size: 15px;}
