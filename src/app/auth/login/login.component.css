@@ -29,14 +29,12 @@ body {
   line-height: 1.6;
   overflow-x: hidden;
 }
-
 .container-fluid {
   padding: 0;
   height: 100vh;
   overflow: hidden;
   background: var(--bg-dark);
 }
-
 .row {
   height: 100%;
   margin: 0;
