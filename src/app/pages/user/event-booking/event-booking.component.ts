@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { EventCategoryModel, EventDetailsModel, EventSeatTypeInventoryModel, UpcomingEventResponse } from '../../../core/models/auth.model';
 import { ApiService } from '../../../core/services/api.service';
@@ -41,6 +41,9 @@ export class EventBookingComponent implements OnInit {
   isSeatModalOpen: boolean = false;
   private isNavigatingAway = false;
 
+  @ViewChild('sidebarCard') sidebarCard!: ElementRef;
+  @ViewChild('bookingSidebar') bookingSidebar!: ElementRef;
+
   constructor(
     private route: ActivatedRoute,
     public router: Router,
@@ -58,7 +61,7 @@ export class EventBookingComponent implements OnInit {
       if (this.eventId > 0) {
         this.loadEventDetails();
         // this.loadEventSeats(); // Load seats immediately
-        
+
         // Check if we have navigation state with seat selections
         const navigation = this.router.getCurrentNavigation();
         const state = navigation?.extras.state as {
@@ -571,7 +574,7 @@ export class EventBookingComponent implements OnInit {
 
     // Get current selections
     const selectedSeatsList = this.getSelectedSeatsList();
-    
+
     // Save to sessionStorage as backup
     const bookingData = {
       seatSelections: selectedSeatsList.map(item => ({
@@ -585,7 +588,7 @@ export class EventBookingComponent implements OnInit {
       eventName: this.eventNameSlug,
       timestamp: new Date().getTime()
     };
-    
+
     sessionStorage.setItem('temp_booking_data', JSON.stringify(bookingData));
 
     // Close modal
@@ -803,7 +806,8 @@ export class EventBookingComponent implements OnInit {
   }
 
   navigateToSignUp(): void {
-    this.router.navigate(['/auth/sign-up']);
+    // this.router.navigate(['/auth/sign-up']);
+    window.location.href = 'mailto:support@tickethouse.in';
   }
 
   // Add these new methods
@@ -873,5 +877,36 @@ export class EventBookingComponent implements OnInit {
     // Open refund policy in a new tab
     const url = this.router.createUrlTree(['/refund-policy']).toString();
     window.open(url, '_blank');
+  }
+
+  ngAfterViewInit() {
+    this.setupStickySidebar();
+  }
+
+  @HostListener('window:resize')
+  onResize() {
+    this.setupStickySidebar();
+  }
+
+  setupStickySidebar() {
+    if (window.innerWidth > 1024) {
+      const sidebar = this.sidebarCard?.nativeElement;
+      const sidebarContainer = this.bookingSidebar?.nativeElement;
+
+      if (sidebar && sidebarContainer) {
+        // Set the spacer height to match sidebar height
+        const sidebarHeight = sidebar.offsetHeight;
+        sidebarContainer.style.setProperty('--sidebar-height', sidebarHeight + 'px');
+
+        // Add CSS rule dynamically
+        const style = document.createElement('style');
+        style.textContent = `
+        .booking-sidebar::before {
+          height: var(--sidebar-height, ${sidebarHeight}px) !important;
+        }
+      `;
+        document.head.appendChild(style);
+      }
+    }
   }
 }

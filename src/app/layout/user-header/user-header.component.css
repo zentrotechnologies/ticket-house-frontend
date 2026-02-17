@@ -1,34 +1,55 @@
-/* User Header Component CSS - White Background Version with Fixed Header & Blur Effect */
+/* User Header Component CSS - Smooth Transition Fixed Header */
 :host {
   display: block;
 }
 
-/* Audience Header Structure - FIXED POSITION */
+/* Audience Header Structure - BASE STYLES (same for both states) */
 .audience-header {
   width: 100%;
-  background: rgba(255, 255, 255, 0.85); /* More transparent initially */
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-  position: fixed;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+  
+  /* CRITICAL: Smooth transition between states */
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Default position (normal flow) */
+  position: relative;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
-  transition: all 0.3s ease;
+  
+  /* Prevent layout shift when switching to fixed */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform, position, background, backdrop-filter;
 }
 
-/* SCROLLED STATE - Stronger blur and muted content */
+/* SCROLLED STATE - Header becomes fixed with same visual appearance */
 .audience-header.scrolled {
-  background: rgba(255, 255, 255, 0.7); /* More transparent */
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  position: fixed;
+  
+  /* Keep the same visual appearance to avoid any visible change */
+  background: rgba(255, 255, 255, 0.85); /* Same as default */
+  backdrop-filter: blur(8px); /* Same as default */
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08); /* Slightly enhanced but subtle */
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  
+  /* Remove animation to prevent any visible movement */
+  animation: none;
 }
 
-/* Mute all content when scrolled */
+/* OPTIONAL: Very subtle effect when scrolled - barely noticeable */
+.audience-header.scrolled {
+  /* Just a hint of extra transparency - almost invisible */
+  background: rgba(255, 255, 255, 0.82);
+}
+
+/* Mute all content when scrolled - very subtle */
 .audience-header.scrolled .logo,
 .audience-header.scrolled .search input,
 .audience-header.scrolled .location,
@@ -38,7 +59,7 @@
 .audience-header.scrolled .crumb,
 .audience-header.scrolled .back-arrow,
 .audience-header.scrolled .separator {
-  opacity: 0.8;
+  opacity: 0.95; /* Almost imperceptible change */
   transition: opacity 0.3s ease;
 }
 
@@ -63,6 +84,12 @@
   width: 100%;
   padding: 15px 0px;
   gap: 20px;
+  transition: padding 0.3s ease;
+}
+
+/* When scrolled, slightly reduce padding for more compact header */
+.audience-header.scrolled .header-row {
+  padding: 10px 0px;
 }
 
 /* Column Structure */
@@ -71,9 +98,10 @@
   align-items: center;
 }
 
-/* Left Section (Logo + Search) - 70% */
+/* Left Section (Logo + Search) */
 .left-section-col {
-  width: 70%;
+  flex: 1;
+  min-width: 0; /* Prevents flex overflow */
   justify-content: flex-start;
 }
 
@@ -86,7 +114,13 @@
 
 .logo-wrapper {
   flex-shrink: 0;
-  width: 15%;
+  width: 140px; /* Fixed width for consistency */
+  transition: width 0.3s ease;
+}
+
+/* Slightly smaller logo when scrolled */
+.audience-header.scrolled .logo-wrapper {
+  width: 120px;
 }
 
 .logo-wrapper a {
@@ -97,21 +131,28 @@
 .search-wrapper {
   flex: 1;
   max-width: 600px;
+  min-width: 200px; /* Prevents search from becoming too small */
 }
 
-/* Actions Column - 30% */
+/* Actions Column */
 .actions-col {
-  width: 30%;
+  flex-shrink: 0;
   justify-content: flex-end;
 }
 
 /* Logo Styles */
 .logo {
-  /* height: 40px; */
-  width: 90%;
+  width: 100%;
+  height: auto;
+  max-height: 45px;
   object-fit: contain;
   cursor: pointer;
-  transition: opacity 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+/* Slightly smaller logo when scrolled */
+.audience-header.scrolled .logo {
+  max-height: 40px;
 }
 
 /* Search Styles */
@@ -121,31 +162,31 @@
 
 .search input {
   width: 100%;
-  padding: 10px 20px;
-  border-radius: 30px;
-  border: 1px solid rgb(0 0 0 / 30%);
-  background: rgba(255, 255, 255, 0.9);
-  color: var(--text-dark);
-  font-size: 14px;
+  padding: 12px 24px;
+  border-radius: 40px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.95);
+  color: #333;
+  font-size: 15px;
   outline: none;
   transition: all 0.3s ease;
-  backdrop-filter: blur(5px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 }
 
 .search input::placeholder {
-  color: var(--text-muted);
-  opacity: 0.7;
+  color: #999;
+  opacity: 0.8;
   transition: opacity 0.3s ease;
 }
 
-/* When scrolled, make placeholder more transparent */
+/* When scrolled, make placeholder slightly more transparent */
 .audience-header.scrolled .search input::placeholder {
-  opacity: 0.5;
+  opacity: 0.6;
 }
 
 .search input:focus {
   border-color: rgb(146, 52, 234);
-  box-shadow: 0 0 0 3px rgba(146, 52, 234, 0.1);
+  box-shadow: 0 0 0 4px rgba(146, 52, 234, 0.15);
   background: white;
 }
 
@@ -159,52 +200,49 @@
 .user-actions {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
   justify-content: flex-end;
 }
 
 .location {
-  color: var(--text-muted);
+  color: #666;
   cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 6px;
+  padding: 8px 16px;
+  border-radius: 30px;
   transition: all 0.3s ease;
   font-weight: 500;
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(5px);
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.8);
+  white-space: nowrap;
 }
 
 .location:hover {
-  background: rgba(0, 0, 0, 0.02);
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .pill {
-  background: var(--gradient-main);
+  background: linear-gradient(135deg, rgb(146, 52, 234) 0%, rgb(226, 54, 163) 50%, rgb(239, 67, 67) 100%);
   color: white;
-  padding: 8px 20px;
-  border-radius: 30px;
+  padding: 10px 24px;
+  border-radius: 40px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   border: none;
   font-size: 14px;
-  backdrop-filter: blur(5px);
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(146, 52, 234, 0.2);
 }
 
-/* When scrolled, make gradient more subtle */
+/* When scrolled, slightly reduce shadow */
 .audience-header.scrolled .pill {
-  background: linear-gradient(
-    135deg,
-    rgba(146, 52, 234, 0.9) 0%,
-    rgba(226, 54, 163, 0.9) 50%,
-    rgba(239, 67, 67, 0.9) 100%
-  );
+  box-shadow: 0 2px 8px rgba(146, 52, 234, 0.15);
+  padding: 8px 22px;
 }
 
 .pill:hover {
-  background: var(--gradient-hover);
   transform: translateY(-2px);
-  box-shadow: var(--shadow);
+  box-shadow: 0 8px 20px rgba(146, 52, 234, 0.3);
 }
 
 /* User Welcome Dropdown Styles */
@@ -214,11 +252,11 @@
 }
 
 .user-welcome-trigger {
-  background: var(--gradient-main);
+  background: linear-gradient(135deg, rgb(146, 52, 234) 0%, rgb(226, 54, 163) 50%, rgb(239, 67, 67) 100%);
   color: white;
   font-weight: 600;
-  padding: 8px 20px;
-  border-radius: 30px;
+  padding: 10px 24px;
+  border-radius: 40px;
   font-size: 14px;
   display: flex;
   align-items: center;
@@ -226,51 +264,58 @@
   transition: all 0.3s ease;
   border: none;
   cursor: pointer;
-  backdrop-filter: blur(5px);
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(146, 52, 234, 0.2);
 }
 
-/* When scrolled, make gradient more subtle */
+/* When scrolled, slightly reduce size */
 .audience-header.scrolled .user-welcome-trigger {
-  background: linear-gradient(
-    135deg,
-    rgba(146, 52, 234, 0.9) 0%,
-    rgba(226, 54, 163, 0.9) 50%,
-    rgba(239, 67, 67, 0.9) 100%
-  );
+  padding: 8px 22px;
+  box-shadow: 0 2px 8px rgba(146, 52, 234, 0.15);
 }
 
 .user-welcome-trigger:hover {
-  background: var(--gradient-hover);
   transform: translateY(-2px);
-  box-shadow: var(--shadow);
+  box-shadow: 0 8px 20px rgba(146, 52, 234, 0.3);
 }
 
 .user-dropdown-menu {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 8px);
   right: 0;
-  margin-top: 8px;
   background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow);
-  min-width: 180px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  min-width: 200px;
   z-index: 1001;
   border: 1px solid rgba(0, 0, 0, 0.05);
   overflow: hidden;
+  animation: dropdownFade 0.2s ease;
+}
+
+@keyframes dropdownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .dropdown-item {
-  padding: 12px 16px;
+  padding: 14px 20px;
   cursor: pointer;
   transition: background-color 0.2s;
   font-size: 14px;
-  color: var(--text-dark);
+  color: #333;
 }
 
 .dropdown-item:hover {
-  background: var(--gradient-soft);
+  background: linear-gradient(135deg, rgba(146, 52, 234, 0.05) 0%, rgba(226, 54, 163, 0.05) 100%);
 }
 
 .dropdown-divider {
@@ -308,6 +353,7 @@
 .search-breadcrumb-container {
   flex: 1;
   max-width: 600px;
+  min-width: 200px;
 }
 
 .breadcrumbs {
@@ -315,23 +361,19 @@
   align-items: center;
   gap: 8px;
   font-size: 14px;
-  color: var(--text-muted);
+  color: #666;
   white-space: nowrap;
   overflow-x: auto;
-  padding-bottom: 2px;
+  padding: 8px 16px;
   scrollbar-width: thin;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(5px);
-  padding: 6px 12px;
-  border-radius: 30px;
+  border-radius: 40px;
   transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-/* When scrolled, make breadcrumbs more transparent */
-.audience-header.scrolled .breadcrumbs {
-  background: rgba(255, 255, 255, 0.3);
-}
-
+/* Hide scrollbar but keep functionality */
 .breadcrumbs::-webkit-scrollbar {
   height: 3px;
 }
@@ -342,35 +384,40 @@
 }
 
 .breadcrumbs::-webkit-scrollbar-thumb {
-  background: var(--gradient-main);
+  background: linear-gradient(135deg, rgb(146, 52, 234) 0%, rgb(226, 54, 163) 100%);
   border-radius: 3px;
 }
 
 .back-arrow {
   font-size: 18px;
   cursor: pointer;
-  padding: 4px 8px;
-  transition: var(--transition);
-  color: var(--text-dark);
+  padding: 4px 10px;
+  transition: all 0.2s ease;
+  color: #333;
   font-weight: 600;
-  background: rgba(0, 0, 0, 0.02);
+  background: rgba(0, 0, 0, 0.03);
   border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 4px;
 }
 
 .back-arrow:hover {
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(0, 0, 0, 0.08);
 }
 
 .crumb {
   cursor: pointer;
-  color: var(--text-muted);
-  transition: var(--transition);
-  padding: 4px 0;
+  color: #666;
+  transition: all 0.2s ease;
+  padding: 4px 6px;
+  border-radius: 20px;
 }
 
 .crumb:hover {
-  color: var(--text-dark);
-  text-decoration: underline;
+  color: #333;
+  background: rgba(0, 0, 0, 0.02);
 }
 
 .crumb.active {
@@ -378,34 +425,25 @@
   font-weight: 600;
   cursor: default;
   text-decoration: none;
-  background: var(--gradient-main);
-  padding: 4px 12px;
-  border-radius: 20px;
-}
-
-/* When scrolled, make active crumb more subtle */
-.audience-header.scrolled .crumb.active {
-  background: linear-gradient(
-    135deg,
-    rgba(146, 52, 234, 0.9) 0%,
-    rgba(226, 54, 163, 0.9) 50%,
-    rgba(239, 67, 67, 0.9) 100%
-  );
+  background: linear-gradient(135deg, rgb(146, 52, 234) 0%, rgb(226, 54, 163) 100%);
+  padding: 6px 16px;
+  border-radius: 30px;
+  box-shadow: 0 2px 8px rgba(146, 52, 234, 0.2);
 }
 
 .crumb.muted {
-  color: var(--text-muted-secondary);
+  color: #999;
   cursor: default;
 }
 
 .separator {
-  color: var(--text-muted);
+  color: #999;
   font-size: 14px;
-  transition: opacity 0.3s ease;
+  margin: 0 2px;
 }
 
 /* ===========================================
-   AUTH MODAL STYLES
+   AUTH MODAL STYLES (Unchanged)
    =========================================== */
 .modal-overlay {
   position: fixed;
@@ -413,8 +451,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -423,17 +461,17 @@
 
 .modal-content {
   background: white;
-  border-radius: var(--radius);
+  border-radius: 24px;
   width: 90%;
-  max-width: 400px;
-  animation: slideIn 0.3s ease;
+  max-width: 420px;
+  animation: modalSlideUp 0.3s ease;
   border: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: var(--shadow);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
 }
 
-@keyframes slideIn {
+@keyframes modalSlideUp {
   from {
-    transform: translateY(-20px);
+    transform: translateY(30px);
     opacity: 0;
   }
   to {
@@ -443,33 +481,35 @@
 }
 
 .modal-header {
-  padding: 20px;
+  padding: 24px 24px 20px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: var(--gradient-main);
-  border-radius: var(--radius) var(--radius) 0 0;
+  background: linear-gradient(135deg, rgb(146, 52, 234) 0%, rgb(226, 54, 163) 100%);
+  border-radius: 24px 24px 0 0;
 }
 
 .modal-header h3 {
   margin: 0;
   color: white;
+  font-size: 20px;
 }
 
 .modal-close {
   background: rgba(255, 255, 255, 0.2);
   border: none;
-  font-size: 24px;
+  font-size: 28px;
   cursor: pointer;
   color: white;
-  transition: var(--transition);
-  width: 32px;
-  height: 32px;
+  transition: all 0.2s ease;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  line-height: 1;
 }
 
 .modal-close:hover {
@@ -478,92 +518,95 @@
 }
 
 .modal-body {
-  padding: 20px;
+  padding: 24px;
 }
 
 /* Auth Modal Styles */
 .auth-modal {
-  max-width: 400px;
+  max-width: 420px;
 }
 
 .signup-steps {
   display: flex;
   justify-content: center;
-  margin-bottom: 20px;
-  gap: 20px;
+  margin-bottom: 24px;
+  gap: 30px;
 }
 
 .step {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--text-muted);
+  color: #999;
+  font-size: 14px;
 }
 
 .step.active {
-  color: var(--primary);
+  color: rgb(146, 52, 234);
 }
 
 .step-number {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .step.active .step-number {
-  background: var(--gradient-main);
+  background: linear-gradient(135deg, rgb(146, 52, 234) 0%, rgb(226, 54, 163) 100%);
   color: white;
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 16px;
 }
 
 .form-group input,
 .form-group select {
   width: 100%;
-  padding: 12px;
+  padding: 14px 16px;
   border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: var(--radius-sm);
-  font-size: 14px;
+  border-radius: 12px;
+  font-size: 15px;
   background: white;
-  color: var(--text-dark);
-  transition: var(--transition);
+  color: #333;
+  transition: all 0.2s ease;
 }
 
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
   border-color: rgb(146, 52, 234);
-  box-shadow: 0 0 0 3px rgba(146, 52, 234, 0.1);
+  box-shadow: 0 0 0 4px rgba(146, 52, 234, 0.1);
 }
 
 .form-group input::placeholder {
-  color: var(--text-muted);
+  color: #999;
 }
 
 .auth-btn {
   width: 100%;
-  padding: 12px;
-  background: var(--gradient-main);
+  padding: 14px;
+  background: linear-gradient(135deg, rgb(146, 52, 234) 0%, rgb(226, 54, 163) 100%);
   color: white;
   border: none;
-  border-radius: 30px;
+  border-radius: 40px;
   font-weight: 600;
+  font-size: 16px;
   cursor: pointer;
-  margin-top: 10px;
-  transition: var(--transition);
+  margin-top: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(146, 52, 234, 0.3);
 }
 
 .auth-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: var(--shadow);
-  background: var(--gradient-hover);
+  box-shadow: 0 8px 25px rgba(146, 52, 234, 0.4);
 }
 
 .auth-btn:disabled {
@@ -574,7 +617,8 @@
 .auth-footer {
   margin-top: 20px;
   text-align: center;
-  color: var(--text-muted);
+  color: #666;
+  font-size: 14px;
 }
 
 .auth-footer a {
@@ -590,12 +634,12 @@
 
 .form-row {
   display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
 .form-group.country-code {
-  flex: 0 0 100px;
+  flex: 0 0 110px;
 }
 
 .form-group.phone-number {
@@ -608,68 +652,77 @@
 }
 
 .verification-header h4 {
-  color: var(--text-dark);
-  margin-bottom: 10px;
+  color: #333;
+  margin-bottom: 8px;
+  font-size: 18px;
 }
 
 .verification-header p {
-  color: var(--text-muted);
-  margin-bottom: 20px;
+  color: #666;
+  margin-bottom: 24px;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .otp-input-container {
-  margin: 20px 0;
+  margin: 24px 0;
 }
 
 .otp-inputs {
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .otp-digit {
-  width: 50px;
-  height: 50px;
+  width: 55px;
+  height: 55px;
   text-align: center;
-  font-size: 20px;
+  font-size: 24px;
+  font-weight: 600;
   border: 2px solid rgba(0, 0, 0, 0.1);
-  border-radius: var(--radius-sm);
+  border-radius: 12px;
   background: white;
-  color: var(--text-dark);
-  transition: var(--transition);
+  color: #333;
+  transition: all 0.2s ease;
 }
 
 .otp-digit:focus {
   border-color: rgb(146, 52, 234);
   outline: none;
+  box-shadow: 0 0 0 4px rgba(146, 52, 234, 0.1);
 }
 
 .otp-timer {
   color: rgb(239, 67, 67);
   font-size: 14px;
-  margin: 10px 0;
+  margin: 12px 0;
+  font-weight: 600;
 }
 
 .otp-actions {
   display: flex;
   justify-content: space-between;
-  gap: 10px;
-  margin-top: 20px;
+  gap: 12px;
+  margin-top: 24px;
 }
 
 .resend-btn {
-  padding: 10px 20px;
+  padding: 12px 24px;
   background: transparent;
   border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: var(--radius-sm);
+  border-radius: 30px;
   cursor: pointer;
-  color: var(--text-dark);
-  transition: var(--transition);
+  color: #666;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  flex: 1;
 }
 
 .resend-btn:hover:not(:disabled) {
   background: rgba(0, 0, 0, 0.02);
   border-color: rgb(146, 52, 234);
+  color: rgb(146, 52, 234);
 }
 
 .resend-btn:disabled {
@@ -678,20 +731,21 @@
 }
 
 .verify-btn {
-  padding: 10px 30px;
-  background: var(--gradient-main);
+  padding: 12px 30px;
+  background: linear-gradient(135deg, rgb(146, 52, 234) 0%, rgb(226, 54, 163) 100%);
   color: white;
   border: none;
   border-radius: 30px;
   cursor: pointer;
   font-weight: 600;
-  transition: var(--transition);
+  transition: all 0.3s ease;
+  flex: 1;
+  box-shadow: 0 4px 15px rgba(146, 52, 234, 0.3);
 }
 
 .verify-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: var(--shadow);
-  background: var(--gradient-hover);
+  box-shadow: 0 8px 25px rgba(146, 52, 234, 0.4);
 }
 
 .verify-btn:disabled {
@@ -699,75 +753,160 @@
   cursor: not-allowed;
 }
 
-/* Add padding to the main content to account for fixed header */
+/* Content padding for fixed header */
 :host-context(.audience-page) {
-  padding-top: 70px;
   display: block;
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
+/* When header is fixed, add padding to the next element */
+.audience-header.scrolled ~ * {
+  padding-top: 70px;
+  transition: padding-top 0.3s ease;
+}
+
+/* ===========================================
+   COMPREHENSIVE MOBILE RESPONSIVE STYLES
+   =========================================== */
+
+/* Large Tablets and Small Desktops */
+@media (max-width: 1200px) {
   .container {
-    padding: 0 15px;
-  }
-  
-  .header-row {
-    gap: 15px;
+    padding: 0 24px;
   }
   
   .left-section-content {
     gap: 20px;
   }
   
+  .logo-wrapper {
+    width: 120px;
+  }
+  
+  .audience-header.scrolled .logo-wrapper {
+    width: 110px;
+  }
+  
+  .search input {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+  
+  .pill, .user-welcome-trigger {
+    padding: 8px 20px;
+    font-size: 13px;
+  }
+}
+
+/* Tablets (Portrait) */
+@media (max-width: 992px) {
+  .container {
+    padding: 0 20px;
+  }
+  
+  .left-section-content {
+    gap: 15px;
+  }
+  
+  .logo-wrapper {
+    width: 100px;
+  }
+  
+  .audience-header.scrolled .logo-wrapper {
+    width: 90px;
+  }
+  
   .logo {
-    height: 35px;
+    max-height: 40px;
+  }
+  
+  .audience-header.scrolled .logo {
+    max-height: 35px;
   }
   
   .search input {
     padding: 8px 16px;
+    font-size: 13px;
+  }
+  
+  .user-actions {
+    gap: 12px;
   }
   
   .pill, .user-welcome-trigger {
     padding: 8px 16px;
-    font-size: 13px;
+    font-size: 12px;
   }
   
-  :host-context(.audience-page) {
-    padding-top: 65px;
+  .location {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  
+  .breadcrumbs {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+  
+  .crumb.active {
+    padding: 4px 12px;
   }
 }
 
+/* Small Tablets and Large Phones */
 @media (max-width: 768px) {
   .header-row {
-    flex-wrap: wrap;
-    height: auto;
+    flex-direction: column;
     padding: 12px 0;
-    gap: 10px;
+    gap: 12px;
+  }
+  
+  .audience-header.scrolled .header-row {
+    padding: 8px 0;
   }
   
   .left-section-col {
     width: 100%;
-    order: 1;
   }
   
   .left-section-content {
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     gap: 12px;
-    align-items: stretch;
   }
   
   .logo-wrapper {
-    align-self: flex-start;
+    width: 90px;
+  }
+  
+  .audience-header.scrolled .logo-wrapper {
+    width: 80px;
+  }
+  
+  .logo {
+    max-height: 35px;
+  }
+  
+  .audience-header.scrolled .logo {
+    max-height: 32px;
+  }
+  
+  .search-breadcrumb-container {
+    flex: 1;
+    min-width: 200px;
+    max-width: none;
   }
   
   .search-wrapper {
-    max-width: 100%;
+    max-width: none;
+  }
+  
+  .search input {
+    padding: 8px 16px;
+    font-size: 13px;
   }
   
   .actions-col {
     width: 100%;
-    order: 2;
-    justify-content: center;
   }
   
   .user-actions {
@@ -775,43 +914,275 @@
     gap: 15px;
     flex-wrap: wrap;
   }
-
+  
+  .pill, .user-welcome-trigger {
+    padding: 8px 20px;
+    font-size: 13px;
+  }
+  
+  .location {
+    padding: 8px 16px;
+  }
+  
   .breadcrumbs {
     font-size: 12px;
-    gap: 4px;
-    padding: 4px 8px;
+    padding: 6px 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
   
   .back-arrow {
     font-size: 16px;
-    padding: 4px;
+    padding: 4px 8px;
   }
   
-  :host-context(.audience-page) {
-    padding-top: 110px;
+  .crumb.active {
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+  
+  /* Adjust content padding for mobile */
+  .audience-header.scrolled ~ * {
+    padding-top: 120px;
   }
 }
 
-@media (max-width: 480px) {
+/* Mobile Phones */
+@media (max-width: 576px) {
+  .container {
+    padding: 0 16px;
+  }
+  
+  .header-row {
+    gap: 10px;
+  }
+  
+  .left-section-content {
+    flex-wrap: wrap;
+  }
+  
+  .logo-wrapper {
+    width: 80px;
+  }
+  
+  .audience-header.scrolled .logo-wrapper {
+    width: 70px;
+  }
+  
+  .logo {
+    max-height: 32px;
+  }
+  
+  .audience-header.scrolled .logo {
+    max-height: 28px;
+  }
+  
+  .search-breadcrumb-container {
+    min-width: 100%;
+    order: 3;
+  }
+  
+  .search input {
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+  
+  .actions-col {
+    order: 2;
+  }
+  
+  .user-actions {
+    gap: 10px;
+  }
+  
+  .pill, .user-welcome-trigger {
+    padding: 6px 16px;
+    font-size: 12px;
+  }
+  
+  .location {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+  
+  .breadcrumbs {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+  
+  .back-arrow {
+    font-size: 14px;
+    padding: 3px 6px;
+  }
+  
+  .crumb.active {
+    padding: 3px 8px;
+    font-size: 10px;
+  }
+  
+  .separator {
+    font-size: 10px;
+  }
+  
+  /* Adjust content padding for small phones */
+  .audience-header.scrolled ~ * {
+    padding-top: 140px;
+  }
+  
+  /* Auth Modal adjustments for mobile */
+  .modal-content {
+    width: 95%;
+    max-width: 380px;
+  }
+  
+  .modal-header {
+    padding: 18px 20px;
+  }
+  
+  .modal-header h3 {
+    font-size: 18px;
+  }
+  
+  .modal-body {
+    padding: 20px;
+  }
+  
+  .signup-steps {
+    gap: 20px;
+  }
+  
+  .step {
+    font-size: 12px;
+  }
+  
+  .step-number {
+    width: 24px;
+    height: 24px;
+    font-size: 11px;
+  }
+  
+  .form-group input,
+  .form-group select {
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+  
+  .auth-btn {
+    padding: 12px;
+    font-size: 14px;
+  }
+  
+  .form-row {
+    gap: 8px;
+  }
+  
+  .form-group.country-code {
+    flex: 0 0 90px;
+  }
+  
+  .otp-digit {
+    width: 45px;
+    height: 45px;
+    font-size: 20px;
+  }
+}
+
+/* Extra Small Phones */
+@media (max-width: 380px) {
+  .logo-wrapper {
+    width: 70px;
+  }
+  
+  .audience-header.scrolled .logo-wrapper {
+    width: 60px;
+  }
+  
+  .logo {
+    max-height: 28px;
+  }
+  
+  .audience-header.scrolled .logo {
+    max-height: 25px;
+  }
+  
+  .pill, .user-welcome-trigger {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+  
   .user-actions {
     gap: 8px;
   }
   
   .location {
-    padding: 6px 8px;
-    font-size: 12px;
-  }
-  
-  .pill, .user-welcome-trigger {
-    padding: 6px 12px;
-    font-size: 12px;
+    padding: 5px 10px;
+    font-size: 10px;
   }
   
   .breadcrumbs {
-    font-size: 11px;
+    font-size: 10px;
+    padding: 4px 8px;
   }
   
-  :host-context(.audience-page) {
-    padding-top: 120px;
+  .crumb.active {
+    padding: 3px 6px;
+    font-size: 9px;
+  }
+  
+  .audience-header.scrolled ~ * {
+    padding-top: 150px;
+  }
+  
+  /* Further reduce OTP input size */
+  .otp-digit {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+}
+
+/* Landscape Mode for Phones */
+@media (max-width: 896px) and (orientation: landscape) {
+  .audience-header.scrolled ~ * {
+    padding-top: 80px;
+  }
+  
+  .modal-content {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+/* High-resolution screens */
+@media (min-width: 1600px) {
+  .container {
+    max-width: 1600px;
+  }
+  
+  .search input {
+    padding: 14px 28px;
+    font-size: 16px;
+  }
+  
+  .pill, .user-welcome-trigger {
+    padding: 12px 28px;
+    font-size: 15px;
+  }
+  
+  .logo-wrapper {
+    width: 160px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .audience-header {
+    position: relative;
+    box-shadow: none;
+    border-bottom: 1px solid #000;
+  }
+  
+  .audience-header.scrolled {
+    position: relative;
   }
 }

@@ -75,8 +75,55 @@
 .event-category {
   font-size: 18px;
   color: var(--text-muted);
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   font-weight: 500;
+}
+
+/* New Event Details Section - Moved from sidebar to left content */
+.event-details-section {
+  margin-bottom: 24px;
+  background: white;
+  padding: 20px 24px;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.event-details-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.event-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--text-muted);
+  font-size: 16px;
+}
+
+.event-detail-icon {
+  font-size: 20px;
+  min-width: 24px;
+  text-align: center;
+}
+
+.event-detail-content {
+  flex: 1;
+}
+
+.event-detail-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+  opacity: 0.8;
+}
+
+.event-detail-value {
+  font-weight: 600;
+  color: var(--text-dark);
+  font-size: 16px;
 }
 
 /* Quick Info Section */
@@ -316,7 +363,7 @@
   line-height: 1.3;
 }
 
-/* Sidebar Styles */
+/* Sidebar Styles - Updated for sticky behavior and simplified content */
 .sidebar-card {
   background: white;
   border-radius: 24px;
@@ -330,49 +377,35 @@
   top: 100px;
 }
 
-/* Sidebar Quick Info */
-.sidebar-quick-info {
-  margin-bottom: 24px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+/* Simplified Sidebar - Only Price and Book Now */
+.sidebar-price-section {
+  margin-bottom: 20px;
+  text-align: center;
 }
 
-.sidebar-price {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 16px;
-}
-
-.price-label {
+.sidebar-price-label {
   font-size: 14px;
   color: var(--text-muted);
+  display: block;
+  margin-bottom: 8px;
 }
 
-.price-value {
-  font-size: 24px;
+.sidebar-price-value {
+  font-size: 36px;
   font-weight: 800;
   background: var(--gradient-main);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  line-height: 1.2;
+  display: block;
 }
 
-.sidebar-date,
-.sidebar-time,
-.sidebar-venue {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 0;
+.sidebar-price-range {
+  font-size: 16px;
   color: var(--text-muted);
-  font-size: 14px;
-}
-
-.sidebar-date span:first-child,
-.sidebar-time span:first-child,
-.sidebar-venue span:first-child {
-  font-size: 18px;
+  margin-top: 4px;
+  display: block;
 }
 
 /* Book Now Button */
@@ -391,7 +424,6 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin-top: 20px;
 }
 
 .book-now-btn:hover:not(:disabled) {
@@ -411,12 +443,7 @@
   line-height: 1;
 }
 
-.terms-note {
-  font-size: 12px;
-  color: var(--text-muted);
-  text-align: center;
-  margin-top: 16px;
-}
+/* Removed terms-note from sidebar - now only in left content */
 
 /* Loading States */
 .loading-container {
@@ -1020,7 +1047,7 @@
 
 .footer-main {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr;
   gap: 40px;
   margin-bottom: 40px;
   max-width: 1240px;
@@ -1035,8 +1062,7 @@
 }
 
 .brand-col .logo {
-  height: 50%;
-  width: 50%;
+  width: 20%;
   margin-bottom: 20px;
 }
 
@@ -1164,6 +1190,74 @@
   margin: 0;
 }
 
+/* Mobile Sticky Footer for Price and Book Now */
+.mobile-sticky-footer {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  padding: 12px 20px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.mobile-footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.mobile-price-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-price-label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.mobile-price-value {
+  font-size: 24px;
+  font-weight: 800;
+  background: var(--gradient-main);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+}
+
+.mobile-price-range {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.mobile-book-btn {
+  background: var(--gradient-main);
+  color: white;
+  padding: 12px 30px;
+  border-radius: 30px;
+  border: none;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mobile-book-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+  background: var(--gradient-hover);
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .booking-layout {
@@ -1172,11 +1266,11 @@
   }
   
   .booking-sidebar {
-    order: -1;
+    display: none; /* Hide desktop sidebar on mobile */
   }
   
-  .sticky-sidebar {
-    position: static;
+  .mobile-sticky-footer {
+    display: block; /* Show mobile sticky footer */
   }
   
   .event-main-title {
@@ -1195,6 +1289,11 @@
     grid-template-columns: 1.5fr 1fr 1fr 1fr;
     gap: 30px;
   }
+  
+  /* Add padding to bottom of main content to account for sticky footer */
+  .booking-main-content {
+    padding-bottom: 80px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -1208,6 +1307,24 @@
   
   .event-category {
     font-size: 16px;
+  }
+  
+  .event-details-section {
+    padding: 16px 20px;
+  }
+  
+  .event-detail-item {
+    gap: 12px;
+    font-size: 15px;
+  }
+  
+  .event-detail-icon {
+    font-size: 18px;
+    min-width: 20px;
+  }
+  
+  .event-detail-value {
+    font-size: 15px;
   }
   
   .quick-info-grid {
@@ -1273,6 +1390,15 @@
   .seat-info-main {
     width: 100%;
   }
+  
+  .mobile-price-value {
+    font-size: 20px;
+  }
+  
+  .mobile-book-btn {
+    padding: 10px 24px;
+    font-size: 15px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1284,21 +1410,21 @@
     font-size: 24px;
   }
   
-  .sidebar-card {
-    padding: 20px;
+  .event-details-section {
+    padding: 14px 16px;
+  }
+  
+  .event-detail-item {
+    gap: 10px;
+    font-size: 14px;
+  }
+  
+  .event-detail-icon {
+    font-size: 16px;
   }
   
   .shows-grid {
     grid-template-columns: 1fr;
-  }
-  
-  .price-value {
-    font-size: 20px;
-  }
-  
-  .book-now-btn {
-    font-size: 16px;
-    padding: 14px;
   }
   
   .footer-main {
@@ -1338,5 +1464,164 @@
   .proceed-btn {
     font-size: 16px;
     padding: 14px;
+  }
+  
+  .mobile-sticky-footer {
+    padding: 10px 15px;
+  }
+  
+  .mobile-price-value {
+    font-size: 18px;
+  }
+  
+  .mobile-book-btn {
+    padding: 8px 20px;
+    font-size: 14px;
+  }
+}
+
+.made-with {
+  margin-left: 8px;
+}
+
+.heart {
+  color: #ff4d6d;
+  font-size: 16px;
+  display: inline-block;
+}
+
+/* Fixed Sticky Sidebar - Always visible when scrolling */
+.booking-sidebar {
+  position: relative;
+  height: 100%;
+}
+
+.sticky-sidebar {
+  position: fixed !important;
+  top: 100px !important;
+  width: 380px !important; /* Match your sidebar width from grid */
+  max-width: calc(100vw - 40px);
+  z-index: 1000;
+  transition: all 0.3s ease;
+  animation: slideIn 0.3s ease;
+}
+
+/* Add a spacer to maintain layout flow and prevent content jump */
+.booking-sidebar::before {
+  content: '';
+  display: block;
+  visibility: hidden;
+  width: 100%;
+}
+
+/* Calculate spacer height based on sidebar content */
+.booking-sidebar {
+  position: relative;
+}
+
+.booking-sidebar::before {
+  height: 0; /* Will be updated via JavaScript if needed, or you can set a fixed height */
+}
+
+/* Smooth animation for sticky appearance */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Adjust for different screen sizes */
+@media (max-width: 1024px) {
+  .sticky-sidebar {
+    display: none; /* Hide fixed sidebar on mobile since you have mobile footer */
+  }
+}
+
+@media (min-width: 1025px) {
+  .booking-layout {
+    grid-template-columns: 1fr 380px;
+  }
+  
+  .sticky-sidebar {
+    width: 380px !important;
+  }
+}
+
+/* Ensure the sidebar doesn't overflow or cause horizontal scroll */
+body {
+  overflow-x: hidden;
+}
+
+/* Add a subtle shadow when sticky to make it stand out */
+.sticky-sidebar.stuck {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Add this at the very end of your CSS file */
+
+/* Fix for sticky sidebar - stays within its container only */
+.booking-layout {
+  align-items: flex-start !important;
+  position: relative;
+}
+
+.booking-sidebar {
+  position: relative;
+  height: 100%;
+  align-self: flex-start;
+}
+
+.sticky-sidebar {
+  position: sticky !important;
+  top: 100px !important;
+  max-height: calc(100vh - 60px);
+  overflow-y: auto;
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+/* Hide scrollbar but keep functionality */
+.sticky-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sticky-sidebar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.sticky-sidebar::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgb(146, 52, 234), rgb(226, 54, 163));
+  border-radius: 4px;
+}
+
+/* Remove any fixed positioning that might be conflicting */
+.booking-sidebar::before {
+  display: none !important;
+}
+
+/* Ensure smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Make sure the footer doesn't interfere */
+.events-footer {
+  position: relative;
+  z-index: 1;
+  clear: both;
+}
+
+/* Responsive handling */
+@media (max-width: 1024px) {
+  .sticky-sidebar {
+    position: relative !important; /* Remove sticky on mobile */
+    top: 0 !important;
+    max-height: none;
   }
 }

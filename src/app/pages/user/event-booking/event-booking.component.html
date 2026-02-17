@@ -79,6 +79,39 @@
                         </div>
                     </div> -->
 
+                    <!-- After event-category and before quick-info-section -->
+                    <div class="event-details-section">
+                        <div class="event-details-grid">
+                            <div class="event-detail-item">
+                                <span class="event-detail-icon">📍</span>
+                                <div class="event-detail-content">
+                                    <div class="event-detail-label">Venue</div>
+                                    <div class="event-detail-value">{{ eventDetails.full_address ||
+                                        eventDetails.location }}</div>
+                                </div>
+                            </div>
+                            <div class="d-flex" style="gap: 50px;">
+                                <div class="event-detail-item">
+                                    <span class="event-detail-icon">📅</span>
+                                    <div class="event-detail-content">
+                                        <div class="event-detail-label">Date</div>
+                                        <div class="event-detail-value">{{ formatDisplayDate(eventDetails.event_date) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="event-detail-item">
+                                    <span class="event-detail-icon">⏰</span>
+                                    <div class="event-detail-content">
+                                        <div class="event-detail-label">Time</div>
+                                        <div class="event-detail-value">{{ formatTimeForDisplay(eventDetails.start_time)
+                                            }}
+                                            • {{ formatDuration(eventDetails.total_duration_minutes) }}</div>
+                                    </div>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>
+
                     <!-- Quick Info Section -->
                     <div class="quick-info-section">
                         <!-- <h3 class="section-title-small">Quick Info</h3> -->
@@ -153,33 +186,14 @@
                 <!-- RIGHT: Booking Sidebar -->
                 <aside class="booking-sidebar">
                     <div class="sidebar-card sticky-sidebar">
-                        <!-- Quick Info in Sidebar -->
-                        <div class="sidebar-quick-info">
-                            <div class="sidebar-price">
-                                <span class="price-label">Starting from</span>
-                                <span class="price-value">{{ getDisplayPrice() }}{{ getPriceRangeDisplay() }}</span>
-                            </div>
-                            <div class="sidebar-date">
-                                <span class="date-icon">📅</span>
-                                <span class="date-text">{{ formatDisplayDate(eventDetails.event_date) }}</span>
-                            </div>
-                            <div class="sidebar-time">
-                                <span class="time-icon">⏰</span>
-                                <span class="time-text">{{ formatTimeForDisplay(eventDetails.start_time) }} • {{
-                                    formatDuration(eventDetails.total_duration_minutes) }}</span>
-                            </div>
-                            <div class="sidebar-venue">
-                                <span class="venue-icon">📍</span>
-                                <span class="venue-text">{{ eventDetails.full_address || eventDetails.location }}</span>
-                            </div>
+                        <div class="sidebar-price-section">
+                            <span class="sidebar-price-label">Starting from</span>
+                            <span class="sidebar-price-value">{{ getDisplayPrice() }}</span>
+                            <span class="sidebar-price-range">{{ getPriceRangeDisplay() }}</span>
                         </div>
-
-                        <!-- Book Now Button (Only this remains - no seat selection) -->
                         <button class="book-now-btn" (click)="onBookNow()">
                             Book Now <span class="btn-arrow">›</span>
                         </button>
-
-                        <p class="terms-note">By proceeding, you agree to our Terms & Conditions</p>
                     </div>
                 </aside>
             </div>
@@ -192,6 +206,21 @@
                 </div>
             </section>
         </main>
+
+        <!-- Add this right before the closing </main> tag or after the footer -->
+        <div class="mobile-sticky-footer">
+            <div class="mobile-footer-content">
+                <div class="mobile-price-info">
+                    <span class="mobile-price-label">Starting from</span>
+                    <span class="mobile-price-value">{{ getDisplayPrice() }}</span>
+                    <span class="mobile-price-range">{{ getPriceRangeDisplay() }}</span>
+                </div>
+                <button class="mobile-book-btn" (click)="onBookNow()">
+                    Book Now <span class="btn-arrow">›</span>
+                </button>
+            </div>
+        </div>
+
         <footer class="events-footer">
             <div class="events-container">
                 <div class="footer-main">
@@ -203,7 +232,7 @@
                         </p>
 
                         <!-- Social Media Icons -->
-                        <div class="social-icons">
+                        <div class="social-icons d-none">
                             <a href="#" class="social-icon facebook" aria-label="Facebook">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
                                     fill="currentColor">
@@ -236,7 +265,7 @@
                     </div>
 
                     <!-- Quick Links -->
-                    <div class="footer-col">
+                    <div class="footer-col d-none">
                         <h4 class="footer-title">Quick Links</h4>
                         <ul class="footer-links-list">
                             <li><a href="#">Events</a></li>
@@ -250,7 +279,7 @@
                     <div class="footer-col">
                         <h4 class="footer-title">Support</h4>
                         <ul class="footer-links-list">
-                            <li><a href="#">Help & Support</a></li>
+                            <!-- <li><a href="#">Help & Support</a></li> -->
                             <!-- <li><a href="#">Terms & Conditions</a></li>
                             <li><a href="#">Privacy Policy</a></li>
                             <li><a href="#">Refund Policy</a></li> -->
@@ -264,15 +293,19 @@
                     <div class="footer-col">
                         <h4 class="footer-title">Contact Us</h4>
                         <ul class="footer-links-list contact-info">
-                            <li><a href="mailto:support@tickethouse.com">support@tickethouse.com</a></li>
-                            <li><a href="tel:1800123456">1800-123-456</a></li>
+                            <li><a href="mailto:support@tickethouse.in">support@tickethouse.com</a></li>
+                            <!-- <li><a href="tel:1800123456">1800-123-456</a></li> -->
                         </ul>
                     </div>
                 </div>
 
                 <!-- Copyright -->
                 <div class="footer-bottom">
-                    <p class="copy">© 2026 Ticket House. All rights reserved.</p>
+                    <!-- <p class="copy">© 2026 Ticket House. All rights reserved.</p> -->
+                    <p class="copy">
+                        © 2026 Zentro Technologies LLP. All Rights Reserved.
+                        <span class="made-with">Made with <span class="heart">♥</span></span>
+                    </p>
                 </div>
             </div>
         </footer>
