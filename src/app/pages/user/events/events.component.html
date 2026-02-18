@@ -97,7 +97,16 @@
                   {{ event.start_time }}
                 </p>
                 <p class="title">{{ event.event_name }}</p>
-                <p class="meta">{{ event.location }}</p>
+                <p class="meta location-text" [title]="event.location">{{ event.location }}</p>
+                <!-- Add price below location using a method call -->
+                <p class="meta price">
+                  <span *ngIf="getEventPrice(event) !== null">
+                    ₹{{ getEventPrice(event) }}
+                  </span>
+                  <span *ngIf="getEventPrice(event) === null">
+                    Price not available
+                  </span>
+                </p>
               </div>
             </div>
           </div>

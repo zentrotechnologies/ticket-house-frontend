@@ -31,10 +31,21 @@ export const routes: Routes = [
     component: LayoutComponent, // Layout wraps ALL routes below
     children: [
       // PUBLIC USER ROUTES - No auth guard needed
+      // {
+      //   path: 'events',
+      //   loadComponent: () =>
+      //     import('./pages/user/events/events.component').then((m) => m.EventsComponent),
+      // },
       {
-        path: 'events',
+        path: '',
         loadComponent: () =>
           import('./pages/user/events/events.component').then((m) => m.EventsComponent),
+      },
+      // Also keep /events as an alias that redirects to empty path
+      {
+        path: 'events',
+        redirectTo: '',
+        pathMatch: 'full',
       },
       {
         path: 'event-booking/:event_id/:event_name',

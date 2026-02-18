@@ -205,7 +205,7 @@
   font-size: 18px;
   background: var(--gradient-main);
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  /* -webkit-text-fill-color: transparent; */
   background-clip: text;
   line-height: 1.3;
 }
@@ -1011,4 +1011,24 @@
   font-size: 16px;
   /* animation: heartbeat 1.2s infinite; */
   display: inline-block;
+}
+
+/* Add to your CSS file */
+.event-card .meta.price {
+  font-weight: 600;
+  color: var(--gradient-main);
+  margin-top: 8px;
+  font-size: 16px;
+  background: var(--gradient-main);
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Add this to your existing CSS */
+.event-card .card-content .meta.location-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: block;
 }

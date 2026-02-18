@@ -90,7 +90,7 @@
                                         eventDetails.location }}</div>
                                 </div>
                             </div>
-                            <div class="d-flex" style="gap: 50px;">
+                            <!-- <div class="d-flex" style="gap: 50px;">
                                 <div class="event-detail-item">
                                     <span class="event-detail-icon">📅</span>
                                     <div class="event-detail-content">
@@ -108,7 +108,29 @@
                                             • {{ formatDuration(eventDetails.total_duration_minutes) }}</div>
                                     </div>
                                 </div>
-                            </div>                            
+                            </div> -->
+                            <div class="d-flex" style="gap: 50px;">
+                                <div class="event-detail-item">
+                                    <span class="event-detail-icon">
+                                        <i class="bi bi-calendar3"></i>
+                                    </span>
+                                    <div class="event-detail-content">
+                                        <div class="event-detail-label">Date</div>
+                                        <div class="event-detail-value">{{ formatDisplayDate(eventDetails.event_date) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="event-detail-item">
+                                    <span class="event-detail-icon">
+                                        <i class="bi bi-clock"></i>
+                                    </span>
+                                    <div class="event-detail-content">
+                                        <div class="event-detail-label">Time</div>
+                                        <div class="event-detail-value">{{ formatTimeForDisplay(eventDetails.start_time)
+                                            }} • {{ formatDuration(eventDetails.total_duration_minutes) }}</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -157,7 +179,7 @@
                     </div>
 
                     <!-- Terms & Conditions -->
-                    <div class="terms-row" (click)="openTermsModal()">
+                    <div class="terms-row d-none" (click)="openTermsModal()">
                         <span class="terms-label">By proceeding, you agree to our Terms & Conditions</span>
                         <span class="terms-arrow">›</span>
                     </div>
@@ -177,7 +199,10 @@
                                 <div class="mini-title">{{ similarEvent.event_name }}</div>
                                 <div class="mini-sub">{{ formatDisplayDate(similarEvent.event_date) }}, {{
                                     similarEvent.start_time }}</div>
-                                <div class="mini-sub">{{ similarEvent.location }}</div>
+                                <div class="mini-sub location-text" [title]="similarEvent.location">{{
+                                    similarEvent.location }}</div>
+                                <!-- Add price below location -->
+                                <div class="mini-sub price">{{ getSimilarEventPrice(similarEvent) }}</div>
                             </div>
                         </div>
                     </div>
@@ -194,6 +219,11 @@
                         <button class="book-now-btn" (click)="onBookNow()">
                             Book Now <span class="btn-arrow">›</span>
                         </button>
+                        <!-- ADD THIS LINE - Terms & Conditions below book now button -->
+                        <div class="terms-agreement">
+                            <span class="terms-text">By proceeding, you agree to our </span>
+                            <span class="terms-link" (click)="openTermsModal()">Terms & Conditions</span>
+                        </div>
                     </div>
                 </aside>
             </div>
@@ -355,9 +385,9 @@
                             <div class="seat-details">
                                 <div class="seat-name">{{ seatType.seat_name }}</div>
                                 <div class="seat-price">₹{{ seatType.price }}</div>
-                                <div class="seat-available" *ngIf="seatType.available_seats > 0">
+                                <!-- <div class="seat-available" *ngIf="seatType.available_seats > 0">
                                     {{ seatType.available_seats }} seats available
-                                </div>
+                                </div> -->
                                 <div class="seat-available sold-out" *ngIf="seatType.available_seats === 0">
                                     Sold Out
                                 </div>

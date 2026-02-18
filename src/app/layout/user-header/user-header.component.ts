@@ -23,24 +23,26 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
   currentUserId: string | null = null;
   userFirstName: string = '';
   showUserDropdown = false;
-  
+
   // Auth Modal properties
   showAuthModal = false;
   isLoginMode = true;
-  
+
   // Login properties
   loginEmail: string = '';
   loginPassword: string = '';
-  
+  showLoginPassword = false; // Add this
+
   // Signup properties
   signupStep = 1;
   signupFirstName: string = '';
   signupLastName: string = '';
   signupEmail: string = '';
   signupPassword: string = '';
+  showSignupPassword = false; // Add this
   signupPhone: string = '';
   signupCountryCode: string = '+91';
-  
+
   // OTP properties
   showOTPVerification = false;
   otpDigits: string[] = ['', '', '', ''];
@@ -48,16 +50,16 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
   otpTimer = 0;
   otpInterval: any;
   isLoading = false;
-  
+
   // City selection
   selectedCity: string = 'Pune';
-  
+
   // ========== NEW: Breadcrumb Properties ==========
   currentRoute: string = '';
   eventId: number | null = null;
   eventNameSlug: string | null = null;
   eventTitle: string = '';
-  
+
   private routerSubscription: Subscription = new Subscription();
   private userSubscription: Subscription = new Subscription();
 
@@ -66,12 +68,12 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
     private router: Router,
     private apiService: ApiService,
     private toastr: ToastrService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     // Check initial auth status
     this.checkAuthStatus();
-    
+
     // Subscribe to auth changes
     this.userSubscription = this.authService.currentUser$.subscribe((user) => {
       console.log('User header - auth state changed:', user);
@@ -79,7 +81,7 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
         this.isUserLoggedIn = true;
         this.currentUserId = user.user_id;
         this.userFirstName = user.first_name;
-        
+
         // Check if we have pending booking after login
         this.checkPendingBookingAfterLogin();
       } else {
@@ -88,12 +90,12 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
         this.userFirstName = '';
       }
     });
-    
+
     // Also check immediately after a short delay to ensure localStorage is read
     setTimeout(() => {
       this.checkAuthStatus();
     }, 0);
-    
+
     // Subscribe to route changes
     this.routerSubscription = this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
@@ -101,14 +103,11 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
         this.currentRoute = event.urlAfterRedirects;
         this.extractRouteParams();
       });
-    
+
     // Initial route extraction
     this.currentRoute = this.router.url;
     this.extractRouteParams();
-    
-    // Listen for custom event to open auth modal
-    // window.addEventListener('openAuthModal', this.handleOpenAuthModal.bind(this));
-    
+
     // Listen for custom event to open auth modal
     window.addEventListener('openAuthModal', () => {
       console.log('Opening auth modal');
@@ -125,12 +124,12 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
   // Add this new method to handle the custom event
   private handleOpenAuthModal(event: any): void {
     console.log('Received openAuthModal event', event.detail);
-    
+
     // Store return URL if provided
     if (event.detail?.returnUrl) {
       localStorage.setItem('pending_return_url', event.detail.returnUrl);
     }
-    
+
     // Open the auth modal
     this.showAuthModal = true;
     this.resetAuthForms();
@@ -142,14 +141,14 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
     const tempSelections = sessionStorage.getItem('temp_seat_selections');
     const tempEventId = sessionStorage.getItem('temp_event_id');
     const tempEventName = sessionStorage.getItem('temp_event_name');
-    
+
     console.log('Checking pending booking:', { tempSelections: !!tempSelections, tempEventId, tempEventName });
-    
+
     if (tempSelections && tempEventId && tempEventName) {
       // We have a pending booking - redirect to payment
       console.log('Redirecting to payment page');
       this.router.navigate([`/event-payment/${tempEventId}/${tempEventName}`]);
-      
+
       // Clear sessionStorage after navigation (payment page will use it)
       // Don't clear here - payment page will clear after using
     }
@@ -158,7 +157,7 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
   checkAuthStatus(): void {
     // First check via AuthService
     this.isUserLoggedIn = this.authService.isLoggedIn();
-    
+
     if (this.isUserLoggedIn) {
       this.currentUserId = this.authService.getCurrentUserId();
       const user = this.authService.getCurrentUser();
@@ -169,14 +168,14 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
       // Double-check localStorage directly as a fallback
       const token = localStorage.getItem('jwt_token');
       const userData = localStorage.getItem('user_data');
-      
+
       if (token && userData) {
         try {
           const user = JSON.parse(userData);
           this.isUserLoggedIn = true;
           this.currentUserId = user.user_id;
           this.userFirstName = user.first_name;
-          
+
           // Also update the AuthService
           this.authService.setcurrentUser(user);
         } catch (e) {
@@ -187,7 +186,7 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
   }
 
   // ========== NEW: Route Detection Methods ==========
-  
+
   /**
    * Determine whether to show search section or breadcrumbs
    */
@@ -219,7 +218,7 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
     this.eventId = null;
     this.eventNameSlug = null;
     this.eventTitle = '';
-    
+
     // Extract from seats-booking route
     const seatsMatch = this.currentRoute.match(/\/seats-booking\/(\d+)\/([^\/?#]+)/);
     if (seatsMatch) {
@@ -228,7 +227,7 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
       this.eventTitle = this.formatEventTitle(this.eventNameSlug);
       return;
     }
-    
+
     // Extract from event-payment route
     const paymentMatch = this.currentRoute.match(/\/event-payment\/(\d+)\/([^\/?#]+)/);
     if (paymentMatch) {
@@ -237,7 +236,7 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
       this.eventTitle = this.formatEventTitle(this.eventNameSlug);
       return;
     }
-    
+
     // Extract from event-booking route (if needed for future)
     const bookingMatch = this.currentRoute.match(/\/event-booking\/(\d+)\/([^\/?#]+)/);
     if (bookingMatch) {
@@ -306,7 +305,7 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
   // ===========================================
   // SEARCH METHODS
   // ===========================================
-  
+
   onSearch(event: any): void {
     const searchTerm = event.target.value;
     console.log('Searching for:', searchTerm);
@@ -361,7 +360,7 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
     this.showUserDropdown = false;
     this.authService.logout();
     this.toastr.success('Logged out successfully!', 'Success');
-    
+
     // Refresh the current page
     const currentUrl = this.router.url;
     this.router.navigateByUrl('/events', { skipLocationChange: true }).then(() => {
@@ -389,10 +388,12 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
     this.showOTPVerification = false;
     this.loginEmail = '';
     this.loginPassword = '';
+    this.showLoginPassword = false; // Add this
     this.signupFirstName = '';
     this.signupLastName = '';
     this.signupEmail = '';
     this.signupPassword = '';
+    this.showSignupPassword = false; // Add this
     this.signupPhone = '';
     this.signupCountryCode = '+91';
     this.otpDigits = ['', '', '', ''];
@@ -432,18 +433,29 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
     this.apiService.UserLogin(loginReq).subscribe({
       next: (response: any) => {
         this.isLoading = false;
-        if (response.response?.status === 'Success') {
-          this.saveUserData(response);
-          this.showAuthModal = false;
-          this.toastr.success('Logged in successfully!', 'Success');
-          this.resetAuthForms();
+        // Check the nested response structure
+        if (response && response.response) {
+          if (response.response.status === 'Success') {
+            this.saveUserData(response);
+            this.showAuthModal = false;
+            this.toastr.success('Logged in successfully!', 'Success');
+            this.resetAuthForms();
+          } else {
+            // Show error message from API
+            this.toastr.error(response.response.message || 'Login Failed', 'Login Failed');
+          }
         } else {
-          this.toastr.error(response.response?.message || 'Login Failed', 'Login Failed');
+          this.toastr.error('Invalid response from server', 'Login Failed');
         }
       },
       error: (error: any) => {
         this.isLoading = false;
-        this.toastr.error('Login failed. Please check your credentials and try again.', 'Error');
+        // Handle HTTP errors
+        if (error.error && error.error.response) {
+          this.toastr.error(error.error.response.message || 'Login failed', 'Error');
+        } else {
+          this.toastr.error('Login failed. Please check your credentials and try again.', 'Error');
+        }
         console.error('Login error:', error);
       },
     });
@@ -475,10 +487,10 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
 
   isValidSignupStep1(): boolean {
     return (
-      this.signupFirstName.length >= 2 &&
-      this.signupLastName.length >= 2 &&
+      this.signupFirstName?.length >= 2 &&
+      this.signupLastName?.length >= 2 &&
       this.isValidEmail(this.signupEmail) &&
-      this.signupPassword.length >= 8
+      this.isPasswordValid() // Use the new comprehensive validation
     );
   }
 
@@ -499,18 +511,27 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
     this.apiService.GenerateOTP(otpRequest).subscribe({
       next: (response) => {
         this.isLoading = false;
-        if (response.response?.status === 'Success') {
-          this.currentOtpId = response.validationotp_id;
-          this.signupStep = 2;
-          this.startOtpTimer(120);
-          this.toastr.success('OTP sent to your email', 'Success');
+        if (response && response.response) {
+          if (response.response.status === 'Success') {
+            this.currentOtpId = response.validationotp_id;
+            this.signupStep = 2;
+            this.startOtpTimer(120);
+            this.toastr.success('OTP sent to your email', 'Success');
+          } else {
+            this.toastr.error(response.response.message || 'Failed to send OTP', 'OTP Failed');
+          }
         } else {
-          this.toastr.error(response.response?.message || 'Failed to send OTP', 'OTP Failed');
+          this.toastr.error('Invalid response from server', 'OTP Failed');
         }
       },
       error: (error) => {
         this.isLoading = false;
-        this.toastr.error('Failed to send OTP. Please try again.', 'Error');
+        // Handle HTTP errors
+        if (error.error && error.error.response) {
+          this.toastr.error(error.error.response.message || 'Failed to send OTP', 'Error');
+        } else {
+          this.toastr.error('Failed to send OTP. Please try again.', 'Error');
+        }
         console.error('OTP error:', error);
       },
     });
@@ -586,17 +607,25 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
     this.apiService.GenerateOTP(otpRequest).subscribe({
       next: (response) => {
         this.isLoading = false;
-        if (response.response?.status === 'Success') {
-          this.currentOtpId = response.validationotp_id;
-          this.startOtpTimer(120);
-          this.toastr.success('New OTP sent to your email', 'Success');
+        if (response && response.response) {
+          if (response.response.status === 'Success') {
+            this.currentOtpId = response.validationotp_id;
+            this.startOtpTimer(120);
+            this.toastr.success('New OTP sent to your email', 'Success');
+          } else {
+            this.toastr.error(response.response.message || 'Failed to resend OTP', 'Resend Failed');
+          }
         } else {
-          this.toastr.error(response.response?.message || 'Failed to resend OTP', 'Resend Failed');
+          this.toastr.error('Invalid response from server', 'Resend Failed');
         }
       },
       error: (error) => {
         this.isLoading = false;
-        this.toastr.error('Failed to resend OTP', 'Error');
+        if (error.error && error.error.response) {
+          this.toastr.error(error.error.response.message || 'Failed to resend OTP', 'Error');
+        } else {
+          this.toastr.error('Failed to resend OTP', 'Error');
+        }
         console.error('Resend OTP error:', error);
       },
     });
@@ -619,16 +648,20 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
 
     this.apiService.VerifyOTP(verifyRequest).subscribe({
       next: (response) => {
-        if (response.status === 'Success') {
+        if (response && response.status === 'Success') {
           this.completeSignup();
         } else {
-          this.toastr.error(response.message, 'OTP Verification Failed');
+          this.toastr.error(response?.message || 'OTP Verification Failed', 'OTP Verification Failed');
           this.isLoading = false;
         }
       },
       error: (error) => {
-        this.toastr.error('OTP verification failed', 'Error');
         this.isLoading = false;
+        if (error.error && error.error.message) {
+          this.toastr.error(error.error.message, 'OTP Verification Failed');
+        } else {
+          this.toastr.error('OTP verification failed', 'Error');
+        }
         console.error('Verify OTP error:', error);
       },
     });
@@ -647,16 +680,27 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
 
     this.apiService.UserSignUp(signUpData).subscribe({
       next: (response: SignUpResponse) => {
-        if (response.response?.status === 'Success') {
-          this.autoLoginAfterSignup();
+        if (response && response.response) {
+          if (response.response.status === 'Success') {
+            this.autoLoginAfterSignup();
+          } else {
+            // Show the specific error message from API (like "Email already registered")
+            this.toastr.error(response.response.message || 'Signup Failed', 'Signup Failed');
+            this.isLoading = false;
+          }
         } else {
-          this.toastr.error(response.response?.message || 'Signup Failed', 'Signup Failed');
+          this.toastr.error('Invalid response from server', 'Signup Failed');
           this.isLoading = false;
         }
       },
       error: (error) => {
-        this.toastr.error('Account creation failed. Please try again.', 'Error');
         this.isLoading = false;
+        // Handle HTTP errors and show API error messages
+        if (error.error && error.error.response) {
+          this.toastr.error(error.error.response.message || 'Account creation failed', 'Signup Failed');
+        } else {
+          this.toastr.error('Account creation failed. Please try again.', 'Error');
+        }
         console.error('Signup error:', error);
       },
     });
@@ -671,11 +715,17 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
     this.apiService.UserLogin(loginReq).subscribe({
       next: (response: any) => {
         this.isLoading = false;
-        if (response.response?.status === 'Success') {
-          this.saveUserData(response);
-          this.showAuthModal = false;
-          this.toastr.success('Account created and logged in successfully!', 'Success');
-          this.resetAuthForms();
+        if (response && response.response) {
+          if (response.response.status === 'Success') {
+            this.saveUserData(response);
+            this.showAuthModal = false;
+            this.toastr.success('Account created and logged in successfully!', 'Success');
+            this.resetAuthForms();
+          } else {
+            this.toastr.success('Account created successfully! Please login to continue.', 'Success');
+            this.switchToLogin();
+            this.loginEmail = this.signupEmail;
+          }
         } else {
           this.toastr.success('Account created successfully! Please login to continue.', 'Success');
           this.switchToLogin();
@@ -734,5 +784,34 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
 
   onScroll() {
     this.isScrolled = window.scrollY > 10;
+  }
+
+  // Password validation methods
+  hasUpperCase(): boolean {
+    return /[A-Z]/.test(this.signupPassword);
+  }
+
+  hasLowerCase(): boolean {
+    return /[a-z]/.test(this.signupPassword);
+  }
+
+  hasNumber(): boolean {
+    return /[0-9]/.test(this.signupPassword);
+  }
+
+  hasSpecialChar(): boolean {
+    return /[@$!%*?&]/.test(this.signupPassword);
+  }
+
+  hasMinLength(): boolean {
+    return this.signupPassword?.length >= 8;
+  }
+
+  isPasswordValid(): boolean {
+    return this.hasUpperCase() &&
+      this.hasLowerCase() &&
+      this.hasNumber() &&
+      this.hasSpecialChar() &&
+      this.hasMinLength();
   }
 }

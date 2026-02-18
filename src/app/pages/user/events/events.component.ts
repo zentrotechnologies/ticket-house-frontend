@@ -55,6 +55,7 @@ export class EventsComponent implements OnInit {
   otpTimer = 0;
   otpInterval: any;
   isLoading = false;
+  eventPrices: Map<number, number | null> = new Map();
 
   private userSubscription: Subscription = new Subscription();
   
@@ -72,34 +73,82 @@ export class EventsComponent implements OnInit {
     this.loadTestimonials();
   }
 
+  // loadUpcomingEvents(): void {
+  //   this.isLoadingEvents = true;
+
+  //   const request = {
+  //     Count: 8,
+  //     IncludeLaterEvents: true
+  //   };
+
+  //   this.apiService.getUpcomingEvents(request).subscribe({
+  //     next: (response: UpcomingEventsResponse) => {
+  //       if (response.status === 'Success' && response.data) {
+  //         this.upcomingEvents = response.data;
+
+  //         // Update section title based on number of events
+  //         if (this.upcomingEvents.length === 0) {
+  //           this.sectionTitle = 'No Upcoming Events';
+  //         } else if (this.upcomingEvents.length < 3) {
+  //           this.sectionTitle = 'Upcoming Events';
+  //         }
+  //       }
+  //     },
+  //     error: (error) => {
+  //       console.error('Error loading upcoming events:', error);
+  //     },
+  //     complete: () => {
+  //       this.isLoadingEvents = false;
+  //     }
+  //   });
+  // }
+
   loadUpcomingEvents(): void {
     this.isLoadingEvents = true;
 
-    const request = {
-      Count: 8,
-      IncludeLaterEvents: true
-    };
-
-    this.apiService.getUpcomingEvents(request).subscribe({
-      next: (response: UpcomingEventsResponse) => {
+    this.apiService.getUpcomingEventsDefault().subscribe({
+      next: (response) => {
         if (response.status === 'Success' && response.data) {
           this.upcomingEvents = response.data;
 
-          // Update section title based on number of events
-          if (this.upcomingEvents.length === 0) {
-            this.sectionTitle = 'No Upcoming Events';
-          } else if (this.upcomingEvents.length < 3) {
-            this.sectionTitle = 'Upcoming Events';
-          }
+          // Load price for each event
+          this.upcomingEvents.forEach(event => {
+            this.loadEventPrice(event.event_id);
+          });
+        } else {
+          this.upcomingEvents = [];
         }
       },
       error: (error) => {
-        console.error('Error loading upcoming events:', error);
+        console.error('Error loading events:', error);
+        this.isLoadingEvents = false;
       },
       complete: () => {
         this.isLoadingEvents = false;
       }
     });
+  }
+
+  // Add this method to load price for an event by ID
+  loadEventPrice(eventId: number): void {
+    this.apiService.getEventPriceInRange(eventId).subscribe({
+      next: (response) => {
+        if (response.status === 'Success' && response.data !== null) {
+          this.eventPrices.set(eventId, response.data);
+        } else {
+          this.eventPrices.set(eventId, null);
+        }
+      },
+      error: (error) => {
+        console.error(`Error loading price for event ${eventId}:`, error);
+        this.eventPrices.set(eventId, null);
+      }
+    });
+  }
+
+  // Add this method to get price for an event
+  getEventPrice(event: UpcomingEventResponse): number | null {
+    return this.eventPrices.get(event.event_id) ?? null;
   }
 
   loadArtists(): void {
@@ -674,7 +723,8 @@ export class EventsComponent implements OnInit {
 
   navigateToSignUp(): void {
     // this.router.navigate(['/auth/sign-up']);
-    window.location.href = 'mailto:support@tickethouse.in';
+    // window.location.href = 'mailto:support@tickethouse.in';
+    window.open('mailto:support@tickethouse.in', '_blank');
   }
 
   openPrivacyPolicy(): void {

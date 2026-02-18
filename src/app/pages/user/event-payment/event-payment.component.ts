@@ -5,7 +5,14 @@ import { AuthService } from '../../../core/services/auth.service';
 import { ApiService } from '../../../core/services/api.service';
 import { ToastrService } from 'ngx-toastr';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { LoginResponse, User, GenerateOTPRequest, VerifyOTPRequest, SignUpRequest, SignUpResponse } from '../../../core/models/auth.model';
+import {
+  LoginResponse,
+  User,
+  GenerateOTPRequest,
+  VerifyOTPRequest,
+  SignUpRequest,
+  SignUpResponse,
+} from '../../../core/models/auth.model';
 import { BookingSuccessModalComponent } from '../booking-success-modal/booking-success-modal.component';
 declare var Razorpay: any;
 
@@ -78,7 +85,7 @@ export class EventPaymentComponent implements OnInit {
     private route: ActivatedRoute,
     private apiService: ApiService,
     public authService: AuthService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
   ) { }
 
   // ngOnInit(): void {
@@ -110,91 +117,157 @@ export class EventPaymentComponent implements OnInit {
   // }
 
   ngOnInit(): void {
-  // Check if user is logged in
-  if (!this.authService.isLoggedIn()) {
-    this.toastr.warning('Please sign in to complete booking', 'Authentication Required');
-    this.route.params.subscribe(params => {
+    this.route.params.subscribe((params) => {
       this.eventId = +params['event_id'] || 0;
       this.eventNameSlug = params['event_name'] || '';
-      this.router.navigate(['/event-booking', this.eventId, this.eventNameSlug]);
-    });
-    return;
-  }
 
-  this.userId = this.authService.getCurrentUserId();
+      // Try to get data from navigation state first
+      const navigation = this.router.getCurrentNavigation();
+      if (navigation?.extras.state) {
+        this.seatSelections = navigation.extras.state['seatSelections'] || [];
+        this.totalAmount = navigation.extras.state['totalAmount'] || 0;
+        this.userId = navigation.extras.state['userId'] || this.userId;
+        this.eventTitle = navigation.extras.state['eventTitle'] || '';
 
-  this.route.params.subscribe(params => {
-    this.eventId = +params['event_id'] || 0;
-    this.eventNameSlug = params['event_name'] || '';
+        console.log('Payment - Received seat selections from state:', this.seatSelections);
 
-    // Try to get data from navigation state first
-    const navigation = this.router.getCurrentNavigation();
-    if (navigation?.extras.state) {
-      this.seatSelections = navigation.extras.state['seatSelections'] || [];
-      this.totalAmount = navigation.extras.state['totalAmount'] || 0;
-      this.userId = navigation.extras.state['userId'] || this.userId;
-      this.eventTitle = navigation.extras.state['eventTitle'] || '';
-
-      console.log('Payment - Received seat selections from state:', this.seatSelections);
-
-      if (this.seatSelections.length > 0) {
-        this.calculateBookingFee();
-        this.loadEventDetails();
-        this.clearSessionStorage();
+        if (this.seatSelections.length > 0) {
+          this.calculateBookingFee();
+          this.loadEventDetails();
+          this.clearSessionStorage();
+        } else {
+          // If state has empty selections, try sessionStorage
+          this.restoreFromSessionStorage();
+        }
       } else {
-        // If state has empty selections, try sessionStorage
+        // Try sessionStorage
         this.restoreFromSessionStorage();
       }
-    } else {
-      // Try sessionStorage
-      this.restoreFromSessionStorage();
-    }
-  });
-}
+    });
 
-restoreFromSessionStorage(): void {
-  const tempData = sessionStorage.getItem('temp_booking_data');
-  
-  console.log('Payment - Attempting to restore from sessionStorage:', { hasData: !!tempData });
+    // Check if we have pending booking data after login
+    this.checkPendingBookingAfterLogin();
+  }
 
-  if (tempData) {
-    try {
-      const bookingData = JSON.parse(tempData);
-      
-      // Check if data is for this event
-      if (bookingData.eventId === this.eventId && bookingData.seatSelections?.length > 0) {
-        this.seatSelections = bookingData.seatSelections;
-        this.totalAmount = bookingData.totalAmount;
-        this.eventTitle = bookingData.eventName 
-          ? bookingData.eventName.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())
-          : '';
+  // Add this new method to check for pending booking after login
+  private checkPendingBookingAfterLogin(): void {
+    const pendingData = sessionStorage.getItem('pending_payment_booking');
 
-        console.log('Payment - Restored seat selections from temp_booking_data:', this.seatSelections);
+    if (pendingData) {
+      try {
+        const bookingData = JSON.parse(pendingData);
 
-        this.calculateBookingFee();
-        this.loadEventDetails();
-        
-        // Clear after restoring
-        sessionStorage.removeItem('temp_booking_data');
-      } else {
-        this.handleNoSelections();
+        // Check if data is for this event
+        if (bookingData.eventId === this.eventId) {
+          this.seatSelections = bookingData.seatSelections;
+          this.totalAmount = bookingData.totalAmount;
+          this.eventTitle = bookingData.eventTitle || this.eventTitle;
+
+          console.log('Restored pending booking data after login:', this.seatSelections);
+
+          this.calculateBookingFee();
+          this.loadEventDetails();
+
+          // Clear after restoring
+          sessionStorage.removeItem('pending_payment_booking');
+
+          // Show success message
+          this.toastr.success('Welcome back! You can now complete your booking.', 'Logged In');
+        }
+      } catch (error) {
+        console.error('Error parsing pending booking data:', error);
+        sessionStorage.removeItem('pending_payment_booking');
       }
-    } catch (error) {
-      console.error('Error parsing temp_booking_data:', error);
-      this.handleNoSelections();
     }
-  } else {
-    this.handleNoSelections();
   }
-}
 
-private handleNoSelections(): void {
-  if (!this.seatSelections.length) {
-    console.log('No seat selections found');
-    this.toastr.warning('Please select seats first', 'Selection Required');
-    this.router.navigate(['/event-booking', this.eventId, this.eventNameSlug]);
+  restoreFromSessionStorage(): void {
+    // First check for temp_booking_data (from seat selection)
+    const tempData = sessionStorage.getItem('temp_booking_data');
+
+    console.log('Payment - Attempting to restore from sessionStorage:', { hasData: !!tempData });
+
+    if (tempData) {
+      try {
+        const bookingData = JSON.parse(tempData);
+
+        // Check if data is for this event
+        if (bookingData.eventId === this.eventId && bookingData.seatSelections?.length > 0) {
+          this.seatSelections = bookingData.seatSelections;
+          this.totalAmount = bookingData.totalAmount;
+          this.eventTitle = bookingData.eventName
+            ? bookingData.eventName
+              .replace(/-/g, ' ')
+              .replace(/\b\w/g, (l: string) => l.toUpperCase())
+            : '';
+
+          console.log(
+            'Payment - Restored seat selections from temp_booking_data:',
+            this.seatSelections,
+          );
+
+          this.calculateBookingFee();
+          this.loadEventDetails();
+
+          // Clear after restoring
+          sessionStorage.removeItem('temp_booking_data');
+          return;
+        }
+      } catch (error) {
+        console.error('Error parsing temp_booking_data:', error);
+      }
+    }
+
+    // If no temp_booking_data, check for pending_payment_booking
+    const pendingData = sessionStorage.getItem('pending_payment_booking');
+
+    if (pendingData) {
+      try {
+        const bookingData = JSON.parse(pendingData);
+
+        if (bookingData.eventId === this.eventId && bookingData.seatSelections?.length > 0) {
+          this.seatSelections = bookingData.seatSelections;
+          this.totalAmount = bookingData.totalAmount;
+          this.eventTitle =
+            bookingData.eventTitle ||
+            (bookingData.eventName
+              ? bookingData.eventName
+                .replace(/-/g, ' ')
+                .replace(/\b\w/g, (l: string) => l.toUpperCase())
+              : '');
+
+          console.log(
+            'Payment - Restored seat selections from pending_payment_booking:',
+            this.seatSelections,
+          );
+
+          this.calculateBookingFee();
+          this.loadEventDetails();
+
+          // Clear after restoring
+          sessionStorage.removeItem('pending_payment_booking');
+          return;
+        }
+      } catch (error) {
+        console.error('Error parsing pending_payment_booking:', error);
+      }
+    }
+
+    // If no data found, redirect
+    if (!this.seatSelections.length) {
+      console.log('No seat selections found');
+      this.toastr.warning('Please select seats first', 'Selection Required');
+      this.router.navigate(['/event-booking', this.eventId, this.eventNameSlug]);
+    }
   }
-}
+
+  private handleNoSelections(): void {
+    if (!this.seatSelections.length) {
+      console.log('No seat selections found');
+      this.toastr.warning('Please select seats first', 'Selection Required');
+      this.router.navigate(['/event-booking', this.eventId, this.eventNameSlug]);
+    }
+  }
 
   restoreFromLocalStorage(): void {
     const pendingSelections = localStorage.getItem('pending_seat_selections');
@@ -205,14 +278,14 @@ private handleNoSelections(): void {
     console.log('Payment - Attempting to restore from localStorage:', {
       hasSelections: !!pendingSelections,
       pendingEventId,
-      pendingEventName
+      pendingEventName,
     });
 
     if (pendingSelections && pendingAmount && pendingEventId === this.eventId.toString()) {
       this.seatSelections = JSON.parse(pendingSelections);
       this.totalAmount = parseFloat(pendingAmount);
       this.eventTitle = pendingEventName
-        ? pendingEventName.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+        ? pendingEventName.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
         : '';
 
       console.log('Payment - Restored seat selections:', this.seatSelections);
@@ -290,7 +363,7 @@ private handleNoSelections(): void {
       },
       error: (error) => {
         console.error('Error loading event details:', error);
-      }
+      },
     });
   }
 
@@ -311,7 +384,9 @@ private handleNoSelections(): void {
     this.gstTotal = parseFloat((this.cgstAmount + this.sgstAmount).toFixed(2));
 
     // Calculate final amount: total + convenience fee + GST
-    this.finalAmount = parseFloat((this.totalAmount + this.convenienceFee + this.gstTotal).toFixed(2));
+    this.finalAmount = parseFloat(
+      (this.totalAmount + this.convenienceFee + this.gstTotal).toFixed(2),
+    );
 
     // Keep the old bookingFee property for backward compatibility if needed
     this.bookingFee = parseFloat((this.convenienceFee + this.gstTotal).toFixed(2));
@@ -327,7 +402,7 @@ private handleNoSelections(): void {
       weekday: 'short',
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
     });
   }
 
@@ -444,13 +519,80 @@ private handleNoSelections(): void {
   // }
 
   // In event-payment.component.ts
+  //-----------------correct before sign in changes----------
+  // onProceedToPay(): void {
+  //   if (!this.authService.isLoggedIn()) {
+  //     this.toastr.warning('Please sign in to complete booking', 'Authentication Required');
+  //     this.router.navigate(['/event-booking', this.eventId, this.eventNameSlug]);
+  //     return;
+  //   }
+
+  //   if (this.seatSelections.length === 0) {
+  //     this.toastr.error('No seats selected', 'Error');
+  //     return;
+  //   }
+
+  //   this.isProcessing = true;
+
+  //   // Use the new combined endpoint
+  //   const bookingWithPaymentRequest = {
+  //     EventId: this.eventId,
+  //     SeatSelections: this.seatSelections.map(seat => ({
+  //       SeatTypeId: seat.SeatTypeId,
+  //       Quantity: seat.Quantity
+  //     }))
+  //   };
+
+  //   console.log('Creating booking with payment:', bookingWithPaymentRequest);
+
+  //   this.apiService.createBookingWithPayment(bookingWithPaymentRequest).subscribe({
+  //     next: (response) => {
+  //       // console.log('Create booking with payment response:', response);
+  //       console.log('Create booking with payment response:', response);
+  //       console.log('Order data structure:', JSON.stringify(response.data, null, 2));
+
+  //       if (response.status === 'Success' && response.data) {
+  //         // Initialize Razorpay payment
+  //         this.initiateRazorpayPayment(response.data);
+  //       } else {
+  //         this.isProcessing = false;
+  //         this.toastr.error(response.message || 'Failed to create booking with payment', 'Error');
+  //       }
+  //     },
+  //     error: (error) => {
+  //       this.isProcessing = false;
+  //       console.error('Booking with payment error:', error);
+  //       this.toastr.error('Error creating booking with payment. Please try again.', 'Error');
+  //     }
+  //   });
+  // }
+
   onProceedToPay(): void {
+    // MOVE LOGIN CHECK HERE - Check if user is logged in when clicking Proceed to Pay
     if (!this.authService.isLoggedIn()) {
       this.toastr.warning('Please sign in to complete booking', 'Authentication Required');
-      this.router.navigate(['/event-booking', this.eventId, this.eventNameSlug]);
+
+      // Save current booking data to restore after login
+      this.saveBookingDataForAfterLogin();
+
+      // Open the auth modal directly
+      this.showAuthModal = true;
+      this.isLoginMode = true; // Ensure login mode is active
+      this.resetAuthForms();
+
+      // Also dispatch custom event as backup
+      setTimeout(() => {
+        window.dispatchEvent(
+          new CustomEvent('openAuthModal', {
+            detail: { returnUrl: `/event-payment/${this.eventId}/${this.eventNameSlug}` },
+          }),
+        );
+      }, 100);
+
       return;
     }
 
+    // User is logged in - proceed with payment
     if (this.seatSelections.length === 0) {
       this.toastr.error('No seats selected', 'Error');
       return;
@@ -461,17 +603,16 @@ private handleNoSelections(): void {
     // Use the new combined endpoint
     const bookingWithPaymentRequest = {
       EventId: this.eventId,
-      SeatSelections: this.seatSelections.map(seat => ({
+      SeatSelections: this.seatSelections.map((seat) => ({
         SeatTypeId: seat.SeatTypeId,
-        Quantity: seat.Quantity
-      }))
+        Quantity: seat.Quantity,
+      })),
     };
 
     console.log('Creating booking with payment:', bookingWithPaymentRequest);
 
     this.apiService.createBookingWithPayment(bookingWithPaymentRequest).subscribe({
       next: (response) => {
-        // console.log('Create booking with payment response:', response);
         console.log('Create booking with payment response:', response);
         console.log('Order data structure:', JSON.stringify(response.data, null, 2));
 
@@ -487,8 +628,26 @@ private handleNoSelections(): void {
         this.isProcessing = false;
         console.error('Booking with payment error:', error);
         this.toastr.error('Error creating booking with payment. Please try again.', 'Error');
-      }
+      },
     });
+  }
+
+  // Add this new method to save booking data for after login
+  private saveBookingDataForAfterLogin(): void {
+    // Save current seat selections to sessionStorage
+    if (this.seatSelections.length > 0) {
+      const bookingData = {
+        seatSelections: this.seatSelections,
+        totalAmount: this.totalAmount,
+        eventId: this.eventId,
+        eventName: this.eventNameSlug,
+        eventTitle: this.eventTitle,
+        timestamp: new Date().getTime(),
+      };
+
+      sessionStorage.setItem('pending_payment_booking', JSON.stringify(bookingData));
+      console.log('Saved booking data for after login:', bookingData);
+    }
   }
 
   // initiateRazorpayPayment(orderData: any): void {
@@ -536,7 +695,7 @@ private handleNoSelections(): void {
   //   try {
   //       const rzp = new Razorpay(options);
   //       rzp.open();
-  //   } 
+  //   }
   //   catch (error) {
   //       this.isProcessing = false;
   //       this.toastr.error('Failed to initialize payment gateway', 'Error');
@@ -562,9 +721,9 @@ private handleNoSelections(): void {
 
     // Rock Night Theme Colors - Simple Version
     const rockNightColors = {
-      primary: '#9234ea',      // Purple
-      secondary: '#e236a3',    // Pink  
-      accent: '#ef4343',        // Red
+      primary: '#9234ea', // Purple
+      secondary: '#e236a3', // Pink
+      accent: '#ef4343', // Red
     };
 
     const options = {
@@ -582,13 +741,13 @@ private handleNoSelections(): void {
       prefill: {
         name: orderData.customerName,
         email: orderData.customerEmail,
-        contact: orderData.customerPhone || ''
+        contact: orderData.customerPhone || '',
       },
       notes: orderData.notes,
 
       // Essential theme customization
       theme: {
-        color: rockNightColors.primary // This is the main theme color
+        color: rockNightColors.primary, // This is the main theme color
       },
 
       modal: {
@@ -598,19 +757,19 @@ private handleNoSelections(): void {
         },
         escape: true,
         backdropclose: true,
-        redirect: true
+        redirect: true,
       },
 
       // Method configuration for better UX
       method: {
         upi: {
-          flow: 'qr'
-        }
+          flow: 'qr',
+        },
       },
 
       retry: {
         enabled: true,
-        max_count: 3
+        max_count: 3,
       },
 
       timeout: 300,
@@ -626,8 +785,8 @@ private handleNoSelections(): void {
         },
         on_close: () => {
           console.log('Payment modal closed');
-        }
-      }
+        },
+      },
     };
 
     console.log('Razorpay options with Rock Night theme:', options);
@@ -642,7 +801,6 @@ private handleNoSelections(): void {
       });
 
       rzp.open();
-
     } catch (error) {
       this.isProcessing = false;
       this.toastr.error('Failed to initialize payment gateway', 'Error');
@@ -709,7 +867,7 @@ private handleNoSelections(): void {
       BookingId: bookingId,
       RazorpayOrderId: paymentResponse.razorpay_order_id,
       RazorpayPaymentId: paymentResponse.razorpay_payment_id,
-      RazorpaySignature: paymentResponse.razorpay_signature
+      RazorpaySignature: paymentResponse.razorpay_signature,
     };
 
     console.log('Verifying payment with:', verifyRequest);
@@ -731,7 +889,6 @@ private handleNoSelections(): void {
 
           // Show QR code modal directly
           this.showQRCodeModal(bookingId);
-
         } else {
           // Payment verification failed
           this.toastr.error(response.message || 'Payment verification failed', 'Error');
@@ -757,7 +914,7 @@ private handleNoSelections(): void {
             this.router.navigate(['/my-bookings']);
           }, 1500);
         }
-      }
+      },
     });
   }
 
@@ -786,7 +943,7 @@ private handleNoSelections(): void {
             hasQR: !!response.data.qrCodeBase64,
             qrLength: response.data.qrCodeBase64?.length || 0,
             thankYouMsg: response.data.thankYouMessage,
-            bookingCode: response.data.bookingCode || response.data.BookingCode
+            bookingCode: response.data.bookingCode || response.data.BookingCode,
           });
 
           this.qrCodeBase64 = response.data.qrCodeBase64;
@@ -808,11 +965,13 @@ private handleNoSelections(): void {
             // Force show toast success
             this.toastr.success('Booking confirmed! Your QR code is ready.', 'Success');
           }, 100);
-
         } else {
           console.warn('QR generation failed with response:', response);
           this.showProcessingModal = false; // Hide processing modal
-          this.toastr.success('Payment successful! Please check your bookings for ticket.', 'Success');
+          this.toastr.success(
+            'Payment successful! Please check your bookings for ticket.',
+            'Success',
+          );
           this.clearAllLocalStorage();
 
           // Redirect to bookings page
@@ -826,13 +985,16 @@ private handleNoSelections(): void {
           error,
           status: error?.status,
           message: error?.message,
-          url: error?.url
+          url: error?.url,
         });
 
         this.showProcessingModal = false; // Hide processing modal
 
         // Even if QR generation fails, payment was successful
-        this.toastr.success('Payment successful! Please check your bookings for ticket.', 'Success');
+        this.toastr.success(
+          'Payment successful! Please check your bookings for ticket.',
+          'Success',
+        );
         this.clearAllLocalStorage();
 
         // Redirect to bookings page
@@ -842,7 +1004,7 @@ private handleNoSelections(): void {
       },
       complete: () => {
         console.log('QR generation API call completed');
-      }
+      },
     });
   }
 
@@ -933,7 +1095,7 @@ private handleNoSelections(): void {
   // Helper method to format the event title for display
   getFormattedEventTitle(): string {
     return this.eventNameSlug
-      ? this.eventNameSlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+      ? this.eventNameSlug.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
       : 'Event Details';
   }
 

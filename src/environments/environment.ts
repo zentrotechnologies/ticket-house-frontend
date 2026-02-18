@@ -5,6 +5,7 @@
     encmode: 0,
     reqexpirymode: 0,
     THapibaseurl: 'https://localhost:7289/',
+    // THapibaseurl: 'https://api.tickethouse.in/',
     // kitapibaseurl: 'https://api.keepintouch.life/kitversion01/',
     // kitapiwaurl: 'https://wahost.keepintouch.life/',
     googlclientid: '799019299860-p005irmef0hrjp3drn62ij6tuu30v085.apps.googleusercontent.com',

@@ -5,6 +5,7 @@
     encmode: 0,
     reqexpirymode: 0,
     THapibaseurl: 'https://localhost:7289/',
+    // THapibaseurl: 'https://api.tickethouse.in/',
     // kitapibaseurl: 'https://kitapp.ortdemo.com/kitversion01/',
     // kitapiwaurl: 'https://kitapp.ortdemo.com/',
     // googlclientid: '799019299860-kc86am2cokfgabuqspr3ts477ronttq5.apps.googleusercontent.com',

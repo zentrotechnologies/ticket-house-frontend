@@ -764,8 +764,60 @@
   transition: padding-top 0.3s ease;
 }
 
+/* Password field with toggle */
+.password-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-field input {
+  width: 100%;
+  padding-right: 45px !important; /* Make space for the toggle button */
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  transition: color 0.2s ease;
+  z-index: 2;
+}
+
+.password-toggle:hover {
+  color: rgb(146, 52, 234);
+}
+
+.password-toggle:focus {
+  outline: none;
+}
+
+.eye-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* Disabled state */
+.password-toggle:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Ensure input text doesn't overlap with toggle */
+.password-field input[type="text"],
+.password-field input[type="password"] {
+  padding-right: 45px;
+}
+
 /* ===========================================
-   COMPREHENSIVE MOBILE RESPONSIVE STYLES
+   MOBILE RESPONSIVE STYLES - FIXED FOR ONE ROW
    =========================================== */
 
 /* Large Tablets and Small Desktops */
@@ -852,12 +904,13 @@
   }
 }
 
-/* Small Tablets and Large Phones */
+/* Small Tablets and Large Phones - KEEP EVERYTHING IN ONE ROW */
 @media (max-width: 768px) {
   .header-row {
-    flex-direction: column;
-    padding: 12px 0;
-    gap: 12px;
+    display: flex;
+    flex-direction: row; /* Keep row layout */
+    padding: 10px 0;
+    gap: 8px;
   }
   
   .audience-header.scrolled .header-row {
@@ -865,275 +918,195 @@
   }
   
   .left-section-col {
-    width: 100%;
+    flex: 1;
+    min-width: 0; /* Allow shrinking */
   }
   
   .left-section-content {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
   }
   
   .logo-wrapper {
-    width: 90px;
+    width: 75px;
+    flex-shrink: 0;
   }
   
   .audience-header.scrolled .logo-wrapper {
-    width: 80px;
+    width: 65px;
   }
   
   .logo {
-    max-height: 35px;
-  }
-  
-  .audience-header.scrolled .logo {
-    max-height: 32px;
+    max-height: 30px;
   }
   
   .search-breadcrumb-container {
     flex: 1;
-    min-width: 200px;
+    min-width: 0; /* Critical for flex items to shrink */
     max-width: none;
   }
   
   .search-wrapper {
-    max-width: none;
-  }
-  
-  .search input {
-    padding: 8px 16px;
-    font-size: 13px;
-  }
-  
-  .actions-col {
     width: 100%;
   }
   
-  .user-actions {
-    justify-content: center;
-    gap: 15px;
-    flex-wrap: wrap;
-  }
-  
-  .pill, .user-welcome-trigger {
-    padding: 8px 20px;
-    font-size: 13px;
-  }
-  
-  .location {
-    padding: 8px 16px;
-  }
-  
-  .breadcrumbs {
-    font-size: 12px;
-    padding: 6px 12px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  .back-arrow {
-    font-size: 16px;
-    padding: 4px 8px;
-  }
-  
-  .crumb.active {
-    padding: 4px 10px;
-    font-size: 11px;
-  }
-  
-  /* Adjust content padding for mobile */
-  .audience-header.scrolled ~ * {
-    padding-top: 120px;
-  }
-}
-
-/* Mobile Phones */
-@media (max-width: 576px) {
-  .container {
-    padding: 0 16px;
-  }
-  
-  .header-row {
-    gap: 10px;
-  }
-  
-  .left-section-content {
-    flex-wrap: wrap;
-  }
-  
-  .logo-wrapper {
-    width: 80px;
-  }
-  
-  .audience-header.scrolled .logo-wrapper {
-    width: 70px;
-  }
-  
-  .logo {
-    max-height: 32px;
-  }
-  
-  .audience-header.scrolled .logo {
-    max-height: 28px;
-  }
-  
-  .search-breadcrumb-container {
-    min-width: 100%;
-    order: 3;
-  }
-  
   .search input {
-    padding: 8px 14px;
+    padding: 6px 10px;
     font-size: 12px;
+    width: 100%;
+    min-width: 0; /* Allows input to shrink */
   }
   
   .actions-col {
-    order: 2;
+    flex-shrink: 0;
   }
   
   .user-actions {
-    gap: 10px;
+    gap: 6px;
   }
   
   .pill, .user-welcome-trigger {
-    padding: 6px 16px;
-    font-size: 12px;
+    padding: 6px 10px;
+    font-size: 11px;
+    white-space: nowrap;
   }
   
   .location {
-    padding: 6px 12px;
+    padding: 5px 8px;
     font-size: 11px;
   }
   
   .breadcrumbs {
     font-size: 11px;
-    padding: 5px 10px;
+    padding: 4px 8px;
+    white-space: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 4px;
   }
   
   .back-arrow {
     font-size: 14px;
-    padding: 3px 6px;
+    padding: 2px 6px;
   }
   
   .crumb.active {
-    padding: 3px 8px;
+    padding: 2px 8px;
     font-size: 10px;
   }
   
   .separator {
     font-size: 10px;
+    margin: 0 1px;
   }
   
-  /* Adjust content padding for small phones */
+  /* Adjust content padding for fixed header */
   .audience-header.scrolled ~ * {
-    padding-top: 140px;
-  }
-  
-  /* Auth Modal adjustments for mobile */
-  .modal-content {
-    width: 95%;
-    max-width: 380px;
-  }
-  
-  .modal-header {
-    padding: 18px 20px;
-  }
-  
-  .modal-header h3 {
-    font-size: 18px;
-  }
-  
-  .modal-body {
-    padding: 20px;
-  }
-  
-  .signup-steps {
-    gap: 20px;
-  }
-  
-  .step {
-    font-size: 12px;
-  }
-  
-  .step-number {
-    width: 24px;
-    height: 24px;
-    font-size: 11px;
-  }
-  
-  .form-group input,
-  .form-group select {
-    padding: 12px 14px;
-    font-size: 14px;
-  }
-  
-  .auth-btn {
-    padding: 12px;
-    font-size: 14px;
-  }
-  
-  .form-row {
-    gap: 8px;
-  }
-  
-  .form-group.country-code {
-    flex: 0 0 90px;
-  }
-  
-  .otp-digit {
-    width: 45px;
-    height: 45px;
-    font-size: 20px;
+    padding-top: 55px;
   }
 }
 
-/* Extra Small Phones */
-@media (max-width: 380px) {
-  .logo-wrapper {
-    width: 70px;
+/* Mobile Phones - KEEP EVERYTHING IN ONE ROW */
+@media (max-width: 576px) {
+  .container {
+    padding: 0 10px;
   }
   
-  .audience-header.scrolled .logo-wrapper {
+  .header-row {
+    padding: 6px 0;
+    gap: 4px;
+  }
+  
+  .audience-header.scrolled .header-row {
+    padding: 5px 0;
+  }
+  
+  .logo-wrapper {
     width: 60px;
   }
   
-  .logo {
-    max-height: 28px;
+  .audience-header.scrolled .logo-wrapper {
+    width: 55px;
   }
   
-  .audience-header.scrolled .logo {
+  .logo {
     max-height: 25px;
   }
   
-  .pill, .user-welcome-trigger {
-    padding: 6px 12px;
+  .left-section-content {
+    gap: 4px;
+  }
+  
+  .search input {
+    padding: 5px 8px;
     font-size: 11px;
+    border-radius: 30px;
   }
   
   .user-actions {
-    gap: 8px;
+    gap: 4px;
   }
   
-  .location {
-    padding: 5px 10px;
+  .pill, .user-welcome-trigger {
+    padding: 4px 8px;
     font-size: 10px;
   }
   
   .breadcrumbs {
     font-size: 10px;
-    padding: 4px 8px;
+    padding: 3px 6px;
   }
   
   .crumb.active {
-    padding: 3px 6px;
+    padding: 2px 6px;
     font-size: 9px;
   }
   
-  .audience-header.scrolled ~ * {
-    padding-top: 150px;
+  .back-arrow {
+    font-size: 12px;
+    padding: 2px 4px;
   }
   
-  /* Further reduce OTP input size */
+  .separator {
+    font-size: 9px;
+  }
+  
+  /* Adjust content padding */
+  .audience-header.scrolled ~ * {
+    padding-top: 50px;
+  }
+  
+  /* Auth Modal adjustments */
+  .modal-content {
+    width: 95%;
+    max-width: 340px;
+  }
+  
+  .modal-header {
+    padding: 15px 16px;
+  }
+  
+  .modal-header h3 {
+    font-size: 16px;
+  }
+  
+  .modal-body {
+    padding: 16px;
+  }
+  
+  .form-group input,
+  .form-group select {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  
+  .auth-btn {
+    padding: 10px;
+    font-size: 13px;
+  }
+  
   .otp-digit {
     width: 40px;
     height: 40px;
@@ -1141,14 +1114,63 @@
   }
 }
 
+/* Extra Small Phones */
+@media (max-width: 380px) {
+  .logo-wrapper {
+    width: 50px;
+  }
+  
+  .audience-header.scrolled .logo-wrapper {
+    width: 45px;
+  }
+  
+  .logo {
+    max-height: 22px;
+  }
+  
+  .search input {
+    padding: 4px 6px;
+    font-size: 10px;
+  }
+  
+  .pill, .user-welcome-trigger {
+    padding: 3px 6px;
+    font-size: 9px;
+  }
+  
+  .user-actions {
+    gap: 3px;
+  }
+  
+  .breadcrumbs {
+    font-size: 9px;
+    padding: 2px 4px;
+  }
+  
+  .crumb.active {
+    padding: 2px 4px;
+    font-size: 8px;
+  }
+  
+  .audience-header.scrolled ~ * {
+    padding-top: 45px;
+  }
+  
+  .otp-digit {
+    width: 35px;
+    height: 35px;
+    font-size: 16px;
+  }
+}
+
 /* Landscape Mode for Phones */
 @media (max-width: 896px) and (orientation: landscape) {
   .audience-header.scrolled ~ * {
-    padding-top: 80px;
+    padding-top: 50px;
   }
   
   .modal-content {
-    max-height: 90vh;
+    max-height: 85vh;
     overflow-y: auto;
   }
 }
@@ -1184,5 +1206,142 @@
   
   .audience-header.scrolled {
     position: relative;
+  }
+}
+
+/* ===========================================
+   PASSWORD VALIDATION STYLES
+   =========================================== */
+
+/* Validation error messages */
+.validation-error {
+  margin-top: 6px;
+  padding-left: 4px;
+}
+
+.validation-error small {
+  color: #dc3545;
+  font-size: 12px;
+  display: block;
+  line-height: 1.4;
+}
+
+.password-error {
+  margin-top: 8px;
+  padding: 6px 10px;
+  background-color: rgba(220, 53, 69, 0.05);
+  border-radius: 8px;
+  border-left: 3px solid #dc3545;
+}
+
+/* Password requirements container */
+.password-validation-container {
+  margin: 8px 0 12px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Password requirements list */
+.password-requirements {
+  padding: 12px 14px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  margin-bottom: 8px;
+}
+
+.requirement {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: #666;
+  transition: all 0.2s ease;
+}
+
+.requirement:last-child {
+  margin-bottom: 0;
+}
+
+.requirement.valid {
+  color: #28a745;
+}
+
+.requirement-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  font-size: 14px;
+  color: #999;
+}
+
+.requirement.valid .requirement-icon {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.requirement-text {
+  flex: 1;
+}
+
+/* Input validation styling */
+.form-group input.ng-invalid.ng-touched,
+.form-group input.ng-invalid.ng-dirty {
+  border-color: #dc3545;
+  background-color: rgba(220, 53, 69, 0.02);
+}
+
+.form-group input.ng-invalid.ng-touched:focus,
+.form-group input.ng-invalid.ng-dirty:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.1);
+}
+
+.form-group input.ng-valid.ng-touched {
+  border-color: #28a745;
+}
+
+/* Hide validation when password becomes valid */
+.form-group input.ng-valid.ng-touched + .password-toggle + .password-validation-container,
+.form-group input.ng-valid.ng-dirty + .password-toggle + .password-validation-container {
+  display: none;
+}
+
+/* Mobile adjustments for password validation */
+@media (max-width: 576px) {
+  .password-requirements {
+    padding: 10px 12px;
+  }
+  
+  .requirement {
+    font-size: 11px;
+    margin-bottom: 4px;
+  }
+  
+  .requirement-icon {
+    width: 16px;
+    height: 16px;
+    font-size: 12px;
+  }
+  
+  .validation-error small {
+    font-size: 11px;
+  }
+  
+  .password-error {
+    padding: 5px 8px;
   }
 }

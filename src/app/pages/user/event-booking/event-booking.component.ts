@@ -40,6 +40,7 @@ export class EventBookingComponent implements OnInit {
   selectedImage = '';
   isSeatModalOpen: boolean = false;
   private isNavigatingAway = false;
+  similarEventPrices: Map<number, number | null> = new Map();
 
   @ViewChild('sidebarCard') sidebarCard!: ElementRef;
   @ViewChild('bookingSidebar') bookingSidebar!: ElementRef;
@@ -229,6 +230,63 @@ export class EventBookingComponent implements OnInit {
     });
   }
 
+  // loadSimilarEvents(): void {
+  //   if (!this.eventDetails?.event_category_id) return;
+
+  //   this.isSimilarLoading = true;
+
+  //   const request = {
+  //     categoryId: this.eventDetails.event_category_id,
+  //     excludeEventId: this.eventId,
+  //     count: 4
+  //   };
+
+  //   this.apiService.getSimilarEventsByCategory(request).subscribe({
+  //     next: (response) => {
+  //       if (response.status === 'Success' && response.data) {
+  //         this.similarEvents = response.data;
+  //       }
+  //     },
+  //     error: (error) => {
+  //       console.error('Error loading similar events:', error);
+  //     },
+  //     complete: () => {
+  //       this.isSimilarLoading = false;
+  //     }
+  //   });
+  // }
+
+  // Add this method to get price for similar events
+  getSimilarEventPrice(event: UpcomingEventResponse): string {
+    // If we already have the price in the map, use it
+    if (this.similarEventPrices.has(event.event_id)) {
+      const price = this.similarEventPrices.get(event.event_id);
+      return price !== null ? `₹${price}` : 'Price not available';
+    }
+
+    // If not, load it and return a placeholder
+    this.loadSimilarEventPrice(event.event_id);
+    return 'Loading...';
+  }
+
+  // Add this method to load price for a similar event
+  loadSimilarEventPrice(eventId: number): void {
+    this.apiService.getEventPriceInRange(eventId).subscribe({
+      next: (response) => {
+        if (response.status === 'Success' && response.data !== null) {
+          this.similarEventPrices.set(eventId, response.data);
+        } else {
+          this.similarEventPrices.set(eventId, null);
+        }
+      },
+      error: (error) => {
+        console.error(`Error loading price for similar event ${eventId}:`, error);
+        this.similarEventPrices.set(eventId, null);
+      }
+    });
+  }
+
+  // Update your loadSimilarEvents method to also load prices
   loadSimilarEvents(): void {
     if (!this.eventDetails?.event_category_id) return;
 
@@ -244,6 +302,11 @@ export class EventBookingComponent implements OnInit {
       next: (response) => {
         if (response.status === 'Success' && response.data) {
           this.similarEvents = response.data;
+
+          // Load prices for all similar events
+          this.similarEvents.forEach(event => {
+            this.loadSimilarEventPrice(event.event_id);
+          });
         }
       },
       error: (error) => {
@@ -481,17 +544,8 @@ export class EventBookingComponent implements OnInit {
     // Reset navigation flag when opening modal
     this.isNavigatingAway = false;
 
-    // Check if user is logged in first
-    const isLoggedIn = this.authService.isLoggedIn();
-    console.log('User logged in?', isLoggedIn);
-
-    if (!isLoggedIn) {
-      console.log('User not logged in - opening auth modal');
-      this.openAuthModal();
-      return;
-    }
-
-    console.log('User logged in - opening seat selection modal');
+    // REMOVED: Login check - Always open seat selection modal
+    console.log('Opening seat selection modal');
 
     // Load seats if not already loaded
     if (this.seatTypes.length === 0) {
@@ -807,7 +861,8 @@ export class EventBookingComponent implements OnInit {
 
   navigateToSignUp(): void {
     // this.router.navigate(['/auth/sign-up']);
-    window.location.href = 'mailto:support@tickethouse.in';
+    // window.location.href = 'mailto:support@tickethouse.in';
+    window.open('mailto:support@tickethouse.in', '_blank');
   }
 
   // Add these new methods

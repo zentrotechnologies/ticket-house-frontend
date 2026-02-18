@@ -1,6 +1,13 @@
 /* In styles.css */
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
+/* Force font family on ALL elements */
+*,
+*::before,
+*::after {
+  font-family: 'Space Grotesk', system-ui, sans-serif !important;
+}
+
 /* Global Styles */
 :root {
   /* Rock Night Theme - Adapted for White Background */

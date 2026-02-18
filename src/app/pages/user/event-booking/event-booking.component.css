@@ -118,12 +118,14 @@
   color: var(--text-muted);
   margin-bottom: 2px;
   opacity: 0.8;
+  line-height: 13px;
 }
 
 .event-detail-value {
   font-weight: 600;
   color: var(--text-dark);
   font-size: 16px;
+  line-height: 20px;
 }
 
 /* Quick Info Section */
@@ -439,7 +441,7 @@
 }
 
 .btn-arrow {
-  font-size: 24px;
+  /* font-size: 24px; */
   line-height: 1;
 }
 
@@ -1624,4 +1626,223 @@ html {
     top: 0 !important;
     max-height: none;
   }
+}
+
+/* Similar Shows - Updated with ellipsis and price */
+.similar-shows {
+  margin-bottom: 40px;
+}
+
+.shows-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.mini-card {
+  background: white;
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.mini-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gradient-main);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.mini-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+
+.mini-card:hover::before {
+  transform: scaleX(1);
+}
+
+.mini-poster {
+  height: 120px;
+  border-radius: 12px;
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.mini-poster::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.2), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.mini-card:hover .mini-poster::after {
+  opacity: 1;
+}
+
+.mini-title {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text-dark);
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+
+.mini-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+/* Location text with ellipsis */
+.mini-sub.location-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* Price styling */
+.mini-sub.price {
+  font-weight: 600;
+  color: var(--gradient-main);
+  margin-top: 4px;
+  font-size: 14px;
+  background: var(--gradient-main);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .shows-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+  
+  .mini-title {
+    font-size: 14px;
+  }
+  
+  .mini-sub {
+    font-size: 12px;
+  }
+  
+  .mini-sub.price {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .shows-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Terms Agreement below Book Now button */
+.terms-agreement {
+    margin-top: 16px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    padding: 0 8px;
+}
+
+.terms-text {
+    display: inline;
+}
+
+.terms-link {
+    display: inline;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--gradient-main);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    transition: opacity 0.2s ease;
+}
+
+.terms-link:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+}
+
+/* Add a subtle separator line above the terms (optional) */
+.sidebar-card {
+    position: relative;
+}
+
+.sidebar-card::after {
+    content: '';
+    position: absolute;
+    bottom: 70px; /* Adjust based on your terms height */
+    left: 20px;
+    right: 20px;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(146, 52, 234, 0.2) 20%, 
+        rgba(226, 54, 163, 0.2) 80%, 
+        transparent 100%);
+}
+
+/* If you want a more visible separator line */
+.terms-agreement {
+    position: relative;
+    padding-top: 12px;
+}
+
+.terms-agreement::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 25%;
+    right: 25%;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(146, 52, 234, 0.3) 20%, 
+        rgba(226, 54, 163, 0.3) 80%, 
+        transparent 100%);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .sidebar-card::after {
+        bottom: 65px;
+    }
+}
+
+@media (max-width: 768px) {
+    .terms-agreement {
+        font-size: 11px;
+    }
+    
+    .terms-agreement::before {
+        left: 20%;
+        right: 20%;
+    }
 }
