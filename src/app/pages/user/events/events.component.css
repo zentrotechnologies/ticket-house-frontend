@@ -1032,3 +1032,86 @@
   max-width: 100%;
   display: block;
 }
+
+@media (max-width: 768px) {
+  .footer-main {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    text-align: left; /* Change to left alignment for the whole footer */
+  }
+  
+  .brand-col {
+    text-align: center; /* Keep logo and company tagline centered */
+    width: 100%;
+  }
+  
+  .brand-col .logo {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    width: 100px; /* Adjust based on your logo size */
+  }
+  
+  .company-tagline {
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center; /* Keep tagline centered */
+  }
+  
+  .social-icons {
+    justify-content: center; /* Keep social icons centered */
+  }
+  
+  /* Left align the Support and Contact Us sections */
+  .footer-col:not(.brand-col) {
+    text-align: left;
+    width: 100%;
+    padding-left: 20px; /* Add some left padding for better alignment */
+    padding-right: 20px;
+    margin: 0;
+  }
+  
+  /* Ensure titles are left aligned */
+  .footer-col:not(.brand-col) .footer-title {
+    text-align: left;
+    display: block;
+    width: 100%;
+  }
+  
+  /* Keep the title underline starting from left */
+  .footer-col:not(.brand-col) .footer-title::after {
+    left: 0;
+    transform: none;
+  }
+  
+  /* Ensure links are left aligned */
+  .footer-col:not(.brand-col) .footer-links-list {
+    text-align: left;
+  }
+  
+  .footer-col:not(.brand-col) .footer-links-list a {
+    text-align: left;
+    justify-content: flex-start;
+  }
+  
+  /* Contact Us section specific */
+  .footer-col:not(.brand-col) .contact-info {
+    text-align: left;
+  }
+  
+  .footer-col:not(.brand-col) .contact-info a {
+    text-align: left;
+    justify-content: flex-start;
+  }
+  
+  /* Footer bottom stays centered */
+  .footer-bottom {
+    text-align: center;
+  }
+  
+  .copy {
+    text-align: center;
+    font-size: 13px;
+  }
+}

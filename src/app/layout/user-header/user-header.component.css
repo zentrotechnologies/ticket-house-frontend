@@ -144,16 +144,16 @@
 .logo {
   width: 100%;
   height: auto;
-  max-height: 45px;
+  /* max-height: 45px; */
   object-fit: contain;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 /* Slightly smaller logo when scrolled */
-.audience-header.scrolled .logo {
+/* .audience-header.scrolled .logo {
   max-height: 40px;
-}
+} */
 
 /* Search Styles */
 .search {
@@ -237,7 +237,7 @@
 /* When scrolled, slightly reduce shadow */
 .audience-header.scrolled .pill {
   box-shadow: 0 2px 8px rgba(146, 52, 234, 0.15);
-  padding: 8px 22px;
+  padding: 6px 10px;
 }
 
 .pill:hover {
@@ -820,97 +820,13 @@
    MOBILE RESPONSIVE STYLES - FIXED FOR ONE ROW
    =========================================== */
 
-/* Large Tablets and Small Desktops */
-@media (max-width: 1200px) {
-  .container {
-    padding: 0 24px;
-  }
-  
-  .left-section-content {
-    gap: 20px;
-  }
-  
-  .logo-wrapper {
-    width: 120px;
-  }
-  
-  .audience-header.scrolled .logo-wrapper {
-    width: 110px;
-  }
-  
-  .search input {
-    padding: 10px 20px;
-    font-size: 14px;
-  }
-  
-  .pill, .user-welcome-trigger {
-    padding: 8px 20px;
-    font-size: 13px;
-  }
-}
-
-/* Tablets (Portrait) */
-@media (max-width: 992px) {
-  .container {
-    padding: 0 20px;
-  }
-  
-  .left-section-content {
-    gap: 15px;
-  }
-  
-  .logo-wrapper {
-    width: 100px;
-  }
-  
-  .audience-header.scrolled .logo-wrapper {
-    width: 90px;
-  }
-  
-  .logo {
-    max-height: 40px;
-  }
-  
-  .audience-header.scrolled .logo {
-    max-height: 35px;
-  }
-  
-  .search input {
-    padding: 8px 16px;
-    font-size: 13px;
-  }
-  
-  .user-actions {
-    gap: 12px;
-  }
-  
-  .pill, .user-welcome-trigger {
-    padding: 8px 16px;
-    font-size: 12px;
-  }
-  
-  .location {
-    padding: 6px 12px;
-    font-size: 12px;
-  }
-  
-  .breadcrumbs {
-    font-size: 12px;
-    padding: 6px 12px;
-  }
-  
-  .crumb.active {
-    padding: 4px 12px;
-  }
-}
-
 /* Small Tablets and Large Phones - KEEP EVERYTHING IN ONE ROW */
 @media (max-width: 768px) {
   .header-row {
     display: flex;
     flex-direction: row; /* Keep row layout */
     padding: 10px 0;
-    gap: 8px;
+    gap: 10px;
   }
   
   .audience-header.scrolled .header-row {
@@ -925,12 +841,12 @@
   .left-section-content {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     width: 100%;
   }
   
   .logo-wrapper {
-    width: 75px;
+    width: 22%;
     flex-shrink: 0;
   }
   
@@ -938,9 +854,9 @@
     width: 65px;
   }
   
-  .logo {
+  /* .logo {
     max-height: 30px;
-  }
+  } */
   
   .search-breadcrumb-container {
     flex: 1;
@@ -1005,194 +921,6 @@
   /* Adjust content padding for fixed header */
   .audience-header.scrolled ~ * {
     padding-top: 55px;
-  }
-}
-
-/* Mobile Phones - KEEP EVERYTHING IN ONE ROW */
-@media (max-width: 576px) {
-  .container {
-    padding: 0 10px;
-  }
-  
-  .header-row {
-    padding: 6px 0;
-    gap: 4px;
-  }
-  
-  .audience-header.scrolled .header-row {
-    padding: 5px 0;
-  }
-  
-  .logo-wrapper {
-    width: 60px;
-  }
-  
-  .audience-header.scrolled .logo-wrapper {
-    width: 55px;
-  }
-  
-  .logo {
-    max-height: 25px;
-  }
-  
-  .left-section-content {
-    gap: 4px;
-  }
-  
-  .search input {
-    padding: 5px 8px;
-    font-size: 11px;
-    border-radius: 30px;
-  }
-  
-  .user-actions {
-    gap: 4px;
-  }
-  
-  .pill, .user-welcome-trigger {
-    padding: 4px 8px;
-    font-size: 10px;
-  }
-  
-  .breadcrumbs {
-    font-size: 10px;
-    padding: 3px 6px;
-  }
-  
-  .crumb.active {
-    padding: 2px 6px;
-    font-size: 9px;
-  }
-  
-  .back-arrow {
-    font-size: 12px;
-    padding: 2px 4px;
-  }
-  
-  .separator {
-    font-size: 9px;
-  }
-  
-  /* Adjust content padding */
-  .audience-header.scrolled ~ * {
-    padding-top: 50px;
-  }
-  
-  /* Auth Modal adjustments */
-  .modal-content {
-    width: 95%;
-    max-width: 340px;
-  }
-  
-  .modal-header {
-    padding: 15px 16px;
-  }
-  
-  .modal-header h3 {
-    font-size: 16px;
-  }
-  
-  .modal-body {
-    padding: 16px;
-  }
-  
-  .form-group input,
-  .form-group select {
-    padding: 10px 12px;
-    font-size: 13px;
-  }
-  
-  .auth-btn {
-    padding: 10px;
-    font-size: 13px;
-  }
-  
-  .otp-digit {
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
-  }
-}
-
-/* Extra Small Phones */
-@media (max-width: 380px) {
-  .logo-wrapper {
-    width: 50px;
-  }
-  
-  .audience-header.scrolled .logo-wrapper {
-    width: 45px;
-  }
-  
-  .logo {
-    max-height: 22px;
-  }
-  
-  .search input {
-    padding: 4px 6px;
-    font-size: 10px;
-  }
-  
-  .pill, .user-welcome-trigger {
-    padding: 3px 6px;
-    font-size: 9px;
-  }
-  
-  .user-actions {
-    gap: 3px;
-  }
-  
-  .breadcrumbs {
-    font-size: 9px;
-    padding: 2px 4px;
-  }
-  
-  .crumb.active {
-    padding: 2px 4px;
-    font-size: 8px;
-  }
-  
-  .audience-header.scrolled ~ * {
-    padding-top: 45px;
-  }
-  
-  .otp-digit {
-    width: 35px;
-    height: 35px;
-    font-size: 16px;
-  }
-}
-
-/* Landscape Mode for Phones */
-@media (max-width: 896px) and (orientation: landscape) {
-  .audience-header.scrolled ~ * {
-    padding-top: 50px;
-  }
-  
-  .modal-content {
-    max-height: 85vh;
-    overflow-y: auto;
-  }
-}
-
-/* High-resolution screens */
-@media (min-width: 1600px) {
-  .container {
-    max-width: 1600px;
-  }
-  
-  .search input {
-    padding: 14px 28px;
-    font-size: 16px;
-  }
-  
-  .pill, .user-welcome-trigger {
-    padding: 12px 28px;
-    font-size: 15px;
-  }
-  
-  .logo-wrapper {
-    width: 160px;
   }
 }
 
@@ -1318,30 +1046,4 @@
 .form-group input.ng-valid.ng-touched + .password-toggle + .password-validation-container,
 .form-group input.ng-valid.ng-dirty + .password-toggle + .password-validation-container {
   display: none;
-}
-
-/* Mobile adjustments for password validation */
-@media (max-width: 576px) {
-  .password-requirements {
-    padding: 10px 12px;
-  }
-  
-  .requirement {
-    font-size: 11px;
-    margin-bottom: 4px;
-  }
-  
-  .requirement-icon {
-    width: 16px;
-    height: 16px;
-    font-size: 12px;
-  }
-  
-  .validation-error small {
-    font-size: 11px;
-  }
-  
-  .password-error {
-    padding: 5px 8px;
-  }
 }
