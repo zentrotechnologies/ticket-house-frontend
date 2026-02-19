@@ -327,6 +327,7 @@ export interface EventDetailsModel {
   updated_by: string;
   updated_at: string | null;
   active: number;
+  convenience_fee: number; // Add this line
 }
 
 export interface EventArtistModel {

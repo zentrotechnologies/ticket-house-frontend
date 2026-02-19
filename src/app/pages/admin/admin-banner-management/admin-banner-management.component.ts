@@ -159,9 +159,9 @@ export class AdminBannerManagementComponent implements OnInit {
       banner_id: 0,
       banner_img: '',
       action_link_url: '',
-      created_by: '',
+      created_by: this.userId,
       created_on: '',
-      updated_by: '',
+      updated_by: this.userId,
       updated_on: null,
       active: 1
     };

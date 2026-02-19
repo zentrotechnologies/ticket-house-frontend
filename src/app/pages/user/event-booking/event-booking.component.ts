@@ -431,6 +431,45 @@ export class EventBookingComponent implements OnInit {
     return this.getSelectedSeatCount() > 0;
   }
 
+  // Add this method to handle div clicks for seat selection
+  toggleSeatSelectionFromDiv(seatTypeId: number, event: MouseEvent): void {
+    // Prevent if clicking on quantity buttons or checkbox
+    const target = event.target as HTMLElement;
+    if (target.closest('.qty-btn') || target.closest('.checkbox-container') || target.closest('input[type="checkbox"]')) {
+      return;
+    }
+
+    const seatType = this.seatTypes.find(s => s.event_seat_type_inventory_id === seatTypeId);
+    if (!seatType) return;
+
+    // Check if seats are available
+    if (seatType.available_seats === 0) {
+      this.toastr.warning('No seats available for this type', 'Sold Out');
+      return;
+    }
+
+    const isCurrentlySelected = this.isSeatSelected(seatTypeId);
+
+    if (!isCurrentlySelected) {
+      // Check if we've reached max 10 tickets
+      const totalSelected = this.getSelectedSeatCount();
+      if (totalSelected >= 10) {
+        this.toastr.warning('You can select maximum 10 tickets only', 'Limit Reached');
+        return;
+      }
+
+      // Select with default quantity 1
+      this.selectedSeats[seatTypeId] = 1;
+      console.log(`Selected seat: ${seatType.seat_name} with quantity 1`);
+    } else {
+      // Unselect - set quantity to 0
+      this.selectedSeats[seatTypeId] = 0;
+      console.log(`Unselected seat: ${seatType.seat_name}`);
+    }
+
+    this.calculateTotalAmount();
+  }
+
   // ===========================================
   // BOOK NOW METHOD (with auth check)
   // ===========================================

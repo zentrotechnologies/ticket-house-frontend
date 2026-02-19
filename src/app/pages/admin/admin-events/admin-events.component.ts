@@ -84,6 +84,7 @@ export class AdminEventsComponent implements OnInit {
     updated_by: '',
     updated_at: null,
     active: 1,
+    convenience_fee: 0.00, // Add this line
   };
 
   // Artists and Galleries
@@ -749,6 +750,7 @@ export class AdminEventsComponent implements OnInit {
       gallery_media: '[]',
       artists: '[]',
       banner_image: '',
+      convenience_fee: this.eventForm.convenience_fee || 0.00, // Add this line
     };
 
     formData.append('EventDetails', JSON.stringify(eventDetails));
@@ -892,6 +894,7 @@ export class AdminEventsComponent implements OnInit {
       max_price: this.eventForm.max_price || 0,
       age_limit: this.eventForm.age_limit || 0,
       no_of_seats: this.eventForm.no_of_seats || 0,
+      convenience_fee: this.eventForm.convenience_fee || 0.00, // Add this line
       gallery_media:
         this.galleries.length > 0
           ? JSON.stringify(this.galleries.map((g) => ({ image: g.event_img })))
@@ -1083,6 +1086,7 @@ export class AdminEventsComponent implements OnInit {
       updated_by: '',
       updated_at: currentDate.toISOString(),
       active: 1,
+      convenience_fee: 0.00, // Add this line
     };
 
     this.artists = [];

@@ -1,132 +1,142 @@
 <div class="modal-overlay" (click)="onBackdropClick($event)">
     <div class="modal-content success-modal">
+        <button class="modal-close" (click)="closeModal()">×</button>
         <div class="modal-header">
             <div class="header-content">
-                <div class="success-icon">✓</div>
+                <!-- <div class="success-icon">✓</div> -->
                 <div class="header-text">
-                    <h3>🎉 Booking Confirmed!</h3>
+                    <h3>🎉 Thank You! Your booking has been confirmed.</h3>
                     <p class="subtitle">Booking #{{ bookingCode }}</p>
                 </div>
             </div>
-            <button class="modal-close" (click)="closeModal()">×</button>
         </div>
 
         <div class="modal-body">
-            <!-- Thank You Message -->
-            <div class="thank-you-message" *ngIf="thankYouMessage">
+            <!-- Thank You Message (Compact) -->
+            <div class="thank-you-message d-none" *ngIf="thankYouMessage">
                 <div class="message-icon">💌</div>
                 <p class="message-text">{{ thankYouMessage }}</p>
             </div>
 
-            <!-- QR Code Display -->
-            <div class="qr-code-section" *ngIf="qrCodeBase64">
-                <h4>Your Entry QR Code</h4>
-                <div class="qr-code-container">
-                    <img [src]="'data:image/png;base64,' + qrCodeBase64" alt="Booking QR Code" class="qr-code-image"
-                        (load)="onImageLoad()" (error)="onImageError()">
-                    <div class="qr-loading" *ngIf="!imageLoaded && !imageError">
-                        Loading QR code...
+            <!-- Split Layout: QR Left + Details Right -->
+            <div class="split-layout">
+                <!-- Left Column - QR Code -->
+                <div class="qr-column" *ngIf="qrCodeBase64">
+                    <div class="qr-code-container">
+                        <img [src]="'data:image/png;base64,' + qrCodeBase64" 
+                             alt="Booking QR Code" 
+                             class="qr-code-image"
+                             (load)="onImageLoad()" 
+                             (error)="onImageError()">
+                        <div class="qr-loading" *ngIf="!imageLoaded && !imageError">
+                            Loading...
+                        </div>
+                        <div class="qr-error" *ngIf="imageError">
+                            ❌ Failed to load
+                        </div>
                     </div>
-                    <div class="qr-error" *ngIf="imageError">
-                        ❌ Failed to load QR code
-                    </div>
-                    <p class="qr-instruction">Present this QR code at the venue for entry</p>
-                </div>
-
-                <div class="qr-actions">
-                    <button class="btn-download" (click)="downloadQRCode()" [disabled]="imageError || !imageLoaded">
-                        <span class="btn-icon">⬇</span> Download QR Code
-                    </button>
-                    <button class="btn-share d-none" (click)="shareQRCode()" [disabled]="imageError || !imageLoaded">
-                        <span class="btn-icon">📤</span> Share
-                    </button>
-                </div>
-            </div>
-
-            <!-- Booking Summary -->
-            <div class="booking-summary d-none" *ngIf="bookingDetails">
-                <h4>Booking Details</h4>
-                <div class="summary-grid">
-                    <div class="summary-item">
-                        <span class="label">Booking Code:</span>
-                        <span class="value highlight">{{ bookingDetails.booking_code }}</span>
-                    </div>
-                    <div class="summary-item">
-                        <span class="label">Event:</span>
-                        <span class="value">{{ bookingDetails.event_name }}</span>
-                    </div>
-                    <div class="summary-item">
-                        <span class="label">Date:</span>
-                        <span class="value">{{ formatDate(bookingDetails.event_date) }}</span>
-                    </div>
-                    <div class="summary-item">
-                        <span class="label">Time:</span>
-                        <span class="value">{{ bookingDetails.start_time }} - {{ bookingDetails.end_time }}</span>
-                    </div>
-                    <div class="summary-item">
-                        <span class="label">Venue:</span>
-                        <span class="value">{{ bookingDetails.location }}</span>
-                    </div>
-                    <div class="summary-item">
-                        <span class="label">Status:</span>
-                        <span class="value status-confirmed">{{ bookingDetails.status | titlecase }}</span>
+                    <p class="qr-instruction">Present at venue entry</p>
+                    <div class="qr-actions">
+                        <button class="btn-download" (click)="downloadQRCode()" [disabled]="imageError || !imageLoaded">
+                            ⬇ Download
+                        </button>
+                        <button class="btn-share d-none" (click)="shareQRCode()" [disabled]="imageError || !imageLoaded">
+                            📤 Share
+                        </button>
                     </div>
                 </div>
 
-                <!-- Total Amount -->
-                <div class="total-amount">
-                    <span class="total-label">Total Amount:</span>
-                    <span class="total-value">₹{{ bookingDetails.total_amount }}</span>
-                </div>
+                <!-- Right Column - Event Details -->
+                <div class="details-column" *ngIf="bookingDetails">
+                    <div class="event-details-card">
+                        <h4 class="details-title">Event Details</h4>
+                        
+                        <div class="detail-row highlight-row d-none">
+                            <span class="detail-label">Booking Code:</span>
+                            <span class="detail-value booking-code">{{ bookingDetails.booking_code }}</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Event:</span>
+                            <span class="detail-value">{{ bookingDetails.event_name }}</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Date:</span>
+                            <span class="detail-value">{{ formatDate(bookingDetails.event_date) }}</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Time:</span>
+                            <span class="detail-value">{{ bookingDetails.start_time }} - {{ bookingDetails.end_time }}</span>
+                        </div>
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Venue:</span>
+                            <span class="detail-value">{{ bookingDetails.location }}</span>
+                        </div>
+                        
+                        <div class="detail-row status-row d-none">
+                            <span class="detail-label">Status:</span>
+                            <span class="status-badge confirmed">{{ bookingDetails.status | titlecase }}</span>
+                        </div>
+                        
+                        <div class="detail-row total-row">
+                            <span class="detail-label">Total Amount:</span>
+                            <span class="total-amount-value">₹{{ bookingDetails.total_amount }}</span>
+                        </div>
+                    </div>
 
-                <!-- Seat Details -->
-                <div class="seat-details" *ngIf="bookingDetails.bookingSeats?.length">
-                    <h5>Seat Details</h5>
-                    <div class="seat-list">
-                        <div class="seat-item" *ngFor="let seat of bookingDetails.bookingSeats; let i = index">
-                            <span class="seat-number">{{ i + 1 }}.</span>
-                            <span class="seat-type">{{ seat.seat_name }} × {{ seat.quantity }}</span>
+                    <!-- Seat Details (Compact) -->
+                    <div class="seat-summary" *ngIf="bookingDetails.bookingSeats?.length">
+                        <div class="seat-summary-header">
+                            <span>Seats</span>
+                            <span>Qty</span>
+                            <span>Price</span>
+                        </div>
+                        <div class="seat-summary-item" *ngFor="let seat of bookingDetails.bookingSeats">
+                            <span class="seat-name">{{ seat.seat_name }}</span>
+                            <span class="seat-qty">{{ seat.quantity }}</span>
                             <span class="seat-price">₹{{ seat.subtotal }}</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Email Notification -->
-            <div class="email-notification" *ngIf="bookingDetails?.email">
-                <div class="email-icon">📧</div>
-                <div class="email-text">
-                    <p><strong>A confirmation email has been sent to:</strong></p>
-                    <p class="email-address">{{ bookingDetails.email }}</p>
-                    <p class="email-note">Check your inbox (and spam folder) for the QR code</p>
+            <!-- Info Section (Compact) -->
+            <div class="info-section">
+                <!-- Email Notification -->
+                <div class="email-notification" *ngIf="bookingDetails?.email">
+                    <div class="email-icon">📧</div>
+                    <div class="email-text">
+                        <p><strong>Email sent to:</strong> {{ bookingDetails.email }}</p>
+                        <p class="email-note">Check spam folder</p>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Important Notes -->
-            <div class="important-notes">
-                <h5>Important Information</h5>
-                <ul>
-                    <li>Please arrive at least 30 minutes before the event</li>
-                    <li>Present your QR code at the entry gate</li>
-                    <li>Keep this QR code safe - it's your ticket!</li>
-                    <li>No physical tickets required</li>
-                </ul>
+                <!-- Important Notes -->
+                <div class="important-notes">
+                    <ul>
+                        <li>Arrive 30 mins early</li>
+                        <li>Show QR at entry</li>
+                        <li>No physical tickets</li>
+                    </ul>
+                </div>
             </div>
 
             <!-- Action Buttons -->
             <div class="modal-actions">
                 <button class="btn-secondary" (click)="viewBookingDetails()">
-                    <span class="btn-icon">📋</span> View Booking Details
+                    📋 Details
                 </button>
                 <button class="btn-primary" (click)="goToEvents()">
-                    <span class="btn-icon">←</span> Back to Events
+                    ← Events
                 </button>
             </div>
         </div>
 
-        <div class="modal-footer d-block">
-            <p>Need help? Contact support@tickethouse.in</p>
-            <p class="footer-note">Thank you for choosing <strong>TicketHouse</strong>!</p>
+        <div class="modal-footer">
+            <p>support@tickethouse.in | Thank you for choosing <strong>TicketHouse</strong>!</p>
         </div>
     </div>
 </div>

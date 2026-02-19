@@ -372,12 +372,14 @@
                 </div>
 
                 <!-- Seat Selection Section -->
+                <!-- Seat Selection Section - Updated with clickable div -->
                 <div class="seat-selection-section" *ngIf="!isSeatLoading && seatTypes.length > 0">
                     <!-- Seat Type Cards -->
                     <div *ngFor="let seatType of seatTypes" class="seat-card"
-                        [class.selected]="isSeatSelected(seatType.event_seat_type_inventory_id)">
+                        [class.selected]="isSeatSelected(seatType.event_seat_type_inventory_id)"
+                        (click)="toggleSeatSelectionFromDiv(seatType.event_seat_type_inventory_id, $event)">
                         <div class="seat-info-main">
-                            <label class="checkbox-container">
+                            <label class="checkbox-container" (click)="$event.stopPropagation()">
                                 <input type="checkbox" [checked]="isSeatSelected(seatType.event_seat_type_inventory_id)"
                                     (change)="toggleSeatSelection(seatType.event_seat_type_inventory_id, $event)">
                                 <span class="checkmark"></span>
@@ -385,9 +387,6 @@
                             <div class="seat-details">
                                 <div class="seat-name">{{ seatType.seat_name }}</div>
                                 <div class="seat-price">₹{{ seatType.price }}</div>
-                                <!-- <div class="seat-available" *ngIf="seatType.available_seats > 0">
-                                    {{ seatType.available_seats }} seats available
-                                </div> -->
                                 <div class="seat-available sold-out" *ngIf="seatType.available_seats === 0">
                                     Sold Out
                                 </div>
@@ -395,11 +394,11 @@
                         </div>
 
                         <!-- Quantity Counter -->
-                        <div *ngIf="selectedSeats[seatType.event_seat_type_inventory_id] > 0" class="seat-qty">
+                        <div *ngIf="selectedSeats[seatType.event_seat_type_inventory_id] > 0" class="seat-qty"
+                            (click)="$event.stopPropagation()">
                             <button class="qty-btn"
                                 (click)="decreaseSeats(seatType.event_seat_type_inventory_id)">−</button>
-                            <span class="qty-count">{{ selectedSeats[seatType.event_seat_type_inventory_id]
-                                }}</span>
+                            <span class="qty-count">{{ selectedSeats[seatType.event_seat_type_inventory_id] }}</span>
                             <button class="qty-btn"
                                 (click)="increaseSeats(seatType.event_seat_type_inventory_id)">+</button>
                         </div>

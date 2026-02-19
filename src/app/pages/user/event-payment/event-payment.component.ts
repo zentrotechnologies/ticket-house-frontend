@@ -79,6 +79,7 @@ export class EventPaymentComponent implements OnInit {
   bookingDetails: any = null;
   bookingCode: string = '';
   showProcessingModal = false;
+  convenienceFeePercentage: number = 0; // Store the percentage from API
 
   constructor(
     private router: Router,
@@ -351,6 +352,23 @@ export class EventPaymentComponent implements OnInit {
     sessionStorage.removeItem('temp_event_name');
   }
 
+  //-------correct before dyn fee
+  // loadEventDetails(): void {
+  //   this.apiService.getEventDetailsById(this.eventId).subscribe({
+  //     next: (response) => {
+  //       if (response.status === 'Success' && response.data) {
+  //         this.eventTitle = response.data.event_name || this.eventTitle;
+  //         this.eventDate = response.data.event_date.toString();
+  //         this.eventTime = `${response.data.start_time} - ${response.data.end_time}`;
+  //         this.eventLocation = response.data.location;
+  //       }
+  //     },
+  //     error: (error) => {
+  //       console.error('Error loading event details:', error);
+  //     },
+  //   });
+  // }
+
   loadEventDetails(): void {
     this.apiService.getEventDetailsById(this.eventId).subscribe({
       next: (response) => {
@@ -359,10 +377,28 @@ export class EventPaymentComponent implements OnInit {
           this.eventDate = response.data.event_date.toString();
           this.eventTime = `${response.data.start_time} - ${response.data.end_time}`;
           this.eventLocation = response.data.location;
+
+          // Capture the convenience fee percentage from API response
+          // response.data.convenience_fee is already a number (e.g., 4.00)
+          if (response.data.convenience_fee !== undefined && response.data.convenience_fee !== null) {
+            // No need for parseFloat since it's already a number
+            this.convenienceFeePercentage = response.data.convenience_fee;
+            console.log('Dynamic convenience fee percentage:', this.convenienceFeePercentage);
+
+            // Recalculate fees with the new percentage
+            this.calculateBookingFee();
+          } else {
+            console.log('No convenience fee in response, using default 6%');
+            this.convenienceFeePercentage = 6; // Default to 6%
+            this.calculateBookingFee();
+          }
         }
       },
       error: (error) => {
         console.error('Error loading event details:', error);
+        // Set default fee on error
+        this.convenienceFeePercentage = 6;
+        this.calculateBookingFee();
       },
     });
   }
@@ -374,23 +410,39 @@ export class EventPaymentComponent implements OnInit {
   // }
 
   calculateBookingFee(): void {
-    // Calculate 6.5% convenience fee
-    // Calculate 6% convenience fee (changed from 7%)
-    this.convenienceFee = parseFloat((this.totalAmount * 0.06).toFixed(2));
+  // Use dynamic convenience fee percentage from API, default to 6% if not available
+  const feePercentage = this.convenienceFeePercentage > 0
+    ? this.convenienceFeePercentage / 100  // Convert to decimal (e.g., 4.00% → 0.04)
+    : 0.06; // Default 6% fallback
 
-    // Calculate GST on convenience fee only (18% = 9% CGST + 9% SGST)
-    this.cgstAmount = parseFloat((this.convenienceFee * 0.09).toFixed(2));
-    this.sgstAmount = parseFloat((this.convenienceFee * 0.09).toFixed(2));
-    this.gstTotal = parseFloat((this.cgstAmount + this.sgstAmount).toFixed(2));
+  // Calculate convenience fee based on dynamic percentage - keep full precision
+  this.convenienceFee = this.totalAmount * feePercentage;
 
-    // Calculate final amount: total + convenience fee + GST
-    this.finalAmount = parseFloat(
-      (this.totalAmount + this.convenienceFee + this.gstTotal).toFixed(2),
-    );
+  // Calculate GST on convenience fee only (18% = 9% CGST + 9% SGST) - keep full precision
+  this.cgstAmount = this.convenienceFee * 0.09;
+  this.sgstAmount = this.convenienceFee * 0.09;
+  this.gstTotal = this.cgstAmount + this.sgstAmount;
 
-    // Keep the old bookingFee property for backward compatibility if needed
-    this.bookingFee = parseFloat((this.convenienceFee + this.gstTotal).toFixed(2));
-  }
+  // Calculate final amount: total + convenience fee + GST - keep full precision
+  this.finalAmount = this.totalAmount + this.convenienceFee + this.gstTotal;
+
+  // Keep the old bookingFee property for backward compatibility if needed - keep full precision
+  this.bookingFee = this.convenienceFee + this.gstTotal;
+
+  // For logging, show rounded values for readability
+  console.log('Fee calculation details (showing 2 decimals):', {
+    totalAmount: this.totalAmount.toFixed(2),
+    feePercentage: (feePercentage * 100).toFixed(2) + '%',
+    convenienceFee: this.convenienceFee.toFixed(2),
+    cgstAmount: this.cgstAmount.toFixed(2),
+    sgstAmount: this.sgstAmount.toFixed(2),
+    gstTotal: this.gstTotal.toFixed(2),
+    bookingFee: this.bookingFee.toFixed(2),
+    finalAmount: this.finalAmount.toFixed(2),
+    // For Razorpay (must be in paise without decimals)
+    finalAmountInPaise: Math.round(this.finalAmount * 100)
+  });
+}
 
   getTotalTickets(): number {
     return this.seatSelections.reduce((total, seat) => total + seat.Quantity, 0);

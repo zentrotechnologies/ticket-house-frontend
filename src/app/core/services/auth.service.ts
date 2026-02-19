@@ -310,4 +310,18 @@ export class AuthService {
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
   }
+
+  getCurrentUserRole(): number | null {
+    const currentUserStr = localStorage.getItem('currentUser');
+    if (currentUserStr) {
+      try {
+        const currentUser = JSON.parse(currentUserStr);
+        return currentUser.role_id || null;
+      } catch (error) {
+        console.error('Error parsing current user:', error);
+        return null;
+      }
+    }
+    return null;
+  }
 }
