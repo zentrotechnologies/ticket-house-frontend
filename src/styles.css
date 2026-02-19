@@ -252,3 +252,26 @@ body {
   bottom: 0;
   z-index: 999;
 }
+
+/* Force toastr to be above everything */
+.toast-container {
+  z-index: 9999 !important; /* Higher than modal overlay (2000) */
+  position: fixed !important;
+  pointer-events: auto !important;
+}
+
+/* Ensure toastr container is not affected by any stacking contexts */
+.ngx-toastr {
+  position: relative;
+  z-index: 9999 !important;
+}
+
+/* If using CDK overlay or other libraries that might affect stacking */
+.cdk-overlay-container .toast-container {
+  z-index: 9999 !important;
+}
+
+/* Ensure body doesn't create interfering contexts */
+body {
+  isolation: isolate; /* This helps with stacking context */
+}

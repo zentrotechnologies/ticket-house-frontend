@@ -1,0 +1,236 @@
+<div class="main-content content-card">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h2 class="page-title">Banner Management</h2>
+    <div class="header-actions">
+      <button class="btn btn-primary btn-add" (click)="openAddModal()">
+        <i class="bi bi-plus-lg"></i>&nbsp; Add Banner
+      </button>
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="card card-white mb-3">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="input-group">
+            <input type="text" class="form-control" [(ngModel)]="searchText" 
+                   placeholder="Search by URL or ID..." (keyup.enter)="onSearch()" />
+            <button class="btn btn-primary" type="button" (click)="onSearch()">
+              <i class="bi bi-search"></i> Search
+            </button>
+            <button class="btn btn-secondary" type="button" (click)="clearSearch()" 
+                    *ngIf="searchText">
+              <i class="bi bi-x-lg"></i> Clear
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Banners Grid -->
+  <div class="card card-white">
+    <div class="banners-grid" *ngIf="filteredBanners.length > 0; else noBanners">
+      <div class="row">
+        <div class="col-md-4 col-sm-6 mb-4" *ngFor="let banner of filteredBanners">
+          <div class="banner-card">
+            <div class="banner-image-container">
+              <img [src]="getImageSrc(banner.banner_img)" 
+                   [alt]="'Banner ' + banner.banner_id"
+                   class="banner-image"
+                   (error)="$event.target.src='assets/images/default-banner.png'" />
+              <div class="banner-actions">
+                <button class="icon-btn edit" title="Edit" (click)="openEditModal(banner)">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="icon-btn delete" title="Delete" (click)="openDeleteModal(banner.banner_id)">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+            <div class="banner-details">
+              <div class="banner-id">ID: #{{ banner.banner_id }}</div>
+              <div class="banner-url">
+                <a [href]="banner.action_link_url" target="_blank" title="{{ banner.action_link_url }}">
+                  {{ banner.action_link_url | slice:0:50 }}{{ banner.action_link_url.length > 50 ? '...' : '' }}
+                </a>
+              </div>
+              <div class="banner-meta">
+                <span class="created-date">
+                  <i class="bi bi-calendar"></i> {{ banner.created_on | date:'dd MMM yyyy' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Banners Template -->
+    <ng-template #noBanners>
+      <div class="text-center py-5">
+        <i class="bi bi-image" style="font-size: 3rem; color: #cbd5e1;"></i>
+        <h5 class="mt-3 text-muted">No banners found</h5>
+        <p class="text-muted">Click the "Add Banner" button to create your first banner.</p>
+      </div>
+    </ng-template>
+  </div>
+</div>
+
+<!-- ADD BANNER MODAL -->
+<div class="modal fade" id="addBannerModal" tabindex="-1" aria-labelledby="addBannerLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content modal-card">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addBannerLabel">Add New Banner</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeModalProperly('addBannerModal')"></button>
+      </div>
+
+      <div class="modal-body">
+        <form class="banner-form">
+          <!-- Banner Image Upload -->
+          <div class="form-section">
+            <h6 class="section-title">Banner Image *</h6>
+            <div class="form-row">
+              <div class="image-upload-container">
+                <div class="image-preview mb-3" *ngIf="imagePreviewUrl">
+                  <img [src]="imagePreviewUrl" class="preview-image" alt="Banner preview" />
+                  <button type="button" class="btn btn-sm btn-danger remove-image" (click)="clearImageSelection()">
+                    <i class="bi bi-x-lg"></i>
+                  </button>
+                </div>
+                
+                <div class="upload-controls" *ngIf="!imagePreviewUrl">
+                  <input #bannerImageInput type="file" class="form-control" accept="image/*" 
+                         (change)="onImageSelected($event)" hidden />
+                  <button type="button" class="btn btn-outline-primary" (click)="bannerImageInput.click()">
+                    <i class="bi bi-upload"></i> Choose Image
+                  </button>
+                  <small class="text-muted d-block mt-2">
+                    Max file size: 5MB | Allowed types: JPG, PNG, GIF, WEBP
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Link URL -->
+          <div class="form-section">
+            <h6 class="section-title">Action Link URL *</h6>
+            <div class="form-row">
+              <input type="url" class="form-control" [(ngModel)]="bannerForm.action_link_url" 
+                     name="actionLinkUrl" placeholder="https://example.com/event" required />
+              <small class="text-muted">The URL where users will be redirected when clicking the banner</small>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModalProperly('addBannerModal')">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" (click)="createBanner()" [disabled]="isSubmitting">
+          <i class="bi bi-plus-lg"></i> {{ isSubmitting ? 'Creating...' : 'Create Banner' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT BANNER MODAL -->
+<div class="modal fade" id="editBannerModal" tabindex="-1" aria-labelledby="editBannerLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content modal-card">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editBannerLabel">Edit Banner</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeModalProperly('editBannerModal')"></button>
+      </div>
+
+      <div class="modal-body">
+        <form class="banner-form">
+          <!-- Current Banner Preview -->
+          <div class="form-section" *ngIf="imagePreviewUrl && !selectedImageFile">
+            <h6 class="section-title">Current Banner</h6>
+            <div class="form-row">
+              <div class="image-preview mb-3">
+                <img [src]="imagePreviewUrl" class="preview-image" alt="Current banner" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Banner Image Upload (Optional for edit) -->
+          <div class="form-section">
+            <h6 class="section-title">Update Banner Image (Optional)</h6>
+            <div class="form-row">
+              <div class="image-upload-container">
+                <div class="image-preview mb-3" *ngIf="selectedImageFile && imagePreviewUrl !== bannerForm.banner_img">
+                  <img [src]="imagePreviewUrl" class="preview-image" alt="New banner preview" />
+                  <button type="button" class="btn btn-sm btn-danger remove-image" (click)="clearImageSelection()">
+                    <i class="bi bi-x-lg"></i>
+                  </button>
+                </div>
+                
+                <div class="upload-controls">
+                  <input #bannerImageInput type="file" class="form-control" accept="image/*" 
+                         (change)="onImageSelected($event)" hidden />
+                  <button type="button" class="btn btn-outline-primary" (click)="bannerImageInput.click()">
+                    <i class="bi bi-upload"></i> Choose New Image
+                  </button>
+                  <small class="text-muted d-block mt-2">
+                    Leave empty to keep current image | Max 5MB | JPG, PNG, GIF, WEBP
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Link URL -->
+          <div class="form-section">
+            <h6 class="section-title">Action Link URL *</h6>
+            <div class="form-row">
+              <input type="url" class="form-control" [(ngModel)]="bannerForm.action_link_url" 
+                     name="actionLinkUrl" placeholder="https://example.com/event" required />
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModalProperly('editBannerModal')">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" (click)="updateBanner()" [disabled]="isSubmitting">
+          <i class="bi bi-save"></i> {{ isSubmitting ? 'Updating...' : 'Update Banner' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRMATION MODAL -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteConfirmLabel">Confirm Delete</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="closeModalProperly('deleteConfirmModal')"></button>
+      </div>
+      <div class="modal-body text-center">
+        <!-- <i class="bi bi-exclamation-triangle text-warning" style="font-size: 3rem;"></i> -->
+        <h6 class="mt-3">Are you sure you want to delete this banner?</h6>
+        <!-- <p class="text-muted small">This action cannot be undone.</p> -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModalProperly('deleteConfirmModal')">
+          <i class="bi bi-x-lg"></i> Cancel
+        </button>
+        <button type="button" class="btn btn-danger" (click)="confirmDelete()" [disabled]="isDeleting">
+          <i class="bi bi-trash"></i> {{ isDeleting ? 'Deleting...' : 'Yes, Delete' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

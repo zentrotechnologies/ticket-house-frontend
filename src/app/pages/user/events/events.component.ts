@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { ArtistResponse, GenerateOTPRequest, LoginResponse, ShowsByArtistsResponse, SignUpRequest, SignUpResponse, TestimonialResponse, TestimonialsResponse, UpcomingEventResponse, UpcomingEventsResponse, User, VerifyOTPRequest } from '../../../core/models/auth.model';
+import { ArtistResponse, BannerManagementModel, BannerResponse, GenerateOTPRequest, LoginResponse, ShowsByArtistsResponse, SignUpRequest, SignUpResponse, TestimonialResponse, TestimonialsResponse, UpcomingEventResponse, UpcomingEventsResponse, User, VerifyOTPRequest } from '../../../core/models/auth.model';
 import { ApiService } from '../../../core/services/api.service';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../../core/services/auth.service';
@@ -57,6 +57,12 @@ export class EventsComponent implements OnInit {
   isLoading = false;
   eventPrices: Map<number, number | null> = new Map();
 
+  // Add these new properties for banners
+  banners: BannerManagementModel[] = [];
+  isLoadingBanners = false;
+  currentBannerIndex = 0;
+  bannerInterval: any;
+
   private userSubscription: Subscription = new Subscription();
   
   constructor(
@@ -68,9 +74,98 @@ export class EventsComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.loadBanners(); // Load banners first
     this.loadUpcomingEvents();
     this.loadArtists();
     this.loadTestimonials();
+  }
+
+  // Add this new method to load banners
+  loadBanners(): void {
+    this.isLoadingBanners = true;
+    
+    this.apiService.getAllBanners().subscribe({
+      next: (response: BannerResponse) => {
+        if (response.status === 'Success' && response.data) {
+          // Filter only active banners
+          this.banners = response.data.filter(banner => banner.active === 1);
+          
+          // Start carousel if there are banners
+          if (this.banners.length > 1) {
+            this.startBannerCarousel();
+          }
+        } else {
+          this.banners = [];
+        }
+      },
+      error: (error) => {
+        console.error('Error loading banners:', error);
+        this.banners = [];
+      },
+      complete: () => {
+        this.isLoadingBanners = false;
+      }
+    });
+  }
+
+  // Add carousel control methods
+  startBannerCarousel(): void {
+    if (this.bannerInterval) {
+      clearInterval(this.bannerInterval);
+    }
+    
+    this.bannerInterval = setInterval(() => {
+      this.nextBanner();
+    }, 5000); // Change banner every 5 seconds
+  }
+
+  nextBanner(): void {
+    if (this.banners.length > 0) {
+      this.currentBannerIndex = (this.currentBannerIndex + 1) % this.banners.length;
+    }
+  }
+
+  prevBanner(): void {
+    if (this.banners.length > 0) {
+      this.currentBannerIndex = (this.currentBannerIndex - 1 + this.banners.length) % this.banners.length;
+    }
+  }
+
+  goToBanner(index: number): void {
+    this.currentBannerIndex = index;
+  }
+
+  getCurrentBanner(): BannerManagementModel | null {
+    return this.banners.length > 0 ? this.banners[this.currentBannerIndex] : null;
+  }
+
+  // Helper method to safely get banner image URL
+  getBannerImageUrl(banner: BannerManagementModel): string {
+    if (!banner || !banner.banner_img) {
+      return 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=60&w=1500'; // Fallback image
+    }
+    
+    // If the banner_img is already a full data URL, use it directly
+    if (banner.banner_img.startsWith('data:image/')) {
+      return banner.banner_img;
+    }
+    
+    // If it's just base64 data, prepend the data URL prefix
+    // You might need to detect the image type - assuming JPEG here
+    return `data:image/jpeg;base64,${banner.banner_img}`;
+  }
+
+  // Handle banner click
+  onBannerClick(banner: BannerManagementModel): void {
+    if (banner.action_link_url) {
+      // If it's a full URL, open in new tab
+      if (banner.action_link_url.startsWith('http')) {
+        window.open(banner.action_link_url, '_blank');
+      } else {
+        // Otherwise, navigate within the app
+        this.router.navigate([banner.action_link_url]);
+      }
+    }
   }
 
   // loadUpcomingEvents(): void {
@@ -747,6 +842,10 @@ export class EventsComponent implements OnInit {
 
   // Clean up event listener when component is destroyed
   ngOnDestroy(): void {
+    if (this.bannerInterval) {
+      clearInterval(this.bannerInterval);
+    }
+    
     document.removeEventListener('click', this.closeDropdownOnClickOutside.bind(this));
     this.clearOtpTimer();
     if (this.userSubscription) {

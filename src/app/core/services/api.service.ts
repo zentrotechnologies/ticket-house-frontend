@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { BookingDetailsResponse, BookingHistoryRequest, BookingQRResponse, BookingResponse, BookingScanSummaryResponse, CommonResponse, CommonResponseModel, CreateBookingRequest, EventCategoryModel, EventCategoryRequest, EventCompleteResponseModel, EventCreateRequestModel, EventDetailsModel, EventPaginationRequest, EventSeatTypeInventoryModel, EventSummaryData, GenerateOTPRequest, GetShowsByArtistsRequest, MyBookingsResponse, OrganizerModel, OrganizerPagedResponse, OrganizerRequest, OTPResponse, PagedBookingHistoryResponse, PagedResponse, PaginationRequest, PartialScanRequest, PaymentOrderResponse, PaymentStatusResponse, PaymentVerificationResponse, QRCodeDataResponse, ResendOTPRequest, ResendOTPResponse, ScanTicketRequest, SeatAvailabilityRequest, ShowsByArtistsResponse, SignUpRequest, SignUpResponse, SimilarEventsRequest, TestimonialModel, TestimonialsResponse, TicketScanResponse, UpcomingEventResponse, UpcomingEventsRequest, UpcomingEventsResponse, UpdateEventCategoryStatusRequest, UpdateOrganizerStatusRequest, UpdateTestimonialStatusRequest, UserIdRequest, VerifyOTPRequest } from '../models/auth.model';
+import { BannerBooleanResponse, BannerIdResponse, BannerResponse, BookingDetailsResponse, BookingHistoryRequest, BookingQRResponse, BookingResponse, BookingScanSummaryResponse, CommonResponse, CommonResponseModel, CreateBannerRequest, CreateBookingRequest, EventCategoryModel, EventCategoryRequest, EventCompleteResponseModel, EventCreateRequestModel, EventDetailsModel, EventPaginationRequest, EventSeatTypeInventoryModel, EventSummaryData, GenerateOTPRequest, GetShowsByArtistsRequest, MyBookingsResponse, OrganizerModel, OrganizerPagedResponse, OrganizerRequest, OTPResponse, PagedBookingHistoryResponse, PagedResponse, PaginationRequest, PartialScanRequest, PaymentOrderResponse, PaymentStatusResponse, PaymentVerificationResponse, QRCodeDataResponse, ResendOTPRequest, ResendOTPResponse, ScanTicketRequest, SeatAvailabilityRequest, ShowsByArtistsResponse, SignUpRequest, SignUpResponse, SimilarEventsRequest, SingleBannerResponse, TestimonialModel, TestimonialsResponse, TicketScanResponse, UpcomingEventResponse, UpcomingEventsRequest, UpcomingEventsResponse, UpdateBannerRequest, UpdateEventCategoryStatusRequest, UpdateOrganizerStatusRequest, UpdateTestimonialStatusRequest, UserIdRequest, VerifyOTPRequest } from '../models/auth.model';
 
 @Injectable({
   providedIn: 'root',
@@ -337,9 +337,9 @@ export class ApiService {
 
   confirmBookingWithUser(bookingId: number, userId: string): Observable<CommonResponseModel<BookingResponse>> {
     const url = `${this.ThApi}api/Booking/ConfirmBookingWithUser`;
-    return this.httpClient.post<CommonResponseModel<BookingResponse>>(url, { 
-      bookingId, 
-      userId 
+    return this.httpClient.post<CommonResponseModel<BookingResponse>>(url, {
+      bookingId,
+      userId
     });
   }
 
@@ -435,7 +435,7 @@ export class ApiService {
 
   createBookingWithPayment(request: any): Observable<any> {
     return this.httpClient.post<any>(`${this.ThApi}api/Payment/CreateBookingWithPayment`, request, {
-        headers: this.getAuthHeaders()
+      headers: this.getAuthHeaders()
     });
   }
 
@@ -450,6 +450,48 @@ export class ApiService {
   getPagedBookingHistoryByUserId(request: BookingHistoryRequest): Observable<PagedBookingHistoryResponse> {
     const url = `${this.ThApi}api/Booking/GetPagedBookingHistoryByUserId`;
     return this.httpClient.post<PagedBookingHistoryResponse>(url, request, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  // ===== BANNER MANAGEMENT APIS =====
+
+  // Get all banners
+  getAllBanners(): Observable<BannerResponse> {
+    const url = `${this.ThApi}api/BannerManagement/GetAllBanners`;
+    return this.httpClient.get<BannerResponse>(url, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  // Get banner by ID
+  getBannerById(bannerId: number): Observable<SingleBannerResponse> {
+    const url = `${this.ThApi}api/BannerManagement/GetBannerById/${bannerId}`;
+    return this.httpClient.get<SingleBannerResponse>(url, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  // Create banner
+  createBanner(request: CreateBannerRequest): Observable<BannerIdResponse> {
+    const url = `${this.ThApi}api/BannerManagement/CreateBanner`;
+    return this.httpClient.post<BannerIdResponse>(url, request, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  // Update banner
+  updateBanner(bannerId: number, request: UpdateBannerRequest): Observable<BannerBooleanResponse> {
+    const url = `${this.ThApi}api/BannerManagement/UpdateBanner/${bannerId}`;
+    return this.httpClient.post<BannerBooleanResponse>(url, request, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  // Delete banner
+  deleteBanner(bannerId: number): Observable<BannerBooleanResponse> {
+    const url = `${this.ThApi}api/BannerManagement/DeleteBanner/${bannerId}`;
+    return this.httpClient.post<BannerBooleanResponse>(url, {}, {
       headers: this.getAuthHeaders()
     });
   }

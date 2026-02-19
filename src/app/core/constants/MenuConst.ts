@@ -42,6 +42,13 @@ export const MENU_ITEMS: MenuItem[] = [
       // }
     ]
   },
+  // Add Banner Management here - ABOVE Testimonial
+  {
+    title: 'Banner Management',
+    icon: 'image', // You can change the icon as needed
+    route: '/admin/banner-management',
+    roles: [1, 2] // Role 1 and 2 can access
+  },
   {
     title: 'Testimonial',
     icon: '',

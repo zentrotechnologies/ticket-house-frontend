@@ -134,6 +134,13 @@ export const routes: Routes = [
                   ),
               },
               {
+                path: 'banner-management',
+                loadComponent: () =>
+                  import('./pages/admin/admin-banner-management/admin-banner-management.component').then(
+                    (m) => m.AdminBannerManagementComponent
+                  ),
+              },
+              {
                 path: 'testimonial',
                 loadComponent: () =>
                   import('./pages/admin/testimonial/testimonial.component').then(

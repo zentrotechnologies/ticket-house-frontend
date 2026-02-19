@@ -826,3 +826,32 @@ export interface PagedBookingHistoryResponse extends CommonResponseModel<Booking
   hasPrevious: boolean;
   hasNext: boolean;
 }
+
+// ===== BANNER MANAGEMENT MODELS =====
+export interface BannerManagementModel {
+  banner_id: number;
+  banner_img: string; // Base64 URL stored in DB
+  action_link_url: string;
+  created_by: string;
+  created_on: string;
+  updated_by: string;
+  updated_on: string | null;
+  active: number;
+}
+
+export interface CreateBannerRequest {
+  banner_img: string; // Base64 string
+  action_link_url: string;
+  created_by?: string;
+}
+
+export interface UpdateBannerRequest {
+  banner_img?: string; // Optional for updates
+  action_link_url?: string;
+  updated_by?: string;
+}
+
+export interface BannerResponse extends CommonResponseModel<BannerManagementModel[]> {}
+export interface SingleBannerResponse extends CommonResponseModel<BannerManagementModel> {}
+export interface BannerIdResponse extends CommonResponseModel<number> {}
+export interface BannerBooleanResponse extends CommonResponseModel<boolean> {}

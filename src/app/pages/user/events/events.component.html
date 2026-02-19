@@ -45,14 +45,71 @@
 
   <!-- events-page.component.html -->
   <div class="events-page">
-    <section class="hero">
-      <div class="events-container">
-        <span class="badge">Satrangi Re</span>
-        <h1>PUNE — <small>By Sonu Nigam</small></h1>
-        <p class="hero-sub">Experience the musical night in the city with live performance</p>
-        <div class="date-pill">10th January 2026</div>
+    <!-- HERO SECTION WITH CAROUSEL -->
+  <section class="hero">
+    <!-- Banner Carousel -->
+    <div class="banner-carousel">
+      <!-- Loading State -->
+      <div *ngIf="isLoadingBanners" class="carousel-loading">
+        <div class="spinner"></div>
       </div>
-    </section>
+
+      <!-- No Banners Fallback -->
+      <div *ngIf="!isLoadingBanners && banners.length === 0" class="carousel-fallback">
+        <div class="fallback-content">
+          <span class="badge">Welcome to</span>
+          <h1>Ticket<span class="highlight">House</span></h1>
+          <p class="hero-sub">Your gateway to amazing events and experiences</p>
+        </div>
+      </div>
+
+      <!-- Banner Carousel Content -->
+      <div *ngIf="!isLoadingBanners && banners.length > 0" class="carousel-container">
+        <!-- Current Banner -->
+        <div class="carousel-slide" [style.background-image]="'url(' + getBannerImageUrl(getCurrentBanner()!) + ')'">
+          <div class="carousel-overlay">
+            <!-- <div class="events-container"> -->
+              <!-- Optional: You can add dynamic content from banners if needed -->
+              <!-- <span class="badge">{{ getCurrentBanner()?.banner_title || 'Featured Event' }}</span>
+              <h1>{{ getCurrentBanner()?.banner_heading || 'Amazing Events' }}</h1>
+              <p class="hero-sub">{{ getCurrentBanner()?.banner_description || 'Discover the best events in your city' }}</p>
+              <div class="date-pill" *ngIf="getCurrentBanner()?.banner_date">{{ getCurrentBanner()?.banner_date }}</div> -->
+              
+              <!-- Static content or dynamic from banner -->
+              <!-- <span class="badge">Featured</span>
+              <h1>Discover Amazing Events</h1>
+              <p class="hero-sub">Experience the best live performances, concerts, and shows</p>
+              <div class="banner-action" *ngIf="getCurrentBanner()?.action_link_url">
+                <button class="action-btn" (click)="onBannerClick(getCurrentBanner()!)">
+                  Learn More →
+                </button>
+              </div>
+            </div> -->
+          </div>
+        </div>
+
+        <!-- Carousel Navigation Arrows -->
+        <button class="carousel-arrow prev" (click)="prevBanner()" aria-label="Previous banner">❮</button>
+        <button class="carousel-arrow next" (click)="nextBanner()" aria-label="Next banner">❯</button>
+
+        <!-- Carousel Indicators -->
+        <!-- <div class="carousel-indicators">
+          <button 
+            *ngFor="let banner of banners; let i = index" 
+            class="indicator" 
+            [class.active]="i === currentBannerIndex"
+            (click)="goToBanner(i)"
+            [attr.aria-label]="'Go to slide ' + (i + 1)">
+          </button>
+        </div> -->
+
+        <!-- Optional: Banner Counter -->
+        <!-- <div class="carousel-counter">
+          {{ currentBannerIndex + 1 }} / {{ banners.length }}
+        </div> -->
+      </div>
+    </div>
+  </section>
 
     <main class="events-main">
       <div class="events-container">
