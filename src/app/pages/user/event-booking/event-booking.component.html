@@ -212,12 +212,17 @@
                 <aside class="booking-sidebar">
                     <div class="sidebar-card sticky-sidebar">
                         <div class="sidebar-price-section">
-                            <span class="sidebar-price-label">Starting from</span>
+                            <span class="sidebar-price-label" *ngIf="hasValidPrice()">Starting from</span>
                             <span class="sidebar-price-value">{{ getDisplayPrice() }}</span>
                             <span class="sidebar-price-range">{{ getPriceRangeDisplay() }}</span>
                         </div>
-                        <button class="book-now-btn" (click)="onBookNow()">
+                        <!-- <button class="book-now-btn" (click)="onBookNow()">
                             Book Now <span class="btn-arrow">›</span>
+                        </button> -->
+                        <button class="book-now-btn" (click)="onBookNow()" [disabled]="!hasValidPrice()"
+                            [class.disabled]="!hasValidPrice()">
+                            {{ hasValidPrice() ? 'Book Now' : 'Sold Out' }}
+                            <span class="btn-arrow" *ngIf="hasValidPrice()">›</span>
                         </button>
                         <!-- ADD THIS LINE - Terms & Conditions below book now button -->
                         <div class="terms-agreement">
@@ -241,12 +246,17 @@
         <div class="mobile-sticky-footer">
             <div class="mobile-footer-content">
                 <div class="mobile-price-info">
-                    <span class="mobile-price-label">Starting from</span>
+                    <span class="mobile-price-label" *ngIf="hasValidPrice()">Starting from</span>
                     <span class="mobile-price-value">{{ getDisplayPrice() }}</span>
                     <span class="mobile-price-range">{{ getPriceRangeDisplay() }}</span>
                 </div>
-                <button class="mobile-book-btn" (click)="onBookNow()">
+                <!-- <button class="mobile-book-btn" (click)="onBookNow()">
                     Book Now <span class="btn-arrow">›</span>
+                </button> -->
+                <button class="mobile-book-btn" (click)="onBookNow()" [disabled]="!hasValidPrice()"
+                    [class.disabled]="!hasValidPrice()">
+                    {{ hasValidPrice() ? 'Book Now' : 'Sold Out' }}
+                    <span class="btn-arrow" *ngIf="hasValidPrice()">›</span>
                 </button>
             </div>
         </div>

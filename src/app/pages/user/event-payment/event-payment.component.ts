@@ -117,37 +117,126 @@ export class EventPaymentComponent implements OnInit {
   //   });
   // }
 
+  // ngOnInit(): void {
+  //   this.route.params.subscribe((params) => {
+  //     this.eventId = +params['event_id'] || 0;
+  //     this.eventNameSlug = params['event_name'] || '';
+
+  //     // Try to get data from navigation state first
+  //     const navigation = this.router.getCurrentNavigation();
+  //     if (navigation?.extras.state) {
+  //       this.seatSelections = navigation.extras.state['seatSelections'] || [];
+  //       this.totalAmount = navigation.extras.state['totalAmount'] || 0;
+  //       this.userId = navigation.extras.state['userId'] || this.userId;
+  //       this.eventTitle = navigation.extras.state['eventTitle'] || '';
+
+  //       console.log('Payment - Received seat selections from state:', this.seatSelections);
+
+  //       if (this.seatSelections.length > 0) {
+  //         this.calculateBookingFee();
+  //         this.loadEventDetails();
+  //         this.clearSessionStorage();
+  //       } else {
+  //         // If state has empty selections, try sessionStorage
+  //         this.restoreFromSessionStorage();
+  //       }
+  //     } else {
+  //       // Try sessionStorage
+  //       this.restoreFromSessionStorage();
+  //     }
+  //   });
+
+  //   // Check if we have pending booking data after login
+  //   this.checkPendingBookingAfterLogin();
+  // }
+
   ngOnInit(): void {
     this.route.params.subscribe((params) => {
       this.eventId = +params['event_id'] || 0;
       this.eventNameSlug = params['event_name'] || '';
 
-      // Try to get data from navigation state first
-      const navigation = this.router.getCurrentNavigation();
-      if (navigation?.extras.state) {
-        this.seatSelections = navigation.extras.state['seatSelections'] || [];
-        this.totalAmount = navigation.extras.state['totalAmount'] || 0;
-        this.userId = navigation.extras.state['userId'] || this.userId;
-        this.eventTitle = navigation.extras.state['eventTitle'] || '';
+      // FIRST: Check sessionStorage for persisted data (this will survive refresh)
+      const persistedData = this.loadFromSessionStorage();
 
-        console.log('Payment - Received seat selections from state:', this.seatSelections);
+      if (persistedData) {
+        console.log('Payment - Restored from sessionStorage on init:', persistedData);
+        this.seatSelections = persistedData.seatSelections;
+        this.totalAmount = persistedData.totalAmount;
+        this.eventTitle = persistedData.eventTitle;
 
-        if (this.seatSelections.length > 0) {
-          this.calculateBookingFee();
-          this.loadEventDetails();
-          this.clearSessionStorage();
-        } else {
-          // If state has empty selections, try sessionStorage
-          this.restoreFromSessionStorage();
+        this.calculateBookingFee();
+        this.loadEventDetails();
+      }
+      // SECOND: Try to get data from navigation state (new navigation)
+      else {
+        const navigation = this.router.getCurrentNavigation();
+        if (navigation?.extras.state) {
+          this.seatSelections = navigation.extras.state['seatSelections'] || [];
+          this.totalAmount = navigation.extras.state['totalAmount'] || 0;
+          this.userId = navigation.extras.state['userId'] || this.userId;
+          this.eventTitle = navigation.extras.state['eventTitle'] || '';
+
+          console.log('Payment - Received seat selections from state:', this.seatSelections);
+
+          if (this.seatSelections.length > 0) {
+            // Save to sessionStorage for refresh persistence
+            this.persistToSessionStorage();
+            this.calculateBookingFee();
+            this.loadEventDetails();
+            this.clearSessionStorage(); // Clear temp data
+          }
         }
-      } else {
-        // Try sessionStorage
+      }
+
+      // If still no selections, try other storage methods
+      if (!this.seatSelections.length) {
         this.restoreFromSessionStorage();
       }
     });
 
     // Check if we have pending booking data after login
     this.checkPendingBookingAfterLogin();
+  }
+
+  // Add these new methods for persistence
+  private persistToSessionStorage(): void {
+    const dataToPersist = {
+      seatSelections: this.seatSelections,
+      totalAmount: this.totalAmount,
+      eventId: this.eventId,
+      eventNameSlug: this.eventNameSlug,
+      eventTitle: this.eventTitle,
+      timestamp: new Date().getTime()
+    };
+
+    sessionStorage.setItem('payment_page_data', JSON.stringify(dataToPersist));
+    console.log('Persisted payment data to sessionStorage');
+  }
+
+  private loadFromSessionStorage(): any {
+    const persistedData = sessionStorage.getItem('payment_page_data');
+
+    if (persistedData) {
+      try {
+        const data = JSON.parse(persistedData);
+
+        // Check if data is for this event (within last 30 minutes)
+        const now = new Date().getTime();
+        const THIRTY_MINUTES = 30 * 60 * 1000;
+
+        if (data.eventId === this.eventId && (now - data.timestamp) < THIRTY_MINUTES) {
+          return data;
+        } else {
+          // Clear expired data
+          sessionStorage.removeItem('payment_page_data');
+        }
+      } catch (error) {
+        console.error('Error parsing persisted data:', error);
+        sessionStorage.removeItem('payment_page_data');
+      }
+    }
+
+    return null;
   }
 
   // Add this new method to check for pending booking after login
@@ -182,8 +271,102 @@ export class EventPaymentComponent implements OnInit {
     }
   }
 
+  // restoreFromSessionStorage(): void {
+  //   // First check for temp_booking_data (from seat selection)
+  //   const tempData = sessionStorage.getItem('temp_booking_data');
+
+  //   console.log('Payment - Attempting to restore from sessionStorage:', { hasData: !!tempData });
+
+  //   if (tempData) {
+  //     try {
+  //       const bookingData = JSON.parse(tempData);
+
+  //       // Check if data is for this event
+  //       if (bookingData.eventId === this.eventId && bookingData.seatSelections?.length > 0) {
+  //         this.seatSelections = bookingData.seatSelections;
+  //         this.totalAmount = bookingData.totalAmount;
+  //         this.eventTitle = bookingData.eventName
+  //           ? bookingData.eventName
+  //             .replace(/-/g, ' ')
+  //             .replace(/\b\w/g, (l: string) => l.toUpperCase())
+  //           : '';
+
+  //         console.log(
+  //           'Payment - Restored seat selections from temp_booking_data:',
+  //           this.seatSelections,
+  //         );
+
+  //         this.calculateBookingFee();
+  //         this.loadEventDetails();
+
+  //         // Clear after restoring
+  //         sessionStorage.removeItem('temp_booking_data');
+  //         return;
+  //       }
+  //     } catch (error) {
+  //       console.error('Error parsing temp_booking_data:', error);
+  //     }
+  //   }
+
+  //   // If no temp_booking_data, check for pending_payment_booking
+  //   const pendingData = sessionStorage.getItem('pending_payment_booking');
+
+  //   if (pendingData) {
+  //     try {
+  //       const bookingData = JSON.parse(pendingData);
+
+  //       if (bookingData.eventId === this.eventId && bookingData.seatSelections?.length > 0) {
+  //         this.seatSelections = bookingData.seatSelections;
+  //         this.totalAmount = bookingData.totalAmount;
+  //         this.eventTitle =
+  //           bookingData.eventTitle ||
+  //           (bookingData.eventName
+  //             ? bookingData.eventName
+  //               .replace(/-/g, ' ')
+  //               .replace(/\b\w/g, (l: string) => l.toUpperCase())
+  //             : '');
+
+  //         console.log(
+  //           'Payment - Restored seat selections from pending_payment_booking:',
+  //           this.seatSelections,
+  //         );
+
+  //         this.calculateBookingFee();
+  //         this.loadEventDetails();
+
+  //         // Clear after restoring
+  //         sessionStorage.removeItem('pending_payment_booking');
+  //         return;
+  //       }
+  //     } catch (error) {
+  //       console.error('Error parsing pending_payment_booking:', error);
+  //     }
+  //   }
+
+  //   // If no data found, redirect
+  //   if (!this.seatSelections.length) {
+  //     console.log('No seat selections found');
+  //     this.toastr.warning('Please select seats first', 'Selection Required');
+  //     this.router.navigate(['/event-booking', this.eventId, this.eventNameSlug]);
+  //   }
+  // }
+
   restoreFromSessionStorage(): void {
-    // First check for temp_booking_data (from seat selection)
+    // First check for persisted payment page data
+    const persistedData = this.loadFromSessionStorage();
+
+    if (persistedData) {
+      console.log('Restored from persisted data in restoreFromSessionStorage');
+      this.seatSelections = persistedData.seatSelections;
+      this.totalAmount = persistedData.totalAmount;
+      this.eventTitle = persistedData.eventTitle;
+
+      this.calculateBookingFee();
+      this.loadEventDetails();
+      return;
+    }
+
+    // Check for temp_booking_data (from seat selection)
     const tempData = sessionStorage.getItem('temp_booking_data');
 
     console.log('Payment - Attempting to restore from sessionStorage:', { hasData: !!tempData });
@@ -207,6 +390,8 @@ export class EventPaymentComponent implements OnInit {
             this.seatSelections,
           );
 
+          // Also persist for refresh protection
+          this.persistToSessionStorage();
           this.calculateBookingFee();
           this.loadEventDetails();
 
@@ -216,41 +401,6 @@ export class EventPaymentComponent implements OnInit {
         }
       } catch (error) {
         console.error('Error parsing temp_booking_data:', error);
-      }
-    }
-
-    // If no temp_booking_data, check for pending_payment_booking
-    const pendingData = sessionStorage.getItem('pending_payment_booking');
-
-    if (pendingData) {
-      try {
-        const bookingData = JSON.parse(pendingData);
-
-        if (bookingData.eventId === this.eventId && bookingData.seatSelections?.length > 0) {
-          this.seatSelections = bookingData.seatSelections;
-          this.totalAmount = bookingData.totalAmount;
-          this.eventTitle =
-            bookingData.eventTitle ||
-            (bookingData.eventName
-              ? bookingData.eventName
-                .replace(/-/g, ' ')
-                .replace(/\b\w/g, (l: string) => l.toUpperCase())
-              : '');
-
-          console.log(
-            'Payment - Restored seat selections from pending_payment_booking:',
-            this.seatSelections,
-          );
-
-          this.calculateBookingFee();
-          this.loadEventDetails();
-
-          // Clear after restoring
-          sessionStorage.removeItem('pending_payment_booking');
-          return;
-        }
-      } catch (error) {
-        console.error('Error parsing pending_payment_booking:', error);
       }
     }
 
@@ -410,39 +560,39 @@ export class EventPaymentComponent implements OnInit {
   // }
 
   calculateBookingFee(): void {
-  // Use dynamic convenience fee percentage from API, default to 6% if not available
-  const feePercentage = this.convenienceFeePercentage > 0
-    ? this.convenienceFeePercentage / 100  // Convert to decimal (e.g., 4.00% → 0.04)
-    : 0.06; // Default 6% fallback
+    // Use dynamic convenience fee percentage from API, default to 6% if not available
+    const feePercentage = this.convenienceFeePercentage > 0
+      ? this.convenienceFeePercentage / 100  // Convert to decimal (e.g., 4.00% → 0.04)
+      : 0.06; // Default 6% fallback
 
-  // Calculate convenience fee based on dynamic percentage - keep full precision
-  this.convenienceFee = this.totalAmount * feePercentage;
+    // Calculate convenience fee based on dynamic percentage - keep full precision
+    this.convenienceFee = this.totalAmount * feePercentage;
 
-  // Calculate GST on convenience fee only (18% = 9% CGST + 9% SGST) - keep full precision
-  this.cgstAmount = this.convenienceFee * 0.09;
-  this.sgstAmount = this.convenienceFee * 0.09;
-  this.gstTotal = this.cgstAmount + this.sgstAmount;
+    // Calculate GST on convenience fee only (18% = 9% CGST + 9% SGST) - keep full precision
+    this.cgstAmount = this.convenienceFee * 0.09;
+    this.sgstAmount = this.convenienceFee * 0.09;
+    this.gstTotal = this.cgstAmount + this.sgstAmount;
 
-  // Calculate final amount: total + convenience fee + GST - keep full precision
-  this.finalAmount = this.totalAmount + this.convenienceFee + this.gstTotal;
+    // Calculate final amount: total + convenience fee + GST - keep full precision
+    this.finalAmount = this.totalAmount + this.convenienceFee + this.gstTotal;
 
-  // Keep the old bookingFee property for backward compatibility if needed - keep full precision
-  this.bookingFee = this.convenienceFee + this.gstTotal;
+    // Keep the old bookingFee property for backward compatibility if needed - keep full precision
+    this.bookingFee = this.convenienceFee + this.gstTotal;
 
-  // For logging, show rounded values for readability
-  console.log('Fee calculation details (showing 2 decimals):', {
-    totalAmount: this.totalAmount.toFixed(2),
-    feePercentage: (feePercentage * 100).toFixed(2) + '%',
-    convenienceFee: this.convenienceFee.toFixed(2),
-    cgstAmount: this.cgstAmount.toFixed(2),
-    sgstAmount: this.sgstAmount.toFixed(2),
-    gstTotal: this.gstTotal.toFixed(2),
-    bookingFee: this.bookingFee.toFixed(2),
-    finalAmount: this.finalAmount.toFixed(2),
-    // For Razorpay (must be in paise without decimals)
-    finalAmountInPaise: Math.round(this.finalAmount * 100)
-  });
-}
+    // For logging, show rounded values for readability
+    console.log('Fee calculation details (showing 2 decimals):', {
+      totalAmount: this.totalAmount.toFixed(2),
+      feePercentage: (feePercentage * 100).toFixed(2) + '%',
+      convenienceFee: this.convenienceFee.toFixed(2),
+      cgstAmount: this.cgstAmount.toFixed(2),
+      sgstAmount: this.sgstAmount.toFixed(2),
+      gstTotal: this.gstTotal.toFixed(2),
+      bookingFee: this.bookingFee.toFixed(2),
+      finalAmount: this.finalAmount.toFixed(2),
+      // For Razorpay (must be in paise without decimals)
+      finalAmountInPaise: Math.round(this.finalAmount * 100)
+    });
+  }
 
   getTotalTickets(): number {
     return this.seatSelections.reduce((total, seat) => total + seat.Quantity, 0);
@@ -685,6 +835,23 @@ export class EventPaymentComponent implements OnInit {
   }
 
   // Add this new method to save booking data for after login
+  // private saveBookingDataForAfterLogin(): void {
+  //   // Save current seat selections to sessionStorage
+  //   if (this.seatSelections.length > 0) {
+  //     const bookingData = {
+  //       seatSelections: this.seatSelections,
+  //       totalAmount: this.totalAmount,
+  //       eventId: this.eventId,
+  //       eventName: this.eventNameSlug,
+  //       eventTitle: this.eventTitle,
+  //       timestamp: new Date().getTime(),
+  //     };
+
+  //     sessionStorage.setItem('pending_payment_booking', JSON.stringify(bookingData));
+  //     console.log('Saved booking data for after login:', bookingData);
+  //   }
+  // }
+
   private saveBookingDataForAfterLogin(): void {
     // Save current seat selections to sessionStorage
     if (this.seatSelections.length > 0) {
@@ -698,6 +865,10 @@ export class EventPaymentComponent implements OnInit {
       };
 
       sessionStorage.setItem('pending_payment_booking', JSON.stringify(bookingData));
+
+      // Also persist for refresh protection
+      this.persistToSessionStorage();
+
       console.log('Saved booking data for after login:', bookingData);
     }
   }
@@ -1135,6 +1306,15 @@ export class EventPaymentComponent implements OnInit {
     this.router.navigate(['/events']);
   }
 
+  // clearAllLocalStorage(): void {
+  //   localStorage.removeItem('pending_seat_selections');
+  //   localStorage.removeItem('pending_total_amount');
+  //   localStorage.removeItem('pending_event_id');
+  //   localStorage.removeItem('pending_event_name');
+  //   localStorage.removeItem('pending_booking_id');
+  //   localStorage.removeItem('pending_booking_user');
+  // }
+
   clearAllLocalStorage(): void {
     localStorage.removeItem('pending_seat_selections');
     localStorage.removeItem('pending_total_amount');
@@ -1142,6 +1322,11 @@ export class EventPaymentComponent implements OnInit {
     localStorage.removeItem('pending_event_name');
     localStorage.removeItem('pending_booking_id');
     localStorage.removeItem('pending_booking_user');
+    
+    // Clear sessionStorage payment page data
+    sessionStorage.removeItem('payment_page_data');
+    sessionStorage.removeItem('pending_payment_booking');
+    sessionStorage.removeItem('temp_booking_data');
   }
 
   // Helper method to format the event title for display

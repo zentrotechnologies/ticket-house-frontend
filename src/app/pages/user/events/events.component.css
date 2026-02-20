@@ -601,9 +601,9 @@
 }
 
 @media (max-width: 768px) {
-  .hero {
+  /* .hero {
     padding: 10px 0;
-  }
+  } */
   
   .hero h1 {
     font-size: 40px;

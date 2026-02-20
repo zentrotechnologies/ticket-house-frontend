@@ -248,7 +248,12 @@
   </div>
 
   <!-- Booking Success Modal -->
-  <app-booking-success-modal *ngIf="showSuccessModal" [qrCodeBase64]="qrCodeBase64" [thankYouMessage]="thankYouMessage"
-    [bookingDetails]="bookingDetails" [bookingCode]="bookingCode" (close)="onSuccessModalClose()">
+  <app-booking-success-modal
+    *ngIf="showSuccessModal"
+    [qrCodeBase64]="qrCodeBase64"
+    [thankYouMessage]="thankYouMessage"
+    [bookingDetails]="bookingDetails"
+    [bookingCode]="bookingCode"
+    (close)="onSuccessModalClose()">
   </app-booking-success-modal>
 </div>

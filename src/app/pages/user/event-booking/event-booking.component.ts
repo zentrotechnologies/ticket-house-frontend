@@ -579,11 +579,35 @@ export class EventBookingComponent implements OnInit {
   //   }
   // }
 
+  // onBookNow(): void {
+  //   // Reset navigation flag when opening modal
+  //   this.isNavigatingAway = false;
+
+  //   // REMOVED: Login check - Always open seat selection modal
+  //   console.log('Opening seat selection modal');
+
+  //   // Load seats if not already loaded
+  //   if (this.seatTypes.length === 0) {
+  //     this.loadEventSeats();
+  //     setTimeout(() => {
+  //       this.openSeatModal();
+  //     }, 500);
+  //   } else {
+  //     this.resetSeatSelections();
+  //     this.openSeatModal();
+  //   }
+  // }
+
   onBookNow(): void {
+    // Add this check at the beginning
+    if (!this.hasValidPrice()) {
+      this.toastr.warning('This event is sold out', 'Not Available');
+      return;
+    }
+
     // Reset navigation flag when opening modal
     this.isNavigatingAway = false;
 
-    // REMOVED: Login check - Always open seat selection modal
     console.log('Opening seat selection modal');
 
     // Load seats if not already loaded
@@ -812,6 +836,10 @@ export class EventBookingComponent implements OnInit {
   }
 
   getDisplayPrice(): string {
+    if (!this.hasValidPrice()) {
+      return 'Sold Out';
+    }
+
     if (this.priceInRange !== null && this.priceInRange > 0) {
       return `₹${this.priceInRange}`;
     }
@@ -820,10 +848,12 @@ export class EventBookingComponent implements OnInit {
       return `₹${this.eventDetails.min_price}`;
     }
 
-    return '';
+    return 'Sold Out';
   }
 
   getPriceRangeDisplay(): string {
+    if (!this.hasValidPrice()) return '';
+
     if (this.priceInRange !== null) return '';
 
     if (!this.eventDetails?.max_price || !this.eventDetails?.min_price) return '';
@@ -1002,5 +1032,26 @@ export class EventBookingComponent implements OnInit {
         document.head.appendChild(style);
       }
     }
+  }
+
+  hasValidPrice(): boolean {
+    // Check priceInRange first
+    if (this.priceInRange !== null && this.priceInRange > 0) {
+      return true;
+    }
+
+    // Fallback to eventDetails min_price
+    if (this.eventDetails?.min_price && this.eventDetails.min_price > 0) {
+      return true;
+    }
+
+    // Check if there are any seat types with available seats and price
+    if (this.seatTypes && this.seatTypes.length > 0) {
+      return this.seatTypes.some(seat =>
+        seat.available_seats > 0 && seat.price > 0
+      );
+    }
+
+    return false;
   }
 }

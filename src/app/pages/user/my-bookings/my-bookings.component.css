@@ -321,7 +321,7 @@
 /* Event Info */
 .event-info {
   margin-bottom: 16px;
-  padding-bottom: 16px;
+  /* padding-bottom: 16px; */
   border-bottom: 1px dashed rgba(0, 0, 0, 0.05);
 }
 
@@ -338,7 +338,7 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  min-height: 46px;
+  /* min-height: 46px; */
 }
 
 .event-location, .event-date-time {
