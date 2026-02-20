@@ -600,43 +600,9 @@
   color: white;
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .events-container {
-    padding: 0 15px;
-  }
-  
-  .hero h1 {
-    font-size: 48px;
-  }
-  
-  .cards-grid {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
-  }
-  
-  .testimonial {
-    gap: 30px;
-    padding: 30px;
-  }
-  
-  .test-img {
-    width: 180px;
-    height: 180px;
-  }
-  
-  .cta {
-    padding: 40px;
-  }
-  
-  .cta-text {
-    font-size: 32px;
-  }
-}
-
 @media (max-width: 768px) {
   .hero {
-    padding: 60px 0;
+    padding: 10px 0;
   }
   
   .hero h1 {
@@ -657,7 +623,7 @@
   }
   
   .section-title {
-    font-size: 32px;
+    font-size: 28px;
   }
   
   .cards-grid {
@@ -717,65 +683,6 @@
   
   .footer-links span:nth-child(even) {
     display: none;
-  }
-}
-
-@media (max-width: 480px) {
-  .events-container {
-    padding: 0 12px;
-  }
-  
-  .hero {
-    padding: 40px 0;
-  }
-  
-  .hero h1 {
-    font-size: 32px;
-  }
-  
-  .hero-sub {
-    font-size: 16px;
-  }
-  
-  .section-title {
-    font-size: 28px;
-  }
-  
-  .cards-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-  
-  .event-card {
-    max-width: 100%;
-  }
-  
-  .test-img {
-    width: 140px;
-    height: 140px;
-  }
-  
-  .test-text h3 {
-    font-size: 22px;
-  }
-  
-  .test-text .desc {
-    font-size: 14px;
-  }
-  
-  .cta-text {
-    font-size: 24px;
-  }
-  
-  .cta-btn {
-    width: 100%;
-    max-width: 250px;
-  }
-  
-  .arrow {
-    width: 40px;
-    height: 40px;
-    font-size: 20px;
   }
 }
 
@@ -887,14 +794,6 @@
   margin: 0;
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .footer-main {
-    grid-template-columns: 1.5fr 1fr 1fr 1fr;
-    gap: 30px;
-  }
-}
-
 @media (max-width: 768px) {
   .footer-main {
     grid-template-columns: 1fr 1fr;
@@ -930,18 +829,6 @@
     transform: translateY(-3px);
   }
 }
-
-@media (max-width: 480px) {
-  .footer-main {
-    grid-template-columns: 1fr;
-    gap: 40px;
-  }
-  
-  .events-footer {
-    padding: 40px 0 20px;
-  }
-}
-
 /* Social Icons */
 .social-icons {
   display: flex;
@@ -1136,7 +1023,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-size: contain;
+  background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
   transition: background-image 0.8s ease-in-out;
@@ -1335,10 +1222,14 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .events-main {
+    padding: 10px 0;
+  }
+
   .banner-carousel,
   .carousel-container,
   .carousel-slide {
-    min-height: 400px;
+    min-height: 100px;
   }
 
   .carousel-arrow {

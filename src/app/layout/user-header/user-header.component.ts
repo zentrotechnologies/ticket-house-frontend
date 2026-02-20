@@ -814,4 +814,9 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
       this.hasSpecialChar() &&
       this.hasMinLength();
   }
+
+  getUserEmail(): string {
+    const user = this.authService.getCurrentUser();
+    return user?.email || '';
+  }
 }

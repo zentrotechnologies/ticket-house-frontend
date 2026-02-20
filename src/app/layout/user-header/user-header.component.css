@@ -339,6 +339,41 @@
   font-size: 16px;
 }
 
+/* Update the logout icon styles */
+.logout-icon {
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logout-icon i {
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* If you want to match the red color theme */
+.dropdown-item.logout-item {
+  color: rgb(239, 67, 67);
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Slightly increased gap for better spacing with icon */
+}
+
+.dropdown-item.logout-item i {
+  color: rgb(239, 67, 67);
+}
+
+.dropdown-item.logout-item:hover {
+  background: rgba(239, 67, 67, 0.05);
+}
+
+/* Optional: Add a slight animation on hover */
+.dropdown-item.logout-item:hover .logout-icon i {
+  transform: translateX(2px);
+  transition: transform 0.2s ease;
+}
+
 .overlay {
   position: fixed;
   top: 0;
@@ -1046,4 +1081,181 @@
 .form-group input.ng-valid.ng-touched + .password-toggle + .password-validation-container,
 .form-group input.ng-valid.ng-dirty + .password-toggle + .password-validation-container {
   display: none;
+}
+
+/* ===========================================
+   MOBILE RESPONSIVE STYLES - UPDATED
+   =========================================== */
+
+/* Small Tablets and Large Phones - KEEP EVERYTHING IN ONE ROW */
+@media (max-width: 768px) {
+  .header-row {
+    display: flex;
+    flex-direction: row; /* Keep row layout */
+    padding: 10px 0;
+    gap: 10px;
+  }
+  
+  .audience-header.scrolled .header-row {
+    padding: 8px 0;
+  }
+  
+  .left-section-col {
+    flex: 1;
+    min-width: 0; /* Allow shrinking */
+  }
+  
+  .left-section-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+  }
+  
+  .logo-wrapper {
+    width: 22%;
+    flex-shrink: 0;
+  }
+  
+  .audience-header.scrolled .logo-wrapper {
+    width: 65px;
+  }
+  
+  .search-breadcrumb-container {
+    flex: 1;
+    min-width: 0; /* Critical for flex items to shrink */
+    max-width: none;
+  }
+  
+  .search-wrapper {
+    width: 100%;
+  }
+  
+  .search input {
+    padding: 6px 10px;
+    font-size: 12px;
+    width: 100%;
+    min-width: 0; /* Allows input to shrink */
+  }
+  
+  .actions-col {
+    flex-shrink: 0;
+  }
+  
+  .user-actions {
+    gap: 6px;
+  }
+  
+  /* Hide desktop welcome text on mobile */
+  .desktop-welcome {
+    display: none;
+  }
+  
+  /* Show user icon on mobile */
+  .mobile-user-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    line-height: 1;
+  }
+  
+  .mobile-user-icon i {
+    display: block;
+  }
+  
+  /* Adjust pill button for mobile */
+  .pill, .user-welcome-trigger {
+    padding: 6px 10px;
+    font-size: 11px;
+    white-space: nowrap;
+    min-width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Ensure user-welcome-trigger shows icon properly */
+  /* .user-welcome-trigger {
+    padding: 8px 12px;
+  } */
+  
+  .location {
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+  
+  .breadcrumbs {
+    font-size: 11px;
+    padding: 4px 8px;
+    white-space: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 4px;
+  }
+  
+  .back-arrow {
+    font-size: 14px;
+    padding: 2px 6px;
+  }
+  
+  .crumb.active {
+    padding: 2px 8px;
+    font-size: 10px;
+  }
+  
+  .separator {
+    font-size: 10px;
+    margin: 0 1px;
+  }
+  
+  /* Mobile-only dropdown user info */
+  .dropdown-user-info {
+    padding: 16px 20px 8px 20px;
+    background: linear-gradient(135deg, rgba(146, 52, 234, 0.02) 0%, rgba(226, 54, 163, 0.02) 100%);
+  }
+  
+  .user-name-display {
+    font-weight: 700;
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 4px;
+  }
+  
+  .user-email-display {
+    font-size: 13px;
+    color: #666;
+    word-break: break-word;
+  }
+  
+  /* Ensure mobile-only elements are hidden on desktop */
+  .mobile-only {
+    display: block;
+  }
+  
+  /* Adjust dropdown menu for mobile */
+  .user-dropdown-menu {
+    min-width: 220px;
+    right: -10px;
+  }
+  
+  /* Adjust content padding for fixed header */
+  .audience-header.scrolled ~ * {
+    padding-top: 55px;
+  }
+}
+
+/* Desktop styles - hide mobile icon and show welcome text */
+@media (min-width: 769px) {
+  .desktop-welcome {
+    display: inline-block;
+  }
+  
+  .mobile-user-icon {
+    display: none;
+  }
+  
+  .mobile-only {
+    display: none !important;
+  }
 }

@@ -57,20 +57,30 @@
           <!-- <div class="location muted" (click)="onCityChange('Pune')">Pune ▼</div> -->
 
           <!-- User Welcome Dropdown - When Logged In -->
+          <!-- User Welcome Dropdown - When Logged In -->
           <div *ngIf="isUserLoggedIn" class="user-welcome-dropdown">
             <div class="user-welcome-trigger" (click)="toggleDropdown()">
-              Welcome, {{ getUserDisplayName() }}! ▼
+              <!-- Desktop: Show Welcome, name and arrow -->
+              <span class="desktop-welcome">Welcome, {{ getUserDisplayName() }}! ▼</span>
+              <!-- Mobile: Show only user icon -->
+              <span class="mobile-user-icon"><i class="bi bi-person-circle"></i></span>
             </div>
             <div *ngIf="showUserDropdown" class="user-dropdown-menu">
-              <div class="dropdown-item" (click)="onViewProfile()">
-                View Profile
+              <!-- Mobile-only user name display -->
+              <div class="dropdown-user-info mobile-only">
+                <div class="user-name-display">{{ getUserDisplayName() }}</div>
+                <div class="user-email-display">{{ getUserEmail() }}</div>
               </div>
+              <div class="dropdown-divider mobile-only"></div>
+              <!-- <div class="dropdown-item" (click)="onViewProfile()">
+                View Profile
+              </div> -->
               <div class="dropdown-item" (click)="onViewBookings()">
                 My Bookings
               </div>
               <div class="dropdown-divider"></div>
               <div class="dropdown-item logout-item" (click)="onLogout()">
-                <span class="logout-icon">🚪</span>
+                <span class="logout-icon"><i class="bi bi-box-arrow-right"></i></span>
                 Logout
               </div>
             </div>
@@ -118,7 +128,7 @@
           <button type="button" class="password-toggle" (click)="showLoginPassword = !showLoginPassword"
             [attr.aria-label]="showLoginPassword ? 'Hide password' : 'Show password'">
             <!-- <i class="fa-solid" [class.fa-eye]="!showLoginPassword" [class.fa-eye-slash]="showLoginPassword"></i> -->
-             <i class="bi" [class.bi-eye]="!showLoginPassword" [class.bi-eye-slash]="showLoginPassword"></i>
+            <i class="bi" [class.bi-eye]="!showLoginPassword" [class.bi-eye-slash]="showLoginPassword"></i>
           </button>
         </div>
         <button class="auth-btn" (click)="onLogin()" [disabled]="isLoading || !loginEmail || !loginPassword">
@@ -227,6 +237,37 @@
           <p>Already have an account?
             <a (click)="switchToLogin()">Sign In</a>
           </p>
+        </div>
+      </div>
+      <!-- Step 2: OTP Verification -->
+      <div *ngIf="signupStep === 2 || showOTPVerification" class="otp-verification-section">
+        <div class="verification-header">
+          <h4>Verify Your Email</h4>
+          <p>Enter the 4-digit code sent to<br>
+            <strong>{{ signupEmail || loginEmail }}</strong>
+          </p>
+        </div>
+        <div class="otp-input-container">
+          <div class="otp-inputs">
+            <input *ngFor="let i of [0,1,2,3]; let idx = index" type="text" maxlength="1" [(ngModel)]="otpDigits[idx]"
+              (input)="onOtpInput($event, idx)" (keydown)="onOtpKeyDown($event, idx)" [disabled]="isLoading"
+              class="otp-digit">
+          </div>
+        </div>
+        <div class="otp-timer" *ngIf="otpTimer > 0">
+          OTP expires in: {{ formatOtpTimer() }}
+        </div>
+        <div class="otp-actions">
+          <button class="resend-btn" (click)="resendOTP()" [disabled]="otpTimer > 0 || isLoading">
+            Resend OTP
+          </button>
+          <button class="verify-btn" (click)="verifyOTP()" [disabled]="!isOtpComplete() || isLoading">
+            <span *ngIf="!isLoading">Verify & Continue</span>
+            <span *ngIf="isLoading">Verifying...</span>
+          </button>
+        </div>
+        <div class="auth-footer" *ngIf="signupStep === 2">
+          <a (click)="goBackToStep1()">← Back to Signup</a>
         </div>
       </div>
     </div>
