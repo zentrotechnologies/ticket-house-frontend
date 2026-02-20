@@ -856,3 +856,35 @@ export interface BannerResponse extends CommonResponseModel<BannerManagementMode
 export interface SingleBannerResponse extends CommonResponseModel<BannerManagementModel> {}
 export interface BannerIdResponse extends CommonResponseModel<number> {}
 export interface BannerBooleanResponse extends CommonResponseModel<boolean> {}
+
+// Forgot Password Request
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+// Reset Password Request
+export interface ResetPasswordRequest {
+  email: string;
+  otp: string;
+  otp_id: number;
+  new_password: string;
+  confirm_password: string;
+}
+
+// Forgot Password Response
+export interface ForgotPasswordResponse {
+  status: string;
+  message: string;
+  validationotp_id: number;
+  email: string;
+}
+
+// Reset Password Response
+// Add this to your auth.model.ts file
+export interface ResetPasswordResponse {
+  status: string;
+  success: boolean;  // boolean type
+  message: string;
+  errorCode: string | null;
+  data: any | null;
+}

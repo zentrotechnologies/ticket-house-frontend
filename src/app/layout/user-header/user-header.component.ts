@@ -60,6 +60,19 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
   eventNameSlug: string | null = null;
   eventTitle: string = '';
 
+  // Forgot Password Properties
+  showForgotPassword = false;
+  forgotPasswordStep = 1; // 1: Email, 2: OTP Verification, 3: Set Password
+  forgotPasswordEmail: string = '';
+  forgotPasswordOtpDigits: string[] = ['', '', '', ''];
+  forgotPasswordOtpId: number | null = null;
+
+  // New Password Properties
+  newPassword: string = '';
+  confirmPassword: string = '';
+  showNewPassword = false;
+  showConfirmPassword = false;
+
   private routerSubscription: Subscription = new Subscription();
   private userSubscription: Subscription = new Subscription();
 
@@ -819,4 +832,261 @@ export class UserHeaderComponent implements OnInit, OnDestroy {
     const user = this.authService.getCurrentUser();
     return user?.email || '';
   }
+
+  // ===========================================
+// FORGOT PASSWORD METHODS
+// ===========================================
+
+onForgotPassword(): void {
+  this.showForgotPassword = true;
+  this.forgotPasswordStep = 1;
+  this.forgotPasswordEmail = this.loginEmail; // Pre-fill with login email if available
+  this.resetForgotPasswordForms();
+}
+
+resetForgotPasswordForms(): void {
+  this.forgotPasswordOtpDigits = ['', '', '', ''];
+  this.forgotPasswordOtpId = null;
+  this.newPassword = '';
+  this.confirmPassword = '';
+  this.clearOtpTimer();
+}
+
+backToLogin(): void {
+  this.showForgotPassword = false;
+  this.forgotPasswordStep = 1;
+  this.resetForgotPasswordForms();
+}
+
+backToForgotStep1(): void {
+  this.forgotPasswordStep = 1;
+  this.resetForgotPasswordForms();
+}
+
+// Send OTP for forgot password
+sendForgotPasswordOTP(): void {
+  if (!this.forgotPasswordEmail) {
+    this.toastr.warning('Please enter your email address', 'Validation Error');
+    return;
+  }
+
+  if (!this.isValidEmail(this.forgotPasswordEmail)) {
+    this.toastr.warning('Please enter a valid email address', 'Validation Error');
+    return;
+  }
+
+  this.isLoading = true;
+
+  const otpRequest: GenerateOTPRequest = {
+    contact_type: 'email',
+    email: this.forgotPasswordEmail,
+    newUser: false // Important: Set to false for existing user
+  };
+
+  this.apiService.GenerateOTP(otpRequest).subscribe({
+    next: (response) => {
+      this.isLoading = false;
+      if (response && response.response) {
+        if (response.response.status === 'Success') {
+          this.forgotPasswordOtpId = response.validationotp_id;
+          this.forgotPasswordStep = 2;
+          this.startOtpTimer(120);
+          this.toastr.success('OTP sent to your email', 'Success');
+        } else {
+          this.toastr.error(response.response.message || 'Failed to send OTP', 'Failed');
+        }
+      }
+    },
+    error: (error) => {
+      this.isLoading = false;
+      const errorMsg = error.error?.response?.message || 'Failed to send OTP. Please try again.';
+      this.toastr.error(errorMsg, 'Error');
+      console.error('Forgot password OTP error:', error);
+    }
+  });
+}
+
+// Resend OTP for forgot password
+resendForgotPasswordOTP(): void {
+  if (this.otpTimer > 30) {
+    this.toastr.warning('Please wait before resending OTP', 'Warning');
+    return;
+  }
+
+  this.forgotPasswordOtpDigits = ['', '', '', ''];
+  this.isLoading = true;
+
+  const otpRequest: GenerateOTPRequest = {
+    contact_type: 'email',
+    email: this.forgotPasswordEmail,
+    newUser: false
+  };
+
+  this.apiService.GenerateOTP(otpRequest).subscribe({
+    next: (response) => {
+      this.isLoading = false;
+      if (response?.response?.status === 'Success') {
+        this.forgotPasswordOtpId = response.validationotp_id;
+        this.startOtpTimer(120);
+        this.toastr.success('New OTP sent to your email', 'Success');
+      } else {
+        this.toastr.error(response?.response?.message || 'Failed to resend OTP', 'Failed');
+      }
+    },
+    error: (error) => {
+      this.isLoading = false;
+      this.toastr.error('Failed to resend OTP', 'Error');
+      console.error('Resend OTP error:', error);
+    }
+  });
+}
+
+// OTP Input Handlers for Forgot Password
+onForgotOtpInput(event: any, index: number): void {
+  const input = event.target;
+  const value = input.value;
+  
+  if (!/^\d*$/.test(value)) {
+    input.value = '';
+    this.forgotPasswordOtpDigits[index] = '';
+    return;
+  }
+  
+  this.forgotPasswordOtpDigits[index] = value;
+  
+  if (value && index < 3) {
+    const nextInput = document.querySelectorAll('.otp-digit')[index + 1] as HTMLInputElement;
+    if (nextInput) nextInput.focus();
+  }
+}
+
+onForgotOtpKeyDown(event: any, index: number): void {
+  if (event.key === 'Backspace' && !this.forgotPasswordOtpDigits[index] && index > 0) {
+    const prevInput = document.querySelectorAll('.otp-digit')[index - 1] as HTMLInputElement;
+    if (prevInput) prevInput.focus();
+  }
+}
+
+isForgotOtpComplete(): boolean {
+  return this.forgotPasswordOtpDigits.every(digit => digit.length === 1);
+}
+
+getForgotOtpCode(): string {
+  return this.forgotPasswordOtpDigits.join('');
+}
+
+// Verify OTP for forgot password
+verifyForgotPasswordOTP(): void {
+  if (!this.isForgotOtpComplete() || !this.forgotPasswordOtpId) {
+    this.toastr.warning('Please enter complete OTP', 'Validation Error');
+    return;
+  }
+
+  this.isLoading = true;
+
+  const verifyRequest: VerifyOTPRequest = {
+    otp_id: this.forgotPasswordOtpId,
+    otp: this.getForgotOtpCode(),
+    email: this.forgotPasswordEmail,
+    contact_type: 'email'
+  };
+
+  this.apiService.VerifyOTP(verifyRequest).subscribe({
+    next: (response) => {
+      this.isLoading = false;
+      if (response?.status === 'Success') {
+        this.forgotPasswordStep = 3;
+        this.clearOtpTimer();
+        this.toastr.success('OTP verified successfully', 'Success');
+      } else {
+        this.toastr.error(response?.message || 'OTP verification failed', 'Failed');
+      }
+    },
+    error: (error) => {
+      this.isLoading = false;
+      const errorMsg = error.error?.message || 'OTP verification failed';
+      this.toastr.error(errorMsg, 'Error');
+      console.error('Verify OTP error:', error);
+    }
+  });
+}
+
+// Password validation for new password
+hasNewUpperCase(): boolean {
+  return /[A-Z]/.test(this.newPassword);
+}
+
+hasNewLowerCase(): boolean {
+  return /[a-z]/.test(this.newPassword);
+}
+
+hasNewNumber(): boolean {
+  return /[0-9]/.test(this.newPassword);
+}
+
+hasNewSpecialChar(): boolean {
+  return /[@$!%*?&]/.test(this.newPassword);
+}
+
+hasNewMinLength(): boolean {
+  return this.newPassword?.length >= 8;
+}
+
+isNewPasswordValid(): boolean {
+  return this.hasNewUpperCase() &&
+    this.hasNewLowerCase() &&
+    this.hasNewNumber() &&
+    this.hasNewSpecialChar() &&
+    this.hasNewMinLength();
+}
+
+// Set new password
+setNewPassword(): void {
+  if (!this.isNewPasswordValid()) {
+    this.toastr.warning('Password does not meet requirements', 'Validation Error');
+    return;
+  }
+
+  if (this.newPassword !== this.confirmPassword) {
+    this.toastr.warning('Passwords do not match', 'Validation Error');
+    return;
+  }
+
+  this.isLoading = true;
+
+  const resetPasswordRequest = {
+    email: this.forgotPasswordEmail,
+    newPassword: this.newPassword,
+    otpId: this.forgotPasswordOtpId
+  };
+
+  this.apiService.resetPassword(resetPasswordRequest).subscribe({
+    next: (response: any) => {
+      this.isLoading = false;
+      if (response?.status === 'Success') {
+        this.toastr.success('Password updated successfully! Please login with your new password.', 'Success');
+        
+        // Redirect to login
+        this.showForgotPassword = false;
+        this.forgotPasswordStep = 1;
+        this.loginEmail = this.forgotPasswordEmail;
+        this.loginPassword = ''; // Clear password field
+        
+        // Reset forms
+        this.resetForgotPasswordForms();
+        
+        // Optional: Auto-fill email for login
+        this.toastr.info('Please login with your new password', 'Info');
+      } else {
+        this.toastr.error(response?.message || 'Failed to update password', 'Failed');
+      }
+    },
+    error: (error) => {
+      this.isLoading = false;
+      const errorMsg = error.error?.message || 'Failed to update password. Please try again.';
+      this.toastr.error(errorMsg, 'Error');
+      console.error('Reset password error:', error);
+    }
+  });
+}
 }

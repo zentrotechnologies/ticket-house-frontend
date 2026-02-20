@@ -115,22 +115,25 @@
       </div>
 
       <!-- Login Form -->
-      <div *ngIf="isLoginMode && !showOTPVerification" class="login-section">
+      <!-- Login Form - Update this section in user-header.component.html -->
+      <div *ngIf="isLoginMode && !showOTPVerification && !showForgotPassword" class="login-section">
         <div class="form-group">
           <input type="email" [(ngModel)]="loginEmail" placeholder="Email" [disabled]="isLoading">
         </div>
-        <!-- <div class="form-group">
-          <input type="password" [(ngModel)]="loginPassword" placeholder="Password" [disabled]="isLoading">
-        </div> -->
         <div class="form-group password-field">
           <input [type]="showLoginPassword ? 'text' : 'password'" [(ngModel)]="loginPassword" placeholder="Password"
             [disabled]="isLoading">
           <button type="button" class="password-toggle" (click)="showLoginPassword = !showLoginPassword"
             [attr.aria-label]="showLoginPassword ? 'Hide password' : 'Show password'">
-            <!-- <i class="fa-solid" [class.fa-eye]="!showLoginPassword" [class.fa-eye-slash]="showLoginPassword"></i> -->
             <i class="bi" [class.bi-eye]="!showLoginPassword" [class.bi-eye-slash]="showLoginPassword"></i>
           </button>
         </div>
+
+        <!-- Forgot Password Link - Bottom Right -->
+        <div class="forgot-password-container">
+          <a class="forgot-password-link" (click)="onForgotPassword()">Forgot Password?</a>
+        </div>
+
         <button class="auth-btn" (click)="onLogin()" [disabled]="isLoading || !loginEmail || !loginPassword">
           <span *ngIf="!isLoading">Sign In</span>
           <span *ngIf="isLoading">Signing In...</span>
@@ -139,6 +142,138 @@
           <p>Don't have an account?
             <a (click)="switchToSignup()">Sign Up</a>
           </p>
+        </div>
+      </div>
+
+      <!-- Forgot Password - Email OTP Step -->
+      <div *ngIf="isLoginMode && showForgotPassword && forgotPasswordStep === 1" class="forgot-password-section">
+        <div class="forgot-header">
+          <h4>Reset Password</h4>
+          <p>Enter your email address to receive an OTP</p>
+        </div>
+
+        <div class="form-group">
+          <input type="email" [(ngModel)]="forgotPasswordEmail" placeholder="Email" [disabled]="isLoading">
+        </div>
+
+        <button class="auth-btn" (click)="sendForgotPasswordOTP()" [disabled]="isLoading || !forgotPasswordEmail">
+          <span *ngIf="!isLoading">Send OTP</span>
+          <span *ngIf="isLoading">Sending OTP...</span>
+        </button>
+
+        <div class="auth-footer">
+          <a (click)="backToLogin()">← Back to Login</a>
+        </div>
+      </div>
+
+      <!-- Forgot Password - OTP Verification Step -->
+      <div *ngIf="isLoginMode && showForgotPassword && forgotPasswordStep === 2" class="otp-verification-section">
+        <div class="verification-header">
+          <h4>Verify OTP</h4>
+          <p>Enter the 4-digit code sent to<br>
+            <strong>{{ forgotPasswordEmail }}</strong>
+          </p>
+        </div>
+
+        <div class="otp-input-container">
+          <div class="otp-inputs">
+            <input *ngFor="let i of [0,1,2,3]; let idx = index" type="text" maxlength="1"
+              [(ngModel)]="forgotPasswordOtpDigits[idx]" (input)="onForgotOtpInput($event, idx)"
+              (keydown)="onForgotOtpKeyDown($event, idx)" [disabled]="isLoading" class="otp-digit">
+          </div>
+        </div>
+
+        <div class="otp-timer" *ngIf="otpTimer > 0">
+          OTP expires in: {{ formatOtpTimer() }}
+        </div>
+
+        <div class="otp-actions">
+          <button class="resend-btn" (click)="resendForgotPasswordOTP()" [disabled]="otpTimer > 0 || isLoading">
+            Resend OTP
+          </button>
+          <button class="verify-btn" (click)="verifyForgotPasswordOTP()"
+            [disabled]="!isForgotOtpComplete() || isLoading">
+            <span *ngIf="!isLoading">Verify OTP</span>
+            <span *ngIf="isLoading">Verifying...</span>
+          </button>
+        </div>
+
+        <div class="auth-footer">
+          <a (click)="backToForgotStep1()">← Back to Email</a>
+        </div>
+      </div>
+
+      <!-- Forgot Password - Set New Password Step -->
+      <div *ngIf="isLoginMode && showForgotPassword && forgotPasswordStep === 3" class="set-password-section">
+        <div class="forgot-header">
+          <h4>Set New Password</h4>
+          <p>Enter your new password below</p>
+        </div>
+
+        <!-- Email Field (Disabled) -->
+        <div class="form-group">
+          <input type="email" [value]="forgotPasswordEmail" placeholder="Email" disabled class="disabled-input">
+        </div>
+
+        <!-- New Password Field -->
+        <div class="form-group password-field">
+          <input [type]="showNewPassword ? 'text' : 'password'" [(ngModel)]="newPassword" placeholder="New Password"
+            [disabled]="isLoading">
+          <button type="button" class="password-toggle" (click)="showNewPassword = !showNewPassword"
+            [attr.aria-label]="showNewPassword ? 'Hide password' : 'Show password'">
+            <i class="bi" [class.bi-eye]="!showNewPassword" [class.bi-eye-slash]="showNewPassword"></i>
+          </button>
+        </div>
+
+        <!-- Confirm Password Field -->
+        <div class="form-group password-field">
+          <input [type]="showConfirmPassword ? 'text' : 'password'" [(ngModel)]="confirmPassword"
+            placeholder="Confirm Password" [disabled]="isLoading">
+          <button type="button" class="password-toggle" (click)="showConfirmPassword = !showConfirmPassword"
+            [attr.aria-label]="showConfirmPassword ? 'Hide password' : 'Show password'">
+            <i class="bi" [class.bi-eye]="!showConfirmPassword" [class.bi-eye-slash]="showConfirmPassword"></i>
+          </button>
+        </div>
+
+        <!-- Password Validation Messages -->
+        <div *ngIf="newPassword && !isNewPasswordValid()" class="password-validation-container">
+          <div class="password-requirements">
+            <div class="requirement" [class.valid]="hasNewUpperCase()">
+              <span class="requirement-icon">{{ hasNewUpperCase() ? '✓' : '○' }}</span>
+              <span class="requirement-text">At least one uppercase letter</span>
+            </div>
+            <div class="requirement" [class.valid]="hasNewLowerCase()">
+              <span class="requirement-icon">{{ hasNewLowerCase() ? '✓' : '○' }}</span>
+              <span class="requirement-text">At least one lowercase letter</span>
+            </div>
+            <div class="requirement" [class.valid]="hasNewNumber()">
+              <span class="requirement-icon">{{ hasNewNumber() ? '✓' : '○' }}</span>
+              <span class="requirement-text">At least one number</span>
+            </div>
+            <div class="requirement" [class.valid]="hasNewSpecialChar()">
+              <span class="requirement-icon">{{ hasNewSpecialChar() ? '✓' : '○' }}</span>
+              <span class="requirement-text">At least one special character (@$!%*?&)</span>
+            </div>
+            <div class="requirement" [class.valid]="hasNewMinLength()">
+              <span class="requirement-icon">{{ hasNewMinLength() ? '✓' : '○' }}</span>
+              <span class="requirement-text">Minimum 8 characters</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Password Match Validation -->
+        <div *ngIf="confirmPassword && newPassword !== confirmPassword" class="validation-error">
+          <small>Passwords do not match</small>
+        </div>
+
+        <button class="auth-btn" (click)="setNewPassword()"
+          [disabled]="isLoading || !isNewPasswordValid() || newPassword !== confirmPassword">
+          <span *ngIf="!isLoading">Set Password</span>
+          <span *ngIf="isLoading">Updating...</span>
+        </button>
+
+        <div class="auth-footer">
+          <a (click)="backToLogin()">← Back to Login</a>
         </div>
       </div>
 

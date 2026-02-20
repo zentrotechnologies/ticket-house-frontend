@@ -495,4 +495,9 @@ export class ApiService {
       headers: this.getAuthHeaders()
     });
   }
+
+  resetPassword(request: any): Observable<any> {
+    const url = `${this.ThApi}api/Login/ResetPassword`;
+    return this.httpClient.post<any>(url, request);
+  }
 }
