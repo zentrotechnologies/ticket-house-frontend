@@ -1268,8 +1268,8 @@
     width: 100%;
     display: flex;
     justify-content: flex-end;
-    border-top: 1px solid rgba(146, 52, 234, 0.1);
-    padding-top: 10px;
+    /* border-top: 1px solid rgba(146, 52, 234, 0.1); */
+    /* padding-top: 10px; */
   }
 
   .qr-code-container {
@@ -1553,5 +1553,204 @@
   .copyright {
     font-size: 12px;
     margin-top: 12px;
+  }
+}
+
+/* Event Info with QR Code Layout */
+.event-info-with-qr {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  /* border-bottom: 1px dashed rgba(0, 0, 0, 0.05); */
+  align-items: flex-start;
+}
+
+.event-info {
+  flex: 1;
+  min-width: 0; /* Allows text wrapping */
+}
+
+.event-info .event-name {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 0 0 10px 0;
+  background: var(--gradient-main);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.3;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.event-info .event-location,
+.event-info .event-date-time {
+  color: var(--text-muted);
+  margin: 6px 0;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.event-info .event-location i,
+.event-info .event-date-time i {
+  font-style: normal;
+  width: 20px;
+  color: rgb(226, 54, 163);
+  flex-shrink: 0;
+}
+
+/* Medium QR Code */
+.booking-qr {
+  flex-shrink: 0;
+}
+
+.qr-code-container {
+  cursor: pointer;
+  transition: var(--transition);
+  border-radius: 12px;
+  padding: 6px;
+  background: white;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(146, 52, 234, 0.1);
+}
+
+.qr-code-container:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-hover);
+  border-color: rgb(226, 54, 163);
+}
+
+.qr-code-medium {
+  width: 150px;
+  height: 150px;
+  display: block;
+  border-radius: 8px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .event-info-with-qr {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .qr-code-medium {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .event-info .event-name {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+  
+  .event-info .event-location,
+  .event-info .event-date-time {
+    font-size: 12px;
+    margin: 4px 0;
+  }
+}
+
+@media (max-width: 768px) {
+  
+  /* Event Info with QR Layout */
+  .event-info-with-qr {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+    /* margin-bottom: 14px;
+    padding-bottom: 14px; */
+    width: 100%;
+  }
+  
+  /* Event Info Section - Takes remaining space */
+  .event-info {
+    flex: 1;
+    min-width: 0; /* Critical for text wrapping */
+    width: calc(100% - 90px); /* Fallback for older browsers */
+  }
+  
+  /* Event Name - Ensure proper wrapping */
+  .event-info .event-name {
+    font-size: 16px;
+    margin-bottom: 6px;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+  }
+  
+  /* Location and DateTime - Adjust for mobile */
+  .event-info .event-location,
+  .event-info .event-date-time {
+    font-size: 11px;
+    margin: 3px 0;
+    gap: 6px;
+    white-space: normal;
+    word-break: break-word;
+  }
+  
+  /* Icons in location and datetime */
+  .event-info .event-location i,
+  .event-info .event-date-time i {
+    width: 16px;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+  
+  /* Location text with booking code */
+  .event-info .event-location:first-of-type {
+    font-weight: 500;
+    color: rgb(146, 52, 234);
+    margin-bottom: 4px;
+  }
+  
+  /* QR Code Section - Fixed width */
+  .booking-qr {
+    flex-shrink: 0;
+    width: auto;
+    margin-left: 0;
+  }
+  
+  /* QR Code Container */
+  .qr-code-container {
+    padding: 4px;
+    border-radius: 10px;
+  }
+  
+  /* Medium QR Code - Adjusted size for mobile */
+  .qr-code-medium {
+    width: 100px;
+    height: 100px;
+    border-radius: 6px;
+  }
+  
+  /* Hover effect removal for touch devices */
+  .qr-code-container:hover {
+    transform: none;
+  }
+  
+  /* Ensure the booking card body padding is consistent */
+  .booking-body {
+    padding: 14px;
+  }
+  
+  /* Adjust booking details section to accommodate new layout */
+  .booking-details {
+    margin-top: 4px;
   }
 }

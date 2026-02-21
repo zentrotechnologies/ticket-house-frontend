@@ -87,7 +87,7 @@
 
         <div class="bookings-grid">
           <div class="booking-card" *ngFor="let booking of bookings">
-            <div class="booking-header">
+            <!-- <div class="booking-header">
               <div class="booking-id">
                 <span class="label">Booking Code</span>
                 <span class="value">{{ booking.booking_code }}</span>
@@ -95,24 +95,35 @@
               <div class="booking-date ms-4 d-none">
                 <i class="calendar-icon">📅</i> {{ formatDate(booking.created_on) }}
               </div>
-              <!-- ADD QR CODE SECTION HERE - Small QR code next to booking header -->
               <div class="booking-qr" *ngIf="booking.qr_code">
                 <div class="qr-code-container" (click)="showQRCodeModal(booking)" title="Click to enlarge QR code">
                   <img [src]="'data:image/png;base64,' + booking.qr_code" alt="QR Code" class="qr-code-small" />
                 </div>
               </div>
-            </div>
+            </div> -->
 
             <div class="booking-body">
-              <div class="event-info">
-                <h3 class="event-name">{{ booking.event_name }}</h3>
-                <p class="event-location">
-                  <i class="bi bi-geo-alt-fill location-icon"></i> {{ booking.location }}
-                </p>
-                <p class="event-date-time">
-                  <i class="bi bi-clock-fill time-icon"></i> {{ formatDate(booking.event_date) }} | {{ formatTime(booking.start_time) }}
-                  - {{ formatTime(booking.end_time) }}
-                </p>
+              <div class="event-info-with-qr">
+                <div class="event-info">
+                  <h3 class="event-name">{{ booking.event_name }}</h3>
+                  <p class="event-location">
+                    {{ booking.booking_code }}
+                  </p>
+                  <p class="event-location">
+                    <i class="bi bi-geo-alt-fill location-icon"></i> {{ booking.location }}
+                  </p>
+                  <p class="event-date-time">
+                    <i class="bi bi-clock-fill time-icon"></i> {{ formatDate(booking.event_date) }} | {{ formatTime(booking.start_time) }}
+                    - {{ formatTime(booking.end_time) }}
+                  </p>
+                </div>
+                
+                <!-- QR CODE SECTION - Medium size beside event info -->
+                <div class="booking-qr" *ngIf="booking.qr_code">
+                  <div class="qr-code-container" (click)="showQRCodeModal(booking)" title="Click to enlarge QR code">
+                    <img [src]="'data:image/png;base64,' + booking.qr_code" alt="QR Code" class="qr-code-medium" />
+                  </div>
+                </div>
               </div>
 
               <div class="booking-details">
@@ -135,16 +146,28 @@
                 </div>
                 <div class="detail-item">
                   <span class="label">Payment Method:</span>
-                  <span class="value payment-method-badge" [ngClass]="getPaymentMethodClass(booking.payment_method)">
+                  <span class="value">
                     {{ booking.payment_method ? (booking.payment_method | titlecase) : 'Not Paid' }}
                   </span>
                 </div>
+                <!-- <div class="detail-item">
+                  <span class="label">Payment Method:</span>
+                  <span class="value payment-method-badge" [ngClass]="getPaymentMethodClass(booking.payment_method)">
+                    {{ booking.payment_method ? (booking.payment_method | titlecase) : 'Not Paid' }}
+                  </span>
+                </div> -->
                 <div class="detail-item">
+                  <span class="label">Payment Method:</span>
+                  <span class="value">
+                    {{ booking.booking_status }}
+                  </span>
+                </div>
+                <!-- <div class="detail-item">
                   <span class="label">Booking Status:</span>
                   <span class="value status-badge" [ngClass]="getStatusClass(booking.booking_status)">
                     {{ booking.booking_status }}
                   </span>
-                </div>
+                </div> -->
                 <div class="detail-item d-none">
                   <span class="label">Payment ID:</span>
                   <span class="value payment-id" [class.na-text]="!booking.razorpay_payment_id">
@@ -172,15 +195,6 @@
                 </div>
               </div>
             </div>
-
-            <!-- <div class="booking-footer">
-              <button class="view-details-btn" (click)="viewBookingDetails(booking.booking_id)">
-                View Details
-              </button>
-              <span class="payment-method" *ngIf="booking.payment_method">
-                Paid via {{ booking.payment_method }}
-              </span>
-            </div> -->
           </div>
         </div>
 
