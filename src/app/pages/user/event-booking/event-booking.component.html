@@ -82,7 +82,8 @@
                     <!-- After event-category and before quick-info-section -->
                     <div class="event-details-section">
                         <div class="event-details-grid">
-                            <div class="event-detail-item">
+                            <div class="event-detail-item" (click)="onVenueLocationClick($event)"
+                                [class.clickable-location]="hasLocationUrl()">
                                 <span class="event-detail-icon">📍</span>
                                 <div class="event-detail-content">
                                     <div class="event-detail-label">Venue</div>
@@ -199,8 +200,16 @@
                                 <div class="mini-title">{{ similarEvent.event_name }}</div>
                                 <div class="mini-sub">{{ formatDisplayDate(similarEvent.event_date) }}, {{
                                     similarEvent.start_time }}</div>
-                                <div class="mini-sub location-text" [title]="similarEvent.location">{{
-                                    similarEvent.location }}</div>
+                                <!-- <div class="mini-sub location-text" [title]="similarEvent.location">{{
+                                    similarEvent.location }}</div> -->
+                                <div class="mini-sub location-text"
+                                    (click)="onSimilarEventLocationClick($event, similarEvent)"
+                                    [class.clickable]="hasSimilarEventLocationUrl(similarEvent)"
+                                    [title]="similarEvent.location">
+                                    <span class="location-icon"
+                                        *ngIf="hasSimilarEventLocationUrl(similarEvent)">📍</span>
+                                    {{ similarEvent.location }}
+                                </div>
                                 <!-- Add price below location -->
                                 <div class="mini-sub price">{{ getSimilarEventPrice(similarEvent) }}</div>
                             </div>

@@ -46,35 +46,35 @@
   <!-- events-page.component.html -->
   <div class="events-page">
     <!-- HERO SECTION WITH CAROUSEL -->
-  <section class="hero">
-    <!-- Banner Carousel -->
-    <div class="banner-carousel">
-      <!-- Loading State -->
-      <div *ngIf="isLoadingBanners" class="carousel-loading">
-        <div class="spinner"></div>
-      </div>
-
-      <!-- No Banners Fallback -->
-      <div *ngIf="!isLoadingBanners && banners.length === 0" class="carousel-fallback">
-        <div class="fallback-content">
-          <span class="badge">Welcome to</span>
-          <h1>Ticket<span class="highlight">House</span></h1>
-          <p class="hero-sub">Your gateway to amazing events and experiences</p>
+    <section class="hero">
+      <!-- Banner Carousel -->
+      <div class="banner-carousel">
+        <!-- Loading State -->
+        <div *ngIf="isLoadingBanners" class="carousel-loading">
+          <div class="spinner"></div>
         </div>
-      </div>
 
-      <!-- Banner Carousel Content -->
-      <div *ngIf="!isLoadingBanners && banners.length > 0" class="carousel-container">
-        <!-- Current Banner -->
-        <div class="carousel-slide" [style.background-image]="'url(' + getBannerImageUrl(getCurrentBanner()!) + ')'">
-          <div class="carousel-overlay">
-            <!-- <div class="events-container"> -->
+        <!-- No Banners Fallback -->
+        <div *ngIf="!isLoadingBanners && banners.length === 0" class="carousel-fallback">
+          <div class="fallback-content">
+            <span class="badge">Welcome to</span>
+            <h1>Ticket<span class="highlight">House</span></h1>
+            <p class="hero-sub">Your gateway to amazing events and experiences</p>
+          </div>
+        </div>
+
+        <!-- Banner Carousel Content -->
+        <div *ngIf="!isLoadingBanners && banners.length > 0" class="carousel-container">
+          <!-- Current Banner -->
+          <div class="carousel-slide" [style.background-image]="'url(' + getBannerImageUrl(getCurrentBanner()!) + ')'">
+            <div class="carousel-overlay">
+              <!-- <div class="events-container"> -->
               <!-- Optional: You can add dynamic content from banners if needed -->
               <!-- <span class="badge">{{ getCurrentBanner()?.banner_title || 'Featured Event' }}</span>
               <h1>{{ getCurrentBanner()?.banner_heading || 'Amazing Events' }}</h1>
               <p class="hero-sub">{{ getCurrentBanner()?.banner_description || 'Discover the best events in your city' }}</p>
               <div class="date-pill" *ngIf="getCurrentBanner()?.banner_date">{{ getCurrentBanner()?.banner_date }}</div> -->
-              
+
               <!-- Static content or dynamic from banner -->
               <!-- <span class="badge">Featured</span>
               <h1>Discover Amazing Events</h1>
@@ -85,15 +85,15 @@
                 </button>
               </div>
             </div> -->
+            </div>
           </div>
-        </div>
 
-        <!-- Carousel Navigation Arrows -->
-        <!-- <button class="carousel-arrow prev" (click)="prevBanner()" aria-label="Previous banner">❮</button>
+          <!-- Carousel Navigation Arrows -->
+          <!-- <button class="carousel-arrow prev" (click)="prevBanner()" aria-label="Previous banner">❮</button>
         <button class="carousel-arrow next" (click)="nextBanner()" aria-label="Next banner">❯</button> -->
 
-        <!-- Carousel Indicators -->
-        <!-- <div class="carousel-indicators">
+          <!-- Carousel Indicators -->
+          <!-- <div class="carousel-indicators">
           <button 
             *ngFor="let banner of banners; let i = index" 
             class="indicator" 
@@ -103,13 +103,13 @@
           </button>
         </div> -->
 
-        <!-- Optional: Banner Counter -->
-        <!-- <div class="carousel-counter">
+          <!-- Optional: Banner Counter -->
+          <!-- <div class="carousel-counter">
           {{ currentBannerIndex + 1 }} / {{ banners.length }}
         </div> -->
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
     <main class="events-main">
       <div class="events-container">
@@ -154,7 +154,12 @@
                   {{ event.start_time }}
                 </p>
                 <p class="title">{{ event.event_name }}</p>
-                <p class="meta location-text" [title]="event.location">{{ event.location }}</p>
+                <!-- <p class="meta location-text" [title]="event.location">{{ event.location }}</p> -->
+                <p class="meta location-text" (click)="onLocationClick($event, event)"
+                  [class.clickable]="hasLocationUrl(event)">
+                  <span class="location-icon" *ngIf="hasLocationUrl(event)">📍</span>
+                  {{ event.location }}
+                </p>
                 <!-- Add price below location using a method call -->
                 <p class="meta price">
                   <span *ngIf="getEventPrice(event) !== null">
@@ -227,7 +232,9 @@
                 {{ getCurrentTestimonial()?.role || 'Stand-up Comedian & Storyteller' }}
               </p>
               <p class="desc">
-                {{ getCurrentTestimonial()?.description || 'Finally, a platform built for performers like us! Managing small shows and stand-up gigs has never been this easy. From listing events to tracking sales — everything feels simple and reliable.'
+                {{ getCurrentTestimonial()?.description || 'Finally, a platform built for performers like us! Managing
+                small shows and stand-up gigs has never been this easy. From listing events to tracking sales —
+                everything feels simple and reliable.'
                 }}
               </p>
             </div>

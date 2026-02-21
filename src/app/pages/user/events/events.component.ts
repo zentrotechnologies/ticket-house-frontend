@@ -64,7 +64,7 @@ export class EventsComponent implements OnInit {
   bannerInterval: any;
 
   private userSubscription: Subscription = new Subscription();
-  
+
   constructor(
     private router: Router,
     private apiService: ApiService,
@@ -83,13 +83,13 @@ export class EventsComponent implements OnInit {
   // Add this new method to load banners
   loadBanners(): void {
     this.isLoadingBanners = true;
-    
+
     this.apiService.getAllBanners().subscribe({
       next: (response: BannerResponse) => {
         if (response.status === 'Success' && response.data) {
           // Filter only active banners
           this.banners = response.data.filter(banner => banner.active === 1);
-          
+
           // Start carousel if there are banners
           if (this.banners.length > 1) {
             this.startBannerCarousel();
@@ -113,7 +113,7 @@ export class EventsComponent implements OnInit {
     if (this.bannerInterval) {
       clearInterval(this.bannerInterval);
     }
-    
+
     this.bannerInterval = setInterval(() => {
       this.nextBanner();
     }, 5000); // Change banner every 5 seconds
@@ -144,12 +144,12 @@ export class EventsComponent implements OnInit {
     if (!banner || !banner.banner_img) {
       return 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=60&w=1500'; // Fallback image
     }
-    
+
     // If the banner_img is already a full data URL, use it directly
     if (banner.banner_img.startsWith('data:image/')) {
       return banner.banner_img;
     }
-    
+
     // If it's just base64 data, prepend the data URL prefix
     // You might need to detect the image type - assuming JPEG here
     return `data:image/jpeg;base64,${banner.banner_img}`;
@@ -323,7 +323,7 @@ export class EventsComponent implements OnInit {
   viewAllEvents(): void {
     // Navigate to a dedicated events listing page or show all events
     this.router.navigate(['/events/all']);
-    
+
     // OR if you want to implement a modal/dialog to show all events
     // this.showAllEventsModal();
   }
@@ -338,10 +338,10 @@ export class EventsComponent implements OnInit {
   onEventClick(event: UpcomingEventResponse): void {
     // Create URL-friendly event name
     const eventNameSlug = this.createSlug(event.event_name);
-    
+
     // Navigate to event-booking with event_id and event_name in route
     this.router.navigate(['/event-booking', event.event_id, eventNameSlug]);
-    
+
     // Alternative: Using query params
     // this.router.navigate(['/event-booking'], {
     //   queryParams: { 
@@ -364,13 +364,13 @@ export class EventsComponent implements OnInit {
   // Optional: Format date for display
   formatEventDate(dateString: string | Date): string {
     if (!dateString) return '';
-    
+
     const date = new Date(dateString);
-    const options: Intl.DateTimeFormatOptions = { 
-      weekday: 'short', 
-      day: 'numeric', 
-      month: 'short', 
-      year: 'numeric' 
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
     };
     return date.toLocaleDateString('en-US', options);
   }
@@ -380,7 +380,7 @@ export class EventsComponent implements OnInit {
     this.isUserLoggedIn = this.authService.isLoggedIn();
     if (this.isUserLoggedIn) {
       this.currentUserId = this.authService.getCurrentUserId();
-      
+
       // Subscribe to user changes
       this.userSubscription = this.authService.currentUser$.subscribe((user) => {
         if (user) {
@@ -791,7 +791,7 @@ export class EventsComponent implements OnInit {
 
   onViewBookings(): void {
     this.showUserDropdown = false;
-    
+
     if (!this.currentUserId) {
       this.toastr.error('User information not found. Please login again.', 'Error');
       return;
@@ -840,12 +840,75 @@ export class EventsComponent implements OnInit {
     window.open(url, '_blank');
   }
 
+  /**
+ * Check if event has a valid map URL or coordinates
+ */
+  hasLocationUrl(event: UpcomingEventResponse): boolean {
+    return !!(event.geo_map_url || (event.latitude && event.longitude));
+  }
+
+  /**
+   * Handle location click - open map in new tab
+   */
+  onLocationClick(event: MouseEvent, eventData: UpcomingEventResponse): void {
+    // Stop propagation to prevent triggering the card click
+    event.stopPropagation();
+
+    let mapUrl = '';
+
+    // Priority 1: Use geo_map_url if available
+    if (eventData.geo_map_url) {
+      mapUrl = eventData.geo_map_url;
+    }
+    // Priority 2: Use latitude/longitude to create Google Maps URL
+    else if (eventData.latitude && eventData.longitude) {
+      mapUrl = `https://www.google.com/maps?q=${eventData.latitude},${eventData.longitude}`;
+    }
+    // Priority 3: Use full address if available
+    else if (eventData.full_address) {
+      mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(eventData.full_address)}`;
+    }
+    // Priority 4: Use location name as fallback
+    else if (eventData.location) {
+      mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(eventData.location)}`;
+    }
+
+    // Open in new tab if we have a URL
+    if (mapUrl) {
+      window.open(mapUrl, '_blank');
+    }
+  }
+
+  /**
+   * Alternative: Open in Google Maps app on mobile
+   */
+  onLocationClickMobile(event: MouseEvent, eventData: UpcomingEventResponse): void {
+    event.stopPropagation();
+
+    let mapUrl = '';
+
+    if (eventData.geo_map_url) {
+      mapUrl = eventData.geo_map_url;
+    } else if (eventData.latitude && eventData.longitude) {
+      // For mobile, use geo: URI scheme
+      mapUrl = `geo:${eventData.latitude},${eventData.longitude}?q=${eventData.latitude},${eventData.longitude}(${encodeURIComponent(eventData.event_name)})`;
+    } else if (eventData.full_address) {
+      mapUrl = `https://maps.apple.com/?q=${encodeURIComponent(eventData.full_address)}`;
+    } else if (eventData.location) {
+      mapUrl = `https://maps.apple.com/?q=${encodeURIComponent(eventData.location)}`;
+    }
+
+    if (mapUrl) {
+      window.open(mapUrl, '_blank');
+    }
+  }
+
   // Clean up event listener when component is destroyed
   ngOnDestroy(): void {
     if (this.bannerInterval) {
       clearInterval(this.bannerInterval);
     }
-    
+
     document.removeEventListener('click', this.closeDropdownOnClickOutside.bind(this));
     this.clearOtpTimer();
     if (this.userSubscription) {

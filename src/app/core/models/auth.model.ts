@@ -436,6 +436,10 @@ export interface UpcomingEventResponse {
   start_time: string;
   end_time: string;
   location: string;
+  full_address?: string; // Add this
+  geo_map_url?: string; // Add this
+  latitude?: number; // Add this
+  longitude?: number; // Add this
   banner_image: string;
   formatted_date: string;
 }
@@ -816,6 +820,7 @@ export interface BookingHistoryResponse {
   razorpay_order_id: string | null;
   booking_status: string;
   created_on: string;
+  qr_code: string;
   seats: BookingSeatHistoryResponse[];
 }
 

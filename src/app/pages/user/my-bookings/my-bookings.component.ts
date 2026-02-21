@@ -32,6 +32,11 @@ export class MyBookingsComponent implements OnInit {
   // Filter properties
   filterText = '';
 
+  showQRModal = false;
+  selectedQRCode: string = '';
+  selectedBookingCode: string = '';
+  selectedEventName: string = '';
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -266,5 +271,44 @@ export class MyBookingsComponent implements OnInit {
     return this.bookings.reduce((total: number, booking: BookingHistoryResponse) => {
       return total + this.getBookingRemainingTickets(booking);
     }, 0);
+  }
+
+  // Add method to show QR code modal
+  showQRCodeModal(booking: BookingHistoryResponse): void {
+    this.selectedQRCode = booking.qr_code;
+    this.selectedBookingCode = booking.booking_code;
+    this.selectedEventName = booking.event_name;
+    this.showQRModal = true;
+    
+    // Prevent body scrolling when modal is open
+    document.body.style.overflow = 'hidden';
+  }
+
+  // Add method to close QR modal
+  closeQRModal(): void {
+    this.showQRModal = false;
+    this.selectedQRCode = '';
+    this.selectedBookingCode = '';
+    this.selectedEventName = '';
+    
+    // Restore body scrolling
+    document.body.style.overflow = 'auto';
+  }
+
+  // Add method to download QR code
+  downloadQRCode(): void {
+    if (!this.selectedQRCode) return;
+    
+    const link = document.createElement('a');
+    link.href = 'data:image/png;base64,' + this.selectedQRCode;
+    link.download = `ticket-${this.selectedBookingCode}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  // Add ngOnDestroy to clean up
+  ngOnDestroy(): void {
+    document.body.style.overflow = 'auto';
   }
 }

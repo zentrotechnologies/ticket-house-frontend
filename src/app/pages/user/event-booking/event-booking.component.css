@@ -1945,3 +1945,84 @@ html {
 .mobile-book-btn:disabled .btn-arrow {
     display: none;
 }
+
+/* event-booking.component.css - Add these styles */
+
+/* Clickable location styling */
+.event-detail-item.clickable-location {
+  cursor: pointer;
+  /* transition: all 0.2s ease; */
+}
+
+.event-detail-item.clickable-location:hover {
+  background-color: rgba(146, 52, 234, 0.05);
+  border-radius: 8px;
+  /* padding-left: 8px; */
+}
+
+.location-text-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.location-icon {
+  font-size: 14px;
+  margin-right: 4px;
+}
+
+/* Similar events location styling */
+.mini-sub.location-text {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  cursor: default;
+  transition: color 0.2s ease;
+}
+
+.mini-sub.location-text.clickable {
+  cursor: pointer;
+}
+/* .mini-sub.location-text.clickable {
+  cursor: pointer;
+  color: #0066cc;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  transition: all 0.2s ease;
+}
+
+.mini-sub.location-text.clickable:hover {
+  text-decoration-color: #0066cc;
+  transform: translateY(-1px);
+} */
+
+/* Ensure the mini-card click doesn't interfere */
+.mini-card {
+  position: relative;
+}
+
+.mini-card .mini-sub.location-text {
+  position: relative;
+  z-index: 2;
+}
+
+/* Add a tooltip-like effect on hover */
+.mini-sub.location-text.clickable:hover::after {
+  content: 'Open in Maps';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  z-index: 10;
+  pointer-events: none;
+}

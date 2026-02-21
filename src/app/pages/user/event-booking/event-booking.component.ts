@@ -1054,4 +1054,102 @@ export class EventBookingComponent implements OnInit {
 
     return false;
   }
+
+  /**
+ * Check if current event has location URL or coordinates
+ */
+  hasLocationUrl(): boolean {
+    if (!this.eventDetails) return false;
+    return !!(this.eventDetails.geo_map_url ||
+      (this.eventDetails.latitude && this.eventDetails.longitude) ||
+      this.eventDetails.full_address ||
+      this.eventDetails.location);
+  }
+
+  /**
+   * Handle venue location click on event details page
+   */
+  onVenueLocationClick(event: MouseEvent): void {
+    event.stopPropagation();
+
+    if (!this.eventDetails) return;
+
+    const mapUrl = this.getMapUrlFromEventData({
+      geo_map_url: this.eventDetails.geo_map_url,
+      latitude: this.eventDetails.latitude,
+      longitude: this.eventDetails.longitude,
+      full_address: this.eventDetails.full_address,
+      location: this.eventDetails.location,
+      event_name: this.eventDetails.event_name
+    });
+
+    if (mapUrl) {
+      window.open(mapUrl, '_blank');
+    }
+  }
+
+  /**
+   * Check if similar event has location URL or coordinates
+   */
+  hasSimilarEventLocationUrl(event: UpcomingEventResponse): boolean {
+    return !!(event.geo_map_url ||
+      (event.latitude && event.longitude) ||
+      event.full_address ||
+      event.location);
+  }
+
+  /**
+   * Handle location click on similar event card
+   */
+  onSimilarEventLocationClick(event: MouseEvent, eventData: UpcomingEventResponse): void {
+    // Stop propagation to prevent triggering the card click
+    event.stopPropagation();
+
+    const mapUrl = this.getMapUrlFromEventData({
+      geo_map_url: eventData.geo_map_url,
+      latitude: eventData.latitude,
+      longitude: eventData.longitude,
+      full_address: eventData.full_address,
+      location: eventData.location,
+      event_name: eventData.event_name
+    });
+
+    if (mapUrl) {
+      window.open(mapUrl, '_blank');
+    }
+  }
+
+  /**
+   * Helper method to generate map URL from event data
+   */
+  private getMapUrlFromEventData(data: {
+    geo_map_url?: string | null;
+    latitude?: number | null;
+    longitude?: number | null;
+    full_address?: string | null;
+    location?: string | null;
+    event_name?: string | null;
+  }): string | null {
+    // Priority 1: Use geo_map_url if available
+    if (data.geo_map_url) {
+      return data.geo_map_url;
+    }
+
+    // Priority 2: Use latitude/longitude to create Google Maps URL
+    if (data.latitude && data.longitude) {
+      return `https://www.google.com/maps?q=${data.latitude},${data.longitude}`;
+    }
+
+    // Priority 3: Use full address if available
+    if (data.full_address) {
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.full_address)}`;
+    }
+
+    // Priority 4: Use location name as fallback
+    if (data.location) {
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.location)}`;
+    }
+
+    return null;
+  }
 }

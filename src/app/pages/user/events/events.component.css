@@ -1267,3 +1267,28 @@
     font-size: 40px;
   }
 }
+
+/* events.component.css */
+.location-text {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: default;
+}
+
+.location-text.clickable {
+  cursor: pointer;
+  color: #0066cc;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  transition: text-decoration-color 0.2s;
+}
+
+.location-text.clickable:hover {
+  text-decoration-color: #0066cc;
+}
+
+.location-icon {
+  font-size: 14px;
+  margin-right: 4px;
+}

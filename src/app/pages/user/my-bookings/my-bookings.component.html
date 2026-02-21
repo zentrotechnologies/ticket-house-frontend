@@ -18,15 +18,15 @@
                   <span class="stat-label">Total Bookings:</span>
                   <span class="stat-value">{{ totalCount }}</span>
                 </span>
-                <span class="stat-item">
+                <span class="stat-item d-none">
                   <span class="stat-label">Tickets:</span>
                   <span class="stat-value">{{ getTotalTickets() }}</span>
                 </span>
-                <span class="stat-item">
+                <span class="stat-item d-none">
                   <span class="stat-label">Scanned:</span>
                   <span class="stat-value">{{ getTotalScanned() }}</span>
                 </span>
-                <span class="stat-item">
+                <span class="stat-item d-none">
                   <span class="stat-label">Remaining:</span>
                   <span class="stat-value">{{ getTotalRemaining() }}</span>
                 </span>
@@ -89,11 +89,17 @@
           <div class="booking-card" *ngFor="let booking of bookings">
             <div class="booking-header">
               <div class="booking-id">
-                <span class="label">Booking #</span>
+                <span class="label">Booking Code</span>
                 <span class="value">{{ booking.booking_code }}</span>
               </div>
-              <div class="booking-date ms-4">
+              <div class="booking-date ms-4 d-none">
                 <i class="calendar-icon">📅</i> {{ formatDate(booking.created_on) }}
+              </div>
+              <!-- ADD QR CODE SECTION HERE - Small QR code next to booking header -->
+              <div class="booking-qr" *ngIf="booking.qr_code">
+                <div class="qr-code-container" (click)="showQRCodeModal(booking)" title="Click to enlarge QR code">
+                  <img [src]="'data:image/png;base64,' + booking.qr_code" alt="QR Code" class="qr-code-small" />
+                </div>
               </div>
             </div>
 
@@ -101,10 +107,10 @@
               <div class="event-info">
                 <h3 class="event-name">{{ booking.event_name }}</h3>
                 <p class="event-location">
-                  <i class="location-icon">📍</i> {{ booking.location }}
+                  <i class="bi bi-geo-alt-fill location-icon"></i> {{ booking.location }}
                 </p>
                 <p class="event-date-time">
-                  <i class="time-icon">⏰</i> {{ formatDate(booking.event_date) }} | {{ formatTime(booking.start_time) }}
+                  <i class="bi bi-clock-fill time-icon"></i> {{ formatDate(booking.event_date) }} | {{ formatTime(booking.start_time) }}
                   - {{ formatTime(booking.end_time) }}
                 </p>
               </div>
@@ -116,7 +122,7 @@
                     {{ getBookingTotalTickets(booking) }}
                   </span>
                 </div>
-                <div class="detail-item">
+                <div class="detail-item d-none">
                   <span class="label">Scanned:</span>
                   <span class="value">
                     {{ getBookingScannedTickets(booking) }}
@@ -139,7 +145,7 @@
                     {{ booking.booking_status }}
                   </span>
                 </div>
-                <div class="detail-item">
+                <div class="detail-item d-none">
                   <span class="label">Payment ID:</span>
                   <span class="value payment-id" [class.na-text]="!booking.razorpay_payment_id">
                     {{ booking.razorpay_payment_id || 'NA' }}
@@ -157,7 +163,7 @@
                       <span class="seat-quantity">× {{ seat.quantity }}</span>
                     </div>
                     <div class="seat-scan-info">
-                      <span class="scan-progress">
+                      <span class="scan-progress d-none">
                         Scanned: {{ seat.scanned_quantity }} / {{ seat.quantity }}
                       </span>
                       <span class="seat-price">₹{{ seat.subtotal }}</span>
@@ -211,4 +217,21 @@
       <p class="copyright">© 2025 Ticket House – All rights reserved.</p>
     </div>
   </footer>
+
+  <!-- QR Code Modal -->
+  <div *ngIf="showQRModal" class="qr-modal-overlay" (click)="closeQRModal()">
+    <div class="qr-modal-content" (click)="$event.stopPropagation()">
+      <button class="qr-modal-close" (click)="closeQRModal()">×</button>
+      <h3>Your Ticket QR Code</h3>
+      <div class="qr-modal-image-container">
+        <img [src]="'data:image/png;base64,' + selectedQRCode" alt="Booking QR Code" class="qr-modal-image" />
+      </div>
+      <p class="qr-modal-booking-code">
+        <strong>{{ selectedBookingCode }}</strong> - {{ selectedEventName }}
+      </p>
+      <button class="qr-modal-download-btn" (click)="downloadQRCode()">
+        Download QR Code
+      </button>
+    </div>
+  </div>
 </div>
