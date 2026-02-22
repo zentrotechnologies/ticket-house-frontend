@@ -143,4 +143,10 @@ export class BookingSuccessModalComponent implements OnInit, OnDestroy {
     this.closeModal();
     this.router.navigate(['/events']);
   }
+
+  // Add this method to your BookingSuccessModalComponent class
+  calculateSubtotal(seats: any[]): number {
+    if (!seats || !seats.length) return 0;
+    return seats.reduce((sum, seat) => sum + (seat.subtotal || 0), 0);
+  }
 }

@@ -671,3 +671,65 @@
 .d-none {
   display: none;
 }
+
+/* Payment Breakdown Styles - Add to your existing CSS */
+.payment-breakdown {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 2px solid rgba(146, 52, 234, 0.1);
+  font-size: 12px;
+}
+
+.breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  border-bottom: 1px dashed rgba(146, 52, 234, 0.05);
+}
+
+.breakdown-row:last-of-type {
+  border-bottom: none;
+}
+
+.breakdown-label {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.breakdown-value {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.breakdown-row.total-row {
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 2px solid rgba(146, 52, 234, 0.1);
+}
+
+.breakdown-value.final-value {
+  font-size: 14px;
+  font-weight: 800;
+  background: linear-gradient(135deg, rgb(146, 52, 234) 0%, rgb(226, 54, 163) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .payment-breakdown {
+    margin-top: 8px;
+    padding-top: 6px;
+  }
+  
+  .breakdown-row {
+    padding: 3px 0;
+    font-size: 11px;
+  }
+  
+  .breakdown-value.final-value {
+    font-size: 13px;
+  }
+}

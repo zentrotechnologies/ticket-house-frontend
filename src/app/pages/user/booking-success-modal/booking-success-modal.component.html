@@ -81,12 +81,13 @@
                             <span class="status-badge confirmed">{{ bookingDetails.status | titlecase }}</span>
                         </div>
                         
-                        <div class="detail-row total-row">
+                        <div class="detail-row total-row d-none">
                             <span class="detail-label">Total Amount:</span>
-                            <span class="total-amount-value">₹{{ bookingDetails.total_amount }}</span>
+                            <span class="total-amount-value">₹{{ bookingDetails.final_amount }}</span>
                         </div>
                     </div>
 
+                    <!-- Seat Details (Compact) -->
                     <!-- Seat Details (Compact) -->
                     <div class="seat-summary" *ngIf="bookingDetails.bookingSeats?.length">
                         <div class="seat-summary-header">
@@ -98,6 +99,26 @@
                             <span class="seat-name">{{ seat.seat_name }}</span>
                             <span class="seat-qty">{{ seat.quantity }}</span>
                             <span class="seat-price">₹{{ seat.subtotal }}</span>
+                        </div>
+                        
+                        <!-- Payment Breakdown Section - Added below seat summary -->
+                        <div class="payment-breakdown">
+                            <div class="breakdown-row">
+                                <span class="breakdown-label">Subtotal:</span>
+                                <span class="breakdown-value">₹{{ calculateSubtotal(bookingDetails.bookingSeats) }}</span>
+                            </div>
+                            <div class="breakdown-row">
+                                <span class="breakdown-label">Convenience Fee:</span>
+                                <span class="breakdown-value">₹{{ bookingDetails.convenience_fee || 0 }}</span>
+                            </div>
+                            <div class="breakdown-row">
+                                <span class="breakdown-label">GST:</span>
+                                <span class="breakdown-value">₹{{ bookingDetails.gst_amount || 0 }}</span>
+                            </div>
+                            <div class="breakdown-row total-row">
+                                <span class="breakdown-label">Total Final Value:</span>
+                                <span class="breakdown-value final-value">₹{{ bookingDetails.final_amount || bookingDetails.total_amount }}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
