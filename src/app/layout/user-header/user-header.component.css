@@ -75,7 +75,7 @@
 .container {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 0 20px;
+  /* padding: 0 20px; */
 }
 
 .header-row {
@@ -270,7 +270,7 @@
 
 /* When scrolled, slightly reduce size */
 .audience-header.scrolled .user-welcome-trigger {
-  padding: 8px 22px;
+  /* padding: 8px 22px; */
   box-shadow: 0 2px 8px rgba(146, 52, 234, 0.15);
 }
 

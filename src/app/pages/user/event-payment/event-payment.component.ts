@@ -992,7 +992,7 @@ export class EventPaymentComponent implements OnInit {
       name: orderData.companyName || 'TicketHouse',
       description: `Payment for ${this.eventTitle}`,
       order_id: orderData.orderId,
-      image: 'https://your-domain.com/assets/logo.png', // Add your logo URL here
+      image: 'https://tickethouse.in/assets/th_transparent_logo.png', // Add your logo URL here
       handler: (response: any) => {
         console.log('Payment successful:', response);
         this.verifyPayment(response, orderData.bookingId);

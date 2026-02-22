@@ -38,10 +38,18 @@
                 <!-- LEFT: Main Content -->
                 <div class="booking-main-content">
                     <!-- Hero Image -->
-                    <div class="event-hero">
+                    <!-- <div class="event-hero">
                         <div class="hero-img">
                             <img [src]="eventDetails.banner_image || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1400&q=60'"
                                 [alt]="eventDetails.event_name" (click)="openImageModal(eventDetails.banner_image)">
+                        </div>
+                    </div> -->
+                    <!-- Hero Image - Updated to use EventDetailBanner -->
+                    <div class="event-hero">
+                        <div class="hero-img">
+                            <img [src]="eventDetails.eventDetailBanner || eventDetails.banner_image || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1400&q=60'"
+                                [alt]="eventDetails.event_name"
+                                (click)="openImageModal(eventDetails.eventDetailBanner || eventDetails.banner_image)">
                         </div>
                     </div>
 

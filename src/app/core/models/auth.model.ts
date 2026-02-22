@@ -328,6 +328,7 @@ export interface EventDetailsModel {
   updated_at: string | null;
   active: number;
   convenience_fee: number; // Add this line
+  eventDetailBanner?: string;
 }
 
 export interface EventArtistModel {
