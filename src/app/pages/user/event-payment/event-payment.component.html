@@ -190,11 +190,35 @@
 
           </div>
 
+          <!-- Add this new line for total before coupon (only show when coupon is applied) -->
+          <div class="row my-0" *ngIf="couponResult?.is_applied">
+            <div class="d-flex justify-content-between">
+              <span>Total Amount</span>
+              <span class="text-black">₹{{ (totalAmount + convenienceFee + gstTotal) | number:'1.2-2' }}</span>
+            </div>
+          </div>
 
+          <!-- Coupon Section - Add right after booking fees section -->
+          <div class="row my-0" *ngIf="isCheckingCoupon">
+            <div class="d-flex justify-content-center">
+              <div class="spinner-small"></div>
+              <span class="ml-2">Checking for applicable coupons...</span>
+            </div>
+          </div>
 
-
-
-
+          <div class="row my-0" *ngIf="couponResult?.is_applied">
+            <div class="coupon-applied">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <span class="coupon-badge d-none">✓</span>
+                  <span class="coupon-name">{{ couponResult.coupon_name }}</span>
+                  <span class="coupon-code">({{ couponResult.coupon_code }})</span>
+                </div>
+                <span class="coupon-discount">-₹{{ couponResult.discount_value | number:'1.2-2' }}</span>
+              </div>
+              <div class="coupon-message">{{ couponResult.message }}</div>
+            </div>
+          </div>
 
           <div class="row my-0">
 
@@ -226,12 +250,32 @@
 
           </div>
 
-
           <div *ngIf="isProcessing" class="loading-state">
             <div class="spinner"></div>
             <p>Please wait while we process your request...</p>
           </div>
         </div>
+        <!-- Coupon Section - Add after price breakup -->
+        <!-- <div class="row my-0" *ngIf="isCheckingCoupon">
+          <div class="d-flex justify-content-center">
+            <div class="spinner-small"></div>
+            <span class="ml-2">Checking for applicable coupons...</span>
+          </div>
+        </div>
+
+        <div class="row my-0" *ngIf="couponResult?.is_applied">
+          <div class="coupon-applied">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <span class="coupon-badge">✓</span>
+                <span class="coupon-name">{{ couponResult.coupon_name }}</span>
+                <span class="coupon-code">({{ couponResult.coupon_code }})</span>
+              </div>
+              <span class="coupon-discount">-₹{{ couponResult.discount_value | number:'1.2-2' }}</span>
+            </div>
+            <div class="coupon-message">{{ couponResult.message }}</div>
+          </div>
+        </div> -->
       </aside>
     </div>
   </main>
@@ -248,12 +292,7 @@
   </div>
 
   <!-- Booking Success Modal -->
-  <app-booking-success-modal
-    *ngIf="showSuccessModal"
-    [qrCodeBase64]="qrCodeBase64"
-    [thankYouMessage]="thankYouMessage"
-    [bookingDetails]="bookingDetails"
-    [bookingCode]="bookingCode"
-    (close)="onSuccessModalClose()">
+  <app-booking-success-modal *ngIf="showSuccessModal" [qrCodeBase64]="qrCodeBase64" [thankYouMessage]="thankYouMessage"
+    [bookingDetails]="bookingDetails" [bookingCode]="bookingCode" (close)="onSuccessModalClose()">
   </app-booking-success-modal>
 </div>

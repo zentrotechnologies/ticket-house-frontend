@@ -688,3 +688,175 @@ grid-template-columns: 6.5fr 3.5fr;
 }
 .ticket-information-points{    color: #738296;
     font-size: 15px;}
+
+/* Coupon Styles */
+.coupon-applied {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-left: 4px solid #4caf50;
+  padding: 7px 6px;
+  border-radius: 8px;
+  margin: 12px 0;
+  width: 100%;
+}
+
+.coupon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background-color: #4caf50;
+  color: white;
+  border-radius: 50%;
+  font-size: 12px;
+  margin-right: 8px;
+}
+
+.coupon-name {
+  font-weight: 600;
+  color: #2e7d32;
+  margin-right: 4px;
+}
+
+.coupon-code {
+  color: #558b2f;
+  font-size: 13px;
+}
+
+.coupon-discount {
+  font-weight: 700;
+  color: #2e7d32;
+  font-size: 14px;
+}
+
+.coupon-message {
+  font-size: 12px;
+  color: #33691e;
+  margin-top: 4px;
+  /* padding-left: 28px; */
+}
+
+.spinner-small {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #9234ea;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin-right: 8px;
+}
+
+.ml-2 {
+  margin-left: 8px;
+}
+
+/* Mobile Responsive Styles for Coupon Section */
+@media (max-width: 768px) {
+  .coupon-applied {
+    padding: 10px 12px;
+  }
+  
+  .coupon-applied .d-flex {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  
+  .coupon-applied .d-flex > div {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .coupon-name {
+    font-size: 13px;
+    margin-right: 3px;
+  }
+  
+  .coupon-code {
+    font-size: 12px;
+  }
+  
+  .coupon-discount {
+    align-self: flex-end;
+    font-size: 13px;
+    margin-top: 2px;
+    width: 100%;
+    text-align: right;
+  }
+  
+  .coupon-message {
+    font-size: 11px;
+    margin-top: 6px;
+  }
+  
+  /* Hide badge on very small screens if needed */
+  .coupon-badge.d-none {
+    display: none !important;
+  }
+  
+  /* Add a more compact style for very small screens */
+  @media (max-width: 480px) {
+    .coupon-applied {
+      padding: 8px 10px;
+    }
+    
+    .coupon-applied .d-flex > div {
+      /* justify-content: space-between; */
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .coupon-name, 
+    .coupon-code {
+      display: inline-block;
+    }
+    
+    .coupon-name {
+      font-size: 12px;
+    }
+    
+    .coupon-code {
+      font-size: 11px;
+    }
+    
+    .coupon-discount {
+      font-size: 12px;
+    }
+    
+    .coupon-message {
+      font-size: 10px;
+      line-height: 1.4;
+    }
+  }
+}
+
+/* Style for the "Total before coupon" line */
+.row.my-0:has(> div.d-flex.justify-content-between) {
+  padding: 8px 0;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
+}
+
+.row.my-0 .d-flex.justify-content-between span:first-child {
+  color: #666;
+  font-size: 14px;
+}
+
+.row.my-0 .d-flex.justify-content-between span.text-black {
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+}
+
+/* Mobile responsive for total before coupon */
+@media (max-width: 768px) {
+  .row.my-0 .d-flex.justify-content-between span:first-child {
+    font-size: 13px;
+  }
+  
+  .row.my-0 .d-flex.justify-content-between span.text-black {
+    font-size: 13px;
+  }
+}

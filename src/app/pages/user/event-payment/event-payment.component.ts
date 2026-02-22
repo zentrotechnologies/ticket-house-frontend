@@ -80,6 +80,8 @@ export class EventPaymentComponent implements OnInit {
   bookingCode: string = '';
   showProcessingModal = false;
   convenienceFeePercentage: number = 0; // Store the percentage from API
+  couponResult: any = null;
+  isCheckingCoupon = false;
 
   constructor(
     private router: Router,
@@ -166,6 +168,9 @@ export class EventPaymentComponent implements OnInit {
 
         this.calculateBookingFee();
         this.loadEventDetails();
+
+        // Add this line after you have seat selections loaded:
+        this.checkForBestCoupon();
       }
       // SECOND: Try to get data from navigation state (new navigation)
       else {
@@ -183,6 +188,11 @@ export class EventPaymentComponent implements OnInit {
             this.persistToSessionStorage();
             this.calculateBookingFee();
             this.loadEventDetails();
+            // ADD THIS LINE - Call coupon check after loading event details
+            setTimeout(() => {
+              this.checkForBestCoupon();
+            }, 500); // Small delay to ensure event details are loaded
+
             this.clearSessionStorage(); // Clear temp data
           }
         }
@@ -537,10 +547,14 @@ export class EventPaymentComponent implements OnInit {
 
             // Recalculate fees with the new percentage
             this.calculateBookingFee();
+
+            // ADD THIS LINE - Check for coupon after fees are calculated
+            this.checkForBestCoupon();
           } else {
             console.log('No convenience fee in response, using default 6%');
             this.convenienceFeePercentage = 6; // Default to 6%
             this.calculateBookingFee();
+            this.checkForBestCoupon(); // Also check here
           }
         }
       },
@@ -549,6 +563,7 @@ export class EventPaymentComponent implements OnInit {
         // Set default fee on error
         this.convenienceFeePercentage = 6;
         this.calculateBookingFee();
+        this.checkForBestCoupon(); // Check even on error
       },
     });
   }
@@ -559,40 +574,40 @@ export class EventPaymentComponent implements OnInit {
   //   this.finalAmount = parseFloat((this.totalAmount + this.bookingFee).toFixed(2));
   // }
 
-  calculateBookingFee(): void {
-    // Use dynamic convenience fee percentage from API, default to 6% if not available
-    const feePercentage = this.convenienceFeePercentage > 0
-      ? this.convenienceFeePercentage / 100  // Convert to decimal (e.g., 4.00% → 0.04)
-      : 0.06; // Default 6% fallback
+  // calculateBookingFee(): void {
+  //   // Use dynamic convenience fee percentage from API, default to 6% if not available
+  //   const feePercentage = this.convenienceFeePercentage > 0
+  //     ? this.convenienceFeePercentage / 100  // Convert to decimal (e.g., 4.00% → 0.04)
+  //     : 0.06; // Default 6% fallback
 
-    // Calculate convenience fee based on dynamic percentage - keep full precision
-    this.convenienceFee = this.totalAmount * feePercentage;
+  //   // Calculate convenience fee based on dynamic percentage - keep full precision
+  //   this.convenienceFee = this.totalAmount * feePercentage;
 
-    // Calculate GST on convenience fee only (18% = 9% CGST + 9% SGST) - keep full precision
-    this.cgstAmount = this.convenienceFee * 0.09;
-    this.sgstAmount = this.convenienceFee * 0.09;
-    this.gstTotal = this.cgstAmount + this.sgstAmount;
+  //   // Calculate GST on convenience fee only (18% = 9% CGST + 9% SGST) - keep full precision
+  //   this.cgstAmount = this.convenienceFee * 0.09;
+  //   this.sgstAmount = this.convenienceFee * 0.09;
+  //   this.gstTotal = this.cgstAmount + this.sgstAmount;
 
-    // Calculate final amount: total + convenience fee + GST - keep full precision
-    this.finalAmount = this.totalAmount + this.convenienceFee + this.gstTotal;
+  //   // Calculate final amount: total + convenience fee + GST - keep full precision
+  //   this.finalAmount = this.totalAmount + this.convenienceFee + this.gstTotal;
 
-    // Keep the old bookingFee property for backward compatibility if needed - keep full precision
-    this.bookingFee = this.convenienceFee + this.gstTotal;
+  //   // Keep the old bookingFee property for backward compatibility if needed - keep full precision
+  //   this.bookingFee = this.convenienceFee + this.gstTotal;
 
-    // For logging, show rounded values for readability
-    console.log('Fee calculation details (showing 2 decimals):', {
-      totalAmount: this.totalAmount.toFixed(2),
-      feePercentage: (feePercentage * 100).toFixed(2) + '%',
-      convenienceFee: this.convenienceFee.toFixed(2),
-      cgstAmount: this.cgstAmount.toFixed(2),
-      sgstAmount: this.sgstAmount.toFixed(2),
-      gstTotal: this.gstTotal.toFixed(2),
-      bookingFee: this.bookingFee.toFixed(2),
-      finalAmount: this.finalAmount.toFixed(2),
-      // For Razorpay (must be in paise without decimals)
-      finalAmountInPaise: Math.round(this.finalAmount * 100)
-    });
-  }
+  //   // For logging, show rounded values for readability
+  //   console.log('Fee calculation details (showing 2 decimals):', {
+  //     totalAmount: this.totalAmount.toFixed(2),
+  //     feePercentage: (feePercentage * 100).toFixed(2) + '%',
+  //     convenienceFee: this.convenienceFee.toFixed(2),
+  //     cgstAmount: this.cgstAmount.toFixed(2),
+  //     sgstAmount: this.sgstAmount.toFixed(2),
+  //     gstTotal: this.gstTotal.toFixed(2),
+  //     bookingFee: this.bookingFee.toFixed(2),
+  //     finalAmount: this.finalAmount.toFixed(2),
+  //     // For Razorpay (must be in paise without decimals)
+  //     finalAmountInPaise: Math.round(this.finalAmount * 100)
+  //   });
+  // }
 
   getTotalTickets(): number {
     return this.seatSelections.reduce((total, seat) => total + seat.Quantity, 0);
@@ -803,12 +818,25 @@ export class EventPaymentComponent implements OnInit {
     this.isProcessing = true;
 
     // Use the new combined endpoint
+    // const bookingWithPaymentRequest = {
+    //   EventId: this.eventId,
+    //   SeatSelections: this.seatSelections.map((seat) => ({
+    //     SeatTypeId: seat.SeatTypeId,
+    //     Quantity: seat.Quantity,
+    //   })),
+    // };
+
+    // Create booking request WITH coupon data if applied
+    // FIX: Send empty string instead of null for CouponCode
     const bookingWithPaymentRequest = {
       EventId: this.eventId,
       SeatSelections: this.seatSelections.map((seat) => ({
         SeatTypeId: seat.SeatTypeId,
         Quantity: seat.Quantity,
       })),
+      // Add coupon info if applied - send empty string if not applied
+      CouponCode: this.couponResult?.is_applied ? this.couponResult.coupon_code : "", // Changed from null to ""
+      DiscountAmount: this.couponResult?.is_applied ? this.couponResult.discount_value : 0
     };
 
     console.log('Creating booking with payment:', bookingWithPaymentRequest);
@@ -829,6 +857,14 @@ export class EventPaymentComponent implements OnInit {
       error: (error) => {
         this.isProcessing = false;
         console.error('Booking with payment error:', error);
+        // Show more detailed error message
+        if (error.error?.errors) {
+          const errorMsg = Object.values(error.error.errors).join(', ');
+          this.toastr.error(errorMsg, 'Validation Error');
+        } else {
+          this.toastr.error('Error creating booking with payment. Please try again.', 'Error');
+        }
+
         this.toastr.error('Error creating booking with payment. Please try again.', 'Error');
       },
     });
@@ -1322,7 +1358,7 @@ export class EventPaymentComponent implements OnInit {
     localStorage.removeItem('pending_event_name');
     localStorage.removeItem('pending_booking_id');
     localStorage.removeItem('pending_booking_user');
-    
+
     // Clear sessionStorage payment page data
     sessionStorage.removeItem('payment_page_data');
     sessionStorage.removeItem('pending_payment_booking');
@@ -1774,6 +1810,138 @@ export class EventPaymentComponent implements OnInit {
   toggleFeeBreakup() {
     this.showFeeBreakup = !this.showFeeBreakup;
   }
+
+  // Add this method to check for best coupon
+  checkForBestCoupon(): void {
+  if (!this.eventId || this.seatSelections.length === 0) {
+    console.log('Cannot check coupon - missing data', { eventId: this.eventId, selections: this.seatSelections.length });
+    return;
+  }
+
+  this.isCheckingCoupon = true;
+  console.log('Checking for best coupon...');
+
+  // Calculate total seats
+  const totalSeats = this.getTotalTickets();
+  
+  // First calculate the fees
+  const feePercentage = this.convenienceFeePercentage > 0
+    ? this.convenienceFeePercentage / 100
+    : 0.06;
+  
+  const calculatedConvenienceFee = this.totalAmount * feePercentage;
+  const calculatedGstTotal = calculatedConvenienceFee * 0.18; // 18% GST
+  const calculatedFinalAmount = this.totalAmount + calculatedConvenienceFee + calculatedGstTotal;
+
+  const checkRequest = {
+    event_id: this.eventId,
+    seat_selections: this.seatSelections.map(seat => ({
+      SeatTypeId: seat.SeatTypeId,
+      Quantity: seat.Quantity
+    })),
+    ticket_base_price: this.totalAmount / totalSeats,
+    total_seats: totalSeats,
+    subtotal: this.totalAmount,
+    // ADD THESE FIELDS - Pass the calculated final amount
+    convenience_fee: calculatedConvenienceFee,
+    gst_amount: calculatedGstTotal,
+    final_amount: calculatedFinalAmount
+  };
+
+  console.log('Coupon check request with final amount:', checkRequest);
+
+  this.apiService.checkAndApplyBestCoupon(checkRequest).subscribe({
+    next: (response) => {
+      this.isCheckingCoupon = false;
+      console.log('Coupon check response:', response);
+
+      if (response.status === 'Success' && response.data?.is_applied) {
+        this.couponResult = response.data;
+        console.log('Coupon applied:', this.couponResult);
+
+        // Update the displayed amounts
+        this.updateAmountsWithCoupon();
+
+        // Show success toast
+        // this.toastr.success(`${this.couponResult.coupon_name} applied! You saved ₹${this.couponResult.discount_value.toFixed(2)}`, 'Coupon Applied');
+      } else {
+        console.log('No coupon applicable');
+        this.couponResult = null;
+        this.updateAmountsWithCoupon(); // Recalculate without coupon
+      }
+    },
+    error: (error) => {
+      this.isCheckingCoupon = false;
+      console.error('Error checking coupon:', error);
+      this.couponResult = null;
+    }
+  });
+}
+
+  // Fix calculateBookingFee to always use latest coupon state
+  calculateBookingFee(): void {
+  // Use dynamic convenience fee percentage from API, default to 6% if not available
+  const feePercentage = this.convenienceFeePercentage > 0
+    ? this.convenienceFeePercentage / 100
+    : 0.06;
+
+  // Calculate convenience fee based on subtotal
+  this.convenienceFee = this.totalAmount * feePercentage;
+
+  // Calculate GST on convenience fee only (18%)
+  this.gstTotal = this.convenienceFee * 0.18; // 18% GST on convenience fee
+  this.cgstAmount = this.gstTotal / 2; // Split for display if needed
+  this.sgstAmount = this.gstTotal / 2;
+
+  // Calculate final amount BEFORE coupon (subtotal + fees)
+  const amountBeforeCoupon = this.totalAmount + this.convenienceFee + this.gstTotal;
+
+  // If coupon applied, subtract discount from the amount with fees
+  if (this.couponResult?.is_applied) {
+    this.finalAmount = amountBeforeCoupon - this.couponResult.discount_value;
+    console.log('Final amount with coupon:', {
+      subtotal: this.totalAmount,
+      convenienceFee: this.convenienceFee,
+      gstTotal: this.gstTotal,
+      amountBeforeCoupon: amountBeforeCoupon,
+      discount: this.couponResult.discount_value,
+      finalAmount: this.finalAmount
+    });
+  } else {
+    this.finalAmount = amountBeforeCoupon;
+  }
+}
+
+  // Update amounts with coupon
+  updateAmountsWithCoupon(): void {
+  // Recalculate fees first (based on subtotal)
+  const feePercentage = this.convenienceFeePercentage > 0
+    ? this.convenienceFeePercentage / 100
+    : 0.06;
+
+  this.convenienceFee = this.totalAmount * feePercentage;
+  this.gstTotal = this.convenienceFee * 0.18;
+  this.cgstAmount = this.gstTotal / 2;
+  this.sgstAmount = this.gstTotal / 2;
+
+  const amountBeforeCoupon = this.totalAmount + this.convenienceFee + this.gstTotal;
+
+  if (this.couponResult?.is_applied) {
+    // Use the discount from coupon result
+    this.finalAmount = amountBeforeCoupon - this.couponResult.discount_value;
+    
+    // Log for debugging
+    console.log('Amount calculation with coupon:', {
+      subtotal: this.totalAmount,
+      fees: this.convenienceFee + this.gstTotal,
+      amountBeforeCoupon,
+      discount: this.couponResult.discount_value,
+      finalAmount: this.finalAmount
+    });
+  } else {
+    this.finalAmount = amountBeforeCoupon;
+  }
+}
 
   ngOnDestroy(): void {
     // Clean up localStorage when leaving page

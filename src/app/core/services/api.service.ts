@@ -500,4 +500,47 @@ export class ApiService {
     const url = `${this.ThApi}api/Login/ResetPassword`;
     return this.httpClient.post<any>(url, request);
   }
+
+  // Check and apply best coupon
+  checkAndApplyBestCoupon(request: any): Observable<CommonResponseModel<any>> {
+    const url = `${this.ThApi}api/Coupon/CheckAndApplyBestCoupon`;
+    return this.httpClient.post<CommonResponseModel<any>>(url, request, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  // Apply coupon manually
+  applyCouponManually(bookingId: number, couponCode: string): Observable<CommonResponseModel<any>> {
+    const url = `${this.ThApi}api/Coupon/ApplyCouponManually`;
+    return this.httpClient.post<CommonResponseModel<any>>(url, {
+      booking_id: bookingId,
+      coupon_code: couponCode
+    }, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  // Remove coupon
+  removeCoupon(bookingId: number): Observable<CommonResponseModel<any>> {
+    const url = `${this.ThApi}api/Coupon/RemoveCoupon/${bookingId}`;
+    return this.httpClient.post<CommonResponseModel<any>>(url, {}, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  // Recalculate coupon for booking
+  recalculateCoupon(bookingId: number): Observable<CommonResponseModel<any>> {
+    const url = `${this.ThApi}api/Coupon/RecalculateCoupon/${bookingId}`;
+    return this.httpClient.get<CommonResponseModel<any>>(url, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  // Get coupons by event
+  getCouponsByEvent(eventId: number): Observable<CommonResponseModel<any[]>> {
+    const url = `${this.ThApi}api/Coupon/GetCouponsByEvent/${eventId}`;
+    return this.httpClient.get<CommonResponseModel<any[]>>(url, {
+      headers: this.getAuthHeaders()
+    });
+  }
 }
