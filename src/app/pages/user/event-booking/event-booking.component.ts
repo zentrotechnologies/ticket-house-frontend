@@ -671,12 +671,23 @@ export class EventBookingComponent implements OnInit {
    * Proceed to checkout from seat modal
    */
   proceedToCheckout(): void {
+    
     const selectedSeatCount = this.getSelectedSeatCount();
 
     if (selectedSeatCount === 0) {
       this.toastr.warning('Please select at least one seat', 'Selection Required');
       return;
     }
+    if ((window as any).fbq) {
+  (window as any).fbq('track', 'AddToCart', {
+    value: this.totalAmount,
+    currency: 'INR',
+    content_name: this.eventDetails?.event_name,
+    content_ids: [this.eventId],
+    content_type: 'product',
+    num_items: this.getSelectedSeatCount()
+  });
+}
 
     if (selectedSeatCount > 10) {
       this.toastr.warning('You can select maximum 10 tickets only', 'Limit Exceeded');

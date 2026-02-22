@@ -849,6 +849,16 @@ export class EventPaymentComponent implements OnInit {
         if (response.status === 'Success' && response.data) {
           // Initialize Razorpay payment
           this.initiateRazorpayPayment(response.data);
+          if ((window as any).fbq) {
+          (window as any).fbq('track', 'Purchase', {
+            value: this.finalAmount,
+            currency: 'INR',
+            content_name: this.eventTitle,
+            content_ids: [this.eventId],
+            num_items: this.getTotalTickets(),
+            content_type: 'product'
+          });
+        }
         } else {
           this.isProcessing = false;
           this.toastr.error(response.message || 'Failed to create booking with payment', 'Error');
@@ -996,6 +1006,7 @@ export class EventPaymentComponent implements OnInit {
       handler: (response: any) => {
         console.log('Payment successful:', response);
         this.verifyPayment(response, orderData.bookingId);
+
       },
       prefill: {
         name: orderData.customerName,
@@ -1148,6 +1159,7 @@ export class EventPaymentComponent implements OnInit {
 
           // Show QR code modal directly
           this.showQRCodeModal(bookingId);
+          
         } else {
           // Payment verification failed
           this.toastr.error(response.message || 'Payment verification failed', 'Error');

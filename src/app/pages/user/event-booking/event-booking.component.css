@@ -1283,9 +1283,7 @@
     padding: 40px;
   }
   
-  .cta-text {
-    font-size: 28px;
-  }
+
   
   .footer-main {
     grid-template-columns: 1.5fr 1fr 1fr 1fr;
@@ -1345,9 +1343,7 @@
     padding: 30px 20px;
   }
   
-  .cta-text {
-    font-size: 24px;
-  }
+
   
   .footer-main {
     grid-template-columns: 1fr 1fr;
@@ -1433,14 +1429,9 @@
     grid-template-columns: 1fr;
     gap: 30px;
   }
+
   
-  .cta-text {
-    font-size: 20px;
-  }
-  
-  .cta-btn {
-    width: 100%;
-  }
+
   
   /* Modal Responsive */
   .seat-modal-header h3 {
