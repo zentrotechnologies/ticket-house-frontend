@@ -794,7 +794,8 @@ export class EventPaymentComponent implements OnInit {
 
       // Open the auth modal directly
       this.showAuthModal = true;
-      this.isLoginMode = true; // Ensure login mode is active
+      // this.isLoginMode = true; // Ensure login mode is active
+      this.isLoginMode = false;
       this.resetAuthForms();
 
       // Also dispatch custom event as backup
@@ -849,16 +850,27 @@ export class EventPaymentComponent implements OnInit {
         if (response.status === 'Success' && response.data) {
           // Initialize Razorpay payment
           this.initiateRazorpayPayment(response.data);
+          //   if ((window as any).fbq) {
+          //   (window as any).fbq('track', 'Purchase', {
+          //     value: this.finalAmount,
+          //     currency: 'INR',
+          //     content_name: this.eventTitle,
+          //     content_ids: [this.eventId],
+          //     num_items: this.getTotalTickets(),
+          //     content_type: 'product'
+          //   });
+          // }
+
           if ((window as any).fbq) {
-          (window as any).fbq('track', 'Purchase', {
-            value: this.finalAmount,
-            currency: 'INR',
-            content_name: this.eventTitle,
-            content_ids: [this.eventId],
-            num_items: this.getTotalTickets(),
-            content_type: 'product'
-          });
-        }
+            (window as any).fbq('track', 'InitiateCheckout', {
+              value: this.finalAmount,
+              currency: 'INR',
+              content_name: this.eventTitle,
+              content_ids: [this.eventId],
+              num_items: this.getTotalTickets(),
+              content_type: 'product'
+            });
+          }
         } else {
           this.isProcessing = false;
           this.toastr.error(response.message || 'Failed to create booking with payment', 'Error');
@@ -1159,7 +1171,7 @@ export class EventPaymentComponent implements OnInit {
 
           // Show QR code modal directly
           this.showQRCodeModal(bookingId);
-          
+
         } else {
           // Payment verification failed
           this.toastr.error(response.message || 'Payment verification failed', 'Error');
@@ -1451,6 +1463,8 @@ export class EventPaymentComponent implements OnInit {
 
   onSignIn(): void {
     this.showAuthModal = true;
+    // Show signup first when clicking Sign In button
+    this.isLoginMode = false; // <--- CHANGE THIS LINE
     this.resetAuthForms();
   }
 
@@ -1464,13 +1478,13 @@ export class EventPaymentComponent implements OnInit {
   }
 
   resetAuthForms(): void {
-    this.isLoginMode = true;
+    this.isLoginMode = false;
     this.signupStep = 1;
     this.showOTPVerification = false;
     this.loginEmail = '';
     this.loginPassword = '';
     this.signupFirstName = '';
-    this.signupLastName = '';
+    // this.signupLastName = '';
     this.signupEmail = '';
     this.signupPassword = '';
     this.signupPhone = '';
@@ -1563,7 +1577,7 @@ export class EventPaymentComponent implements OnInit {
   isValidSignupStep1(): boolean {
     return (
       this.signupFirstName.length >= 2 &&
-      this.signupLastName.length >= 2 &&
+      // this.signupLastName.length >= 2 &&
       this.isValidEmail(this.signupEmail) &&
       this.signupPassword.length >= 8
     );
@@ -1738,7 +1752,7 @@ export class EventPaymentComponent implements OnInit {
     // Prepare signup data
     const signUpData: SignUpRequest = {
       first_name: this.signupFirstName,
-      last_name: this.signupLastName,
+      // last_name: this.signupLastName,
       email: this.signupEmail,
       password: this.signupPassword,
       role_id: 3, // Always set role_id = 3 for audience
@@ -1825,135 +1839,135 @@ export class EventPaymentComponent implements OnInit {
 
   // Add this method to check for best coupon
   checkForBestCoupon(): void {
-  if (!this.eventId || this.seatSelections.length === 0) {
-    console.log('Cannot check coupon - missing data', { eventId: this.eventId, selections: this.seatSelections.length });
-    return;
-  }
-
-  this.isCheckingCoupon = true;
-  console.log('Checking for best coupon...');
-
-  // Calculate total seats
-  const totalSeats = this.getTotalTickets();
-  
-  // First calculate the fees
-  const feePercentage = this.convenienceFeePercentage > 0
-    ? this.convenienceFeePercentage / 100
-    : 0.06;
-  
-  const calculatedConvenienceFee = this.totalAmount * feePercentage;
-  const calculatedGstTotal = calculatedConvenienceFee * 0.18; // 18% GST
-  const calculatedFinalAmount = this.totalAmount + calculatedConvenienceFee + calculatedGstTotal;
-
-  const checkRequest = {
-    event_id: this.eventId,
-    seat_selections: this.seatSelections.map(seat => ({
-      SeatTypeId: seat.SeatTypeId,
-      Quantity: seat.Quantity
-    })),
-    ticket_base_price: this.totalAmount / totalSeats,
-    total_seats: totalSeats,
-    subtotal: this.totalAmount,
-    // ADD THESE FIELDS - Pass the calculated final amount
-    convenience_fee: calculatedConvenienceFee,
-    gst_amount: calculatedGstTotal,
-    final_amount: calculatedFinalAmount
-  };
-
-  console.log('Coupon check request with final amount:', checkRequest);
-
-  this.apiService.checkAndApplyBestCoupon(checkRequest).subscribe({
-    next: (response) => {
-      this.isCheckingCoupon = false;
-      console.log('Coupon check response:', response);
-
-      if (response.status === 'Success' && response.data?.is_applied) {
-        this.couponResult = response.data;
-        console.log('Coupon applied:', this.couponResult);
-
-        // Update the displayed amounts
-        this.updateAmountsWithCoupon();
-
-        // Show success toast
-        // this.toastr.success(`${this.couponResult.coupon_name} applied! You saved ₹${this.couponResult.discount_value.toFixed(2)}`, 'Coupon Applied');
-      } else {
-        console.log('No coupon applicable');
-        this.couponResult = null;
-        this.updateAmountsWithCoupon(); // Recalculate without coupon
-      }
-    },
-    error: (error) => {
-      this.isCheckingCoupon = false;
-      console.error('Error checking coupon:', error);
-      this.couponResult = null;
+    if (!this.eventId || this.seatSelections.length === 0) {
+      console.log('Cannot check coupon - missing data', { eventId: this.eventId, selections: this.seatSelections.length });
+      return;
     }
-  });
-}
+
+    this.isCheckingCoupon = true;
+    console.log('Checking for best coupon...');
+
+    // Calculate total seats
+    const totalSeats = this.getTotalTickets();
+
+    // First calculate the fees
+    const feePercentage = this.convenienceFeePercentage > 0
+      ? this.convenienceFeePercentage / 100
+      : 0.06;
+
+    const calculatedConvenienceFee = this.totalAmount * feePercentage;
+    const calculatedGstTotal = calculatedConvenienceFee * 0.18; // 18% GST
+    const calculatedFinalAmount = this.totalAmount + calculatedConvenienceFee + calculatedGstTotal;
+
+    const checkRequest = {
+      event_id: this.eventId,
+      seat_selections: this.seatSelections.map(seat => ({
+        SeatTypeId: seat.SeatTypeId,
+        Quantity: seat.Quantity
+      })),
+      ticket_base_price: this.totalAmount / totalSeats,
+      total_seats: totalSeats,
+      subtotal: this.totalAmount,
+      // ADD THESE FIELDS - Pass the calculated final amount
+      convenience_fee: calculatedConvenienceFee,
+      gst_amount: calculatedGstTotal,
+      final_amount: calculatedFinalAmount
+    };
+
+    console.log('Coupon check request with final amount:', checkRequest);
+
+    this.apiService.checkAndApplyBestCoupon(checkRequest).subscribe({
+      next: (response) => {
+        this.isCheckingCoupon = false;
+        console.log('Coupon check response:', response);
+
+        if (response.status === 'Success' && response.data?.is_applied) {
+          this.couponResult = response.data;
+          console.log('Coupon applied:', this.couponResult);
+
+          // Update the displayed amounts
+          this.updateAmountsWithCoupon();
+
+          // Show success toast
+          // this.toastr.success(`${this.couponResult.coupon_name} applied! You saved ₹${this.couponResult.discount_value.toFixed(2)}`, 'Coupon Applied');
+        } else {
+          console.log('No coupon applicable');
+          this.couponResult = null;
+          this.updateAmountsWithCoupon(); // Recalculate without coupon
+        }
+      },
+      error: (error) => {
+        this.isCheckingCoupon = false;
+        console.error('Error checking coupon:', error);
+        this.couponResult = null;
+      }
+    });
+  }
 
   // Fix calculateBookingFee to always use latest coupon state
   calculateBookingFee(): void {
-  // Use dynamic convenience fee percentage from API, default to 6% if not available
-  const feePercentage = this.convenienceFeePercentage > 0
-    ? this.convenienceFeePercentage / 100
-    : 0.06;
+    // Use dynamic convenience fee percentage from API, default to 6% if not available
+    const feePercentage = this.convenienceFeePercentage > 0
+      ? this.convenienceFeePercentage / 100
+      : 0.06;
 
-  // Calculate convenience fee based on subtotal
-  this.convenienceFee = this.totalAmount * feePercentage;
+    // Calculate convenience fee based on subtotal
+    this.convenienceFee = this.totalAmount * feePercentage;
 
-  // Calculate GST on convenience fee only (18%)
-  this.gstTotal = this.convenienceFee * 0.18; // 18% GST on convenience fee
-  this.cgstAmount = this.gstTotal / 2; // Split for display if needed
-  this.sgstAmount = this.gstTotal / 2;
+    // Calculate GST on convenience fee only (18%)
+    this.gstTotal = this.convenienceFee * 0.18; // 18% GST on convenience fee
+    this.cgstAmount = this.gstTotal / 2; // Split for display if needed
+    this.sgstAmount = this.gstTotal / 2;
 
-  // Calculate final amount BEFORE coupon (subtotal + fees)
-  const amountBeforeCoupon = this.totalAmount + this.convenienceFee + this.gstTotal;
+    // Calculate final amount BEFORE coupon (subtotal + fees)
+    const amountBeforeCoupon = this.totalAmount + this.convenienceFee + this.gstTotal;
 
-  // If coupon applied, subtract discount from the amount with fees
-  if (this.couponResult?.is_applied) {
-    this.finalAmount = amountBeforeCoupon - this.couponResult.discount_value;
-    console.log('Final amount with coupon:', {
-      subtotal: this.totalAmount,
-      convenienceFee: this.convenienceFee,
-      gstTotal: this.gstTotal,
-      amountBeforeCoupon: amountBeforeCoupon,
-      discount: this.couponResult.discount_value,
-      finalAmount: this.finalAmount
-    });
-  } else {
-    this.finalAmount = amountBeforeCoupon;
+    // If coupon applied, subtract discount from the amount with fees
+    if (this.couponResult?.is_applied) {
+      this.finalAmount = amountBeforeCoupon - this.couponResult.discount_value;
+      console.log('Final amount with coupon:', {
+        subtotal: this.totalAmount,
+        convenienceFee: this.convenienceFee,
+        gstTotal: this.gstTotal,
+        amountBeforeCoupon: amountBeforeCoupon,
+        discount: this.couponResult.discount_value,
+        finalAmount: this.finalAmount
+      });
+    } else {
+      this.finalAmount = amountBeforeCoupon;
+    }
   }
-}
 
   // Update amounts with coupon
   updateAmountsWithCoupon(): void {
-  // Recalculate fees first (based on subtotal)
-  const feePercentage = this.convenienceFeePercentage > 0
-    ? this.convenienceFeePercentage / 100
-    : 0.06;
+    // Recalculate fees first (based on subtotal)
+    const feePercentage = this.convenienceFeePercentage > 0
+      ? this.convenienceFeePercentage / 100
+      : 0.06;
 
-  this.convenienceFee = this.totalAmount * feePercentage;
-  this.gstTotal = this.convenienceFee * 0.18;
-  this.cgstAmount = this.gstTotal / 2;
-  this.sgstAmount = this.gstTotal / 2;
+    this.convenienceFee = this.totalAmount * feePercentage;
+    this.gstTotal = this.convenienceFee * 0.18;
+    this.cgstAmount = this.gstTotal / 2;
+    this.sgstAmount = this.gstTotal / 2;
 
-  const amountBeforeCoupon = this.totalAmount + this.convenienceFee + this.gstTotal;
+    const amountBeforeCoupon = this.totalAmount + this.convenienceFee + this.gstTotal;
 
-  if (this.couponResult?.is_applied) {
-    // Use the discount from coupon result
-    this.finalAmount = amountBeforeCoupon - this.couponResult.discount_value;
-    
-    // Log for debugging
-    console.log('Amount calculation with coupon:', {
-      subtotal: this.totalAmount,
-      fees: this.convenienceFee + this.gstTotal,
-      amountBeforeCoupon,
-      discount: this.couponResult.discount_value,
-      finalAmount: this.finalAmount
-    });
-  } else {
-    this.finalAmount = amountBeforeCoupon;
+    if (this.couponResult?.is_applied) {
+      // Use the discount from coupon result
+      this.finalAmount = amountBeforeCoupon - this.couponResult.discount_value;
+
+      // Log for debugging
+      console.log('Amount calculation with coupon:', {
+        subtotal: this.totalAmount,
+        fees: this.convenienceFee + this.gstTotal,
+        amountBeforeCoupon,
+        discount: this.couponResult.discount_value,
+        finalAmount: this.finalAmount
+      });
+    } else {
+      this.finalAmount = amountBeforeCoupon;
+    }
   }
-}
 
   ngOnDestroy(): void {
     // Clean up localStorage when leaving page

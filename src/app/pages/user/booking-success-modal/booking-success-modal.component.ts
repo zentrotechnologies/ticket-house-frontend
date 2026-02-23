@@ -26,6 +26,17 @@ export class BookingSuccessModalComponent implements OnInit, OnDestroy {
     document.body.style.overflow = 'hidden';
     // Add escape key listener
     document.addEventListener('keydown', this.onEscapeKey.bind(this));
+
+    // 🔥 Fire Meta Purchase Event
+    if ((window as any).fbq && this.bookingDetails) {
+      (window as any).fbq('track', 'Purchase', {
+        value: this.bookingDetails.total_amount || 0,  // Use real amount
+        currency: 'INR',
+        content_name: this.bookingDetails?.event_name,
+        content_ids: [this.bookingDetails?.event_id],
+        content_type: 'product'
+      });
+    }
   }
   
   ngOnDestroy(): void {

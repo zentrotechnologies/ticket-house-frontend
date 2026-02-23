@@ -103,7 +103,7 @@
 <div *ngIf="showAuthModal" class="modal-overlay">
   <div class="modal-content auth-modal">
     <div class="modal-header">
-      <h3>{{ isLoginMode ? 'Sign In' : 'Create Account' }}</h3>
+      <h3>{{ isLoginMode ? 'Sign In' : 'Create an account to confirm your booking' }}</h3>
       <button class="modal-close" (click)="onCloseAuthModal()">×</button>
     </div>
     <div class="modal-body">
@@ -163,7 +163,7 @@
 
         <button class="auth-btn" (click)="sendForgotPasswordOTP()" [disabled]="isLoading || !forgotPasswordEmail">
           <span *ngIf="!isLoading">Send OTP</span>
-          <span *ngIf="isLoading">Sending OTP...</span>
+          <span *ngIf="isLoading">Send OTP</span>
         </button>
 
         <div class="auth-footer">
@@ -172,7 +172,7 @@
       </div>
 
       <!-- Forgot Password - OTP Verification Step -->
-      <div *ngIf="isLoginMode && showForgotPassword && forgotPasswordStep === 2" class="otp-verification-section">
+      <!-- <div *ngIf="isLoginMode && showForgotPassword && forgotPasswordStep === 2" class="otp-verification-section">
         <div class="verification-header">
           <h4>Verify OTP</h4>
           <p>Enter the 4-digit code sent to<br>
@@ -200,6 +200,65 @@
             [disabled]="!isForgotOtpComplete() || isLoading">
             <span *ngIf="!isLoading">Verify OTP</span>
             <span *ngIf="isLoading">Verifying...</span>
+          </button>
+        </div>
+
+        <div class="auth-footer">
+          <a (click)="backToForgotStep1()">← Back to Email</a>
+        </div>
+      </div> -->
+      <!-- Forgot Password - OTP Verification Step -->
+      <div *ngIf="isLoginMode && showForgotPassword && forgotPasswordStep === 2" class="otp-verification-section">
+        <div class="verification-header">
+          <h4>Verify OTP</h4>
+          <p>Enter the 4-digit code sent to<br>
+            <strong>{{ forgotPasswordEmail }}</strong>
+          </p>
+        </div>
+
+        <!-- OTP Input Fields - Always visible -->
+        <div class="otp-input-container">
+          <div class="otp-inputs">
+            <input *ngFor="let i of [0,1,2,3]; let idx = index" type="text" maxlength="1"
+              [(ngModel)]="forgotPasswordOtpDigits[idx]" (input)="onForgotOtpInput($event, idx)"
+              (keydown)="onForgotOtpKeyDown($event, idx)" [disabled]="isLoading || forgotPasswordOtpRequestInProgress"
+              [class.sending]="forgotPasswordOtpRequestInProgress" class="otp-digit">
+          </div>
+        </div>
+
+        <!-- Show "Sending OTP" timer while waiting -->
+        <div *ngIf="forgotPasswordOtpRequestInProgress" class="otp-request-timer">
+          <div class="timer-count">
+            Expect OTP in {{ formatForgotPasswordOtpRequestTimer() }}
+          </div>
+          <div class="timer-progress">
+            <div class="progress-bar" [style.width]="(forgotPasswordOtpRequestTimer/30)*100 + '%'"></div>
+          </div>
+        </div>
+
+        <!-- Show OTP expiry timer after OTP is sent -->
+        <div class="otp-timer" *ngIf="!forgotPasswordOtpRequestInProgress && otpTimer > 0">
+          OTP expires in: {{ formatOtpTimer() }}
+        </div>
+
+        <!-- Show retry option if OTP request fails -->
+        <div *ngIf="!forgotPasswordOtpRequestInProgress && otpTimer === 0 && !forgotPasswordOtpId" class="otp-retry">
+          <p class="text-warning">Didn't receive OTP?</p>
+          <button class="resend-btn" (click)="resendForgotPasswordOTP()" [disabled]="isLoading">
+            Resend OTP
+          </button>
+        </div>
+
+        <div class="otp-actions">
+          <button class="resend-btn" (click)="resendForgotPasswordOTP()"
+            [disabled]="otpTimer > 0 || isLoading || forgotPasswordOtpRequestInProgress">
+            <span *ngIf="!forgotPasswordOtpRequestInProgress">Resend OTP</span>
+            <span *ngIf="forgotPasswordOtpRequestInProgress">Resend OTP</span>
+          </button>
+          <button class="verify-btn" (click)="verifyForgotPasswordOTP()"
+            [disabled]="!isForgotOtpComplete() || isLoading || forgotPasswordOtpRequestInProgress">
+            <span *ngIf="!isLoading">Verify OTP</span>
+            <span *ngIf="isLoading">Verify OTP</span>
           </button>
         </div>
 
@@ -286,22 +345,22 @@
       <!-- Step 1: Signup Form -->
       <div *ngIf="!isLoginMode && signupStep === 1" class="signup-section">
         <div class="form-group">
-          <input type="text" [(ngModel)]="signupFirstName" placeholder="First Name" [disabled]="isLoading"
+          <input type="text" [(ngModel)]="signupFirstName" placeholder="Name" [disabled]="isLoading"
             #firstName="ngModel" required minlength="2">
           <div *ngIf="firstName.invalid && (firstName.dirty || firstName.touched)" class="validation-error">
-            <small *ngIf="firstName.errors?.['required']">First name is required</small>
-            <small *ngIf="firstName.errors?.['minlength']">First name must be at least 2 characters</small>
+            <small *ngIf="firstName.errors?.['required']">Name is required</small>
+            <small *ngIf="firstName.errors?.['minlength']">Name must be at least 2 characters</small>
           </div>
         </div>
 
-        <div class="form-group">
+        <!-- <div class="form-group">
           <input type="text" [(ngModel)]="signupLastName" placeholder="Last Name" [disabled]="isLoading"
             #lastName="ngModel" required minlength="2">
           <div *ngIf="lastName.invalid && (lastName.dirty || lastName.touched)" class="validation-error">
             <small *ngIf="lastName.errors?.['required']">Last name is required</small>
             <small *ngIf="lastName.errors?.['minlength']">Last name must be at least 2 characters</small>
           </div>
-        </div>
+        </div> -->
 
         <div class="form-group">
           <input type="email" [(ngModel)]="signupEmail" placeholder="Email" [disabled]="isLoading" #email="ngModel"
@@ -313,8 +372,8 @@
         </div>
 
         <div class="form-group password-field">
-          <input [type]="showSignupPassword ? 'text' : 'password'" [(ngModel)]="signupPassword" placeholder="Password"
-            [disabled]="isLoading" #password="ngModel" required>
+          <input [type]="showSignupPassword ? 'text' : 'password'" [(ngModel)]="signupPassword"
+            placeholder="Set your password" [disabled]="isLoading" #password="ngModel" required>
           <button type="button" class="password-toggle" (click)="showSignupPassword = !showSignupPassword"
             [attr.aria-label]="showSignupPassword ? 'Hide password' : 'Show password'">
             <!-- <i class="fa-solid" [class.fa-eye]="!showSignupPassword" [class.fa-eye-slash]="showSignupPassword"></i> -->
@@ -368,9 +427,9 @@
         </div>
 
         <button class="auth-btn" (click)="onSignupStep1()"
-          [disabled]="isLoading || !signupFirstName || !signupLastName || !signupEmail || !isPasswordValid() || !isValidSignupStep1()">
+          [disabled]="isLoading || !signupFirstName || !signupEmail || !isPasswordValid() || !isValidSignupStep1()">
           <span *ngIf="!isLoading">Send OTP</span>
-          <span *ngIf="isLoading">Sending OTP...</span>
+          <span *ngIf="isLoading">Send OTP</span>
         </button>
 
         <div class="auth-footer">
@@ -380,7 +439,7 @@
         </div>
       </div>
       <!-- Step 2: OTP Verification -->
-      <div *ngIf="signupStep === 2 || showOTPVerification" class="otp-verification-section">
+      <!-- <div *ngIf="signupStep === 2 || showOTPVerification" class="otp-verification-section">
         <div class="verification-header">
           <h4>Verify Your Email</h4>
           <p>Enter the 4-digit code sent to<br>
@@ -406,6 +465,68 @@
             <span *ngIf="isLoading">Verifying...</span>
           </button>
         </div>
+        <div class="auth-footer" *ngIf="signupStep === 2">
+          <a (click)="goBackToStep1()">← Back to Signup</a>
+        </div>
+      </div> -->
+      <!-- Step 2: OTP Verification -->
+      <div *ngIf="signupStep === 2 || showOTPVerification" class="otp-verification-section">
+        <div class="verification-header">
+          <h4>Verify Your Email</h4>
+          <p>Enter the 4-digit code sent to<br>
+            <strong>{{ signupEmail || loginEmail }}</strong>
+          </p>
+        </div>
+
+        <!-- OTP Input Fields - Always visible -->
+        <div class="otp-input-container">
+          <div class="otp-inputs">
+            <input *ngFor="let i of [0,1,2,3]; let idx = index" type="text" maxlength="1" [(ngModel)]="otpDigits[idx]"
+              (input)="onOtpInput($event, idx)" (keydown)="onOtpKeyDown($event, idx)"
+              [disabled]="isLoading || otpRequestInProgress" [class.sending]="otpRequestInProgress" class="otp-digit">
+          </div>
+        </div>
+
+        <!-- Show "Sending OTP" timer while waiting -->
+        <div *ngIf="otpRequestInProgress" class="otp-request-timer">
+          <!-- <div class="timer-message d-none">
+            <i class="bi bi-hourglass-split"></i>
+            Sending OTP to your email...
+          </div> -->
+          <div class="timer-count">
+            Expect OTP in {{ formatOtpRequestTimer() }}
+          </div>
+          <div class="timer-progress">
+            <div class="progress-bar" [style.width]="(otpRequestTimer/30)*100 + '%'"></div>
+          </div>
+        </div>
+
+        <!-- Show OTP expiry timer after OTP is sent -->
+        <div class="otp-timer" *ngIf="!otpRequestInProgress && otpTimer > 0">
+          OTP expires in: {{ formatOtpTimer() }}
+        </div>
+
+        <!-- Show retry option if OTP request fails -->
+        <div *ngIf="!otpRequestInProgress && otpTimer === 0 && !currentOtpId" class="otp-retry">
+          <p class="text-warning">Didn't receive OTP?</p>
+          <button class="resend-btn" (click)="resendOTP()" [disabled]="isLoading">
+            Resend OTP
+          </button>
+        </div>
+
+        <div class="otp-actions">
+          <button class="resend-btn" (click)="resendOTP()"
+            [disabled]="otpTimer > 0 || isLoading || otpRequestInProgress">
+            <span *ngIf="!otpRequestInProgress">Resend OTP</span>
+            <span *ngIf="otpRequestInProgress">Resend OTP</span>
+          </button>
+          <button class="verify-btn" (click)="verifyOTP()"
+            [disabled]="!isOtpComplete() || isLoading || otpRequestInProgress">
+            <span *ngIf="!isLoading">Verify OTP</span>
+            <span *ngIf="isLoading">Verify OTP</span>
+          </button>
+        </div>
+
         <div class="auth-footer" *ngIf="signupStep === 2">
           <a (click)="goBackToStep1()">← Back to Signup</a>
         </div>

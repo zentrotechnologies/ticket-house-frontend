@@ -379,8 +379,7 @@
                     <div class="col" *ngFor="let gallery of galleries; let i = index">
                       <div class="gallery-item position-relative">
                         <img [src]="gallery.event_img" class="img-fluid rounded"
-                          style="height: 100px; width: 100%; object-fit: cover"
-                          onerror="this.src='assets/images/default-gallery.png'" />
+                          style="height: 100px; width: 100%; object-fit: cover" />
                         <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1"
                           (click)="removeGallery(i)">
                           <i class="fa fa-times"></i>

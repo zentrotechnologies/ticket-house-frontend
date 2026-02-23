@@ -233,6 +233,11 @@
                             <span class="sidebar-price-value">{{ getDisplayPrice() }}</span>
                             <span class="sidebar-price-range">{{ getPriceRangeDisplay() }}</span>
                         </div>
+
+                        <!-- ADD THIS - Filling Fast Badge -->
+                        <div class="filling-fast-badge">
+                            <span class="badge-text">Filling Fast</span>
+                        </div>
                         <!-- <button class="book-now-btn" (click)="onBookNow()">
                             Book Now <span class="btn-arrow">›</span>
                         </button> -->
@@ -266,6 +271,11 @@
                     <span class="mobile-price-label" *ngIf="hasValidPrice()">Starting from</span>
                     <span class="mobile-price-value">{{ getDisplayPrice() }}</span>
                     <span class="mobile-price-range">{{ getPriceRangeDisplay() }}</span>
+                </div>
+
+                <!-- ADD THIS - Mobile Filling Fast Badge -->
+                <div class="mobile-filling-fast-badge">
+                    <span class="badge-text">Filling Fast</span>
                 </div>
                 <!-- <button class="mobile-book-btn" (click)="onBookNow()">
                     Book Now <span class="btn-arrow">›</span>

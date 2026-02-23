@@ -148,7 +148,10 @@
                     (event.banner_image ||
                       'https://images.unsplash.com/photo-1526178611801-4f9d2f6d1a6c?w=800&q=60') +
                     ')'
-                  "></div>
+                  ">
+                  <!-- Add this pill badge -->
+                  <div class="pill-badge">Filling Fast</div>
+                </div>
                 <p class="meta">
                   {{ event.formatted_date || formatEventDate(event.event_date) }},
                   {{ event.start_time }}

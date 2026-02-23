@@ -381,7 +381,7 @@
 
 /* Simplified Sidebar - Only Price and Book Now */
 .sidebar-price-section {
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
   text-align: center;
 }
 
@@ -2016,4 +2016,85 @@ html {
   white-space: nowrap;
   z-index: 10;
   pointer-events: none;
+}
+
+/* Filling Fast Badge Styles */
+.filling-fast-badge {
+    /* margin: 12px 0 8px 0; */
+    text-align: center;
+    /* animation: pulse 2s infinite; */
+}
+
+.badge-text {
+    display: inline-block;
+    /* background: linear-gradient(135deg, #ff416c, #ff4b2b); */
+    color: #c62828;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 8px 20px;
+    border-radius: 30px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    /* box-shadow: 0 4px 15px rgba(255, 75, 43, 0.3); */
+    /* border: 1px solid rgba(255, 255, 255, 0.3); */
+    /* backdrop-filter: blur(2px); */
+    white-space: nowrap;
+}
+
+/* Mobile Filling Fast Badge */
+.mobile-filling-fast-badge {
+    margin: 0 10px;
+}
+
+.mobile-filling-fast-badge .badge-text {
+    font-size: 12px;
+    padding: 6px 12px;
+    white-space: nowrap;
+}
+
+/* Pulse Animation */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 4px 15px rgba(255, 75, 43, 0.3);
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 8px 25px rgba(255, 75, 43, 0.5);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 4px 15px rgba(255, 75, 43, 0.3);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .filling-fast-badge .badge-text {
+        font-size: 13px;
+        padding: 6px 16px;
+    }
+    
+    .mobile-filling-fast-badge .badge-text {
+        font-size: 11px;
+        padding: 4px 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .filling-fast-badge .badge-text {
+        font-size: 12px;
+        padding: 6px 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mobile-filling-fast-badge {
+        margin: 0 5px;
+    }
+    
+    .mobile-filling-fast-badge .badge-text {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
 }

@@ -81,7 +81,8 @@
 }
 
 .date-pill {
-  background: linear-gradient(135deg, #ffd700, #ffa500);
+  /* background: linear-gradient(135deg, #ffd700, #ffa500); */
+  background: #c62828;
   color: #000;
   display: inline-block;
   padding: 14px 32px;
@@ -1289,4 +1290,52 @@
 .location-icon {
   font-size: 14px;
   margin-right: 4px;
+}
+
+/* Pill Badge for "Filling Fast" */
+.event-card .poster {
+  position: relative;
+  overflow: visible; /* Change from hidden to visible to allow badge to be seen */
+}
+
+.pill-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 30px;
+  z-index: 10;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 10px rgba(255, 75, 43, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(2px);
+  animation: pulse 2s infinite;
+  white-space: nowrap;
+}
+
+/* Optional: Add a subtle animation */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 4px 10px rgba(255, 75, 43, 0.3);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 6px 15px rgba(255, 75, 43, 0.5);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 4px 10px rgba(255, 75, 43, 0.3);
+  }
+}
+
+/* Optional: Different color variation for "Sold Out" events */
+.event-card .meta.price span:contains("Sold Out") + .pill-badge {
+  background: linear-gradient(135deg, #666, #444);
+  animation: none;
 }
