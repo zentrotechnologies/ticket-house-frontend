@@ -275,3 +275,9 @@ body {
 body {
   isolation: isolate; /* This helps with stacking context */
 }
+.sub-heading-text{
+color: #ffffff;
+    font-size: 12px;
+    font-weight: 400;
+    padding: 5px 0;
+}
