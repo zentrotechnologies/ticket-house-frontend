@@ -115,6 +115,13 @@
                                 <span class="breakdown-label">GST:</span>
                                 <span class="breakdown-value">₹{{ bookingDetails.gst_amount || 0 }}</span>
                             </div>
+                            <!-- NEW: Coupon Applied Row - Only shown if coupon was applied -->
+                            <div class="breakdown-row coupon-row" *ngIf="bookingDetails?.discount_amount && bookingDetails?.coupon_code_applied">
+                                <span class="breakdown-label coupon-label">
+                                    Coupon Applied (<span class="coupon-code">{{ bookingDetails.coupon_code_applied }}</span>):
+                                </span>
+                                <span class="breakdown-value coupon-discount">- ₹{{ bookingDetails.discount_amount }}</span>
+                            </div>
                             <div class="breakdown-row total-row">
                                 <span class="breakdown-label">Total Final Value:</span>
                                 <span class="breakdown-value final-value">₹{{ bookingDetails.final_amount || bookingDetails.total_amount }}</span>

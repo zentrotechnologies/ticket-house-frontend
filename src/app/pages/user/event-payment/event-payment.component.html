@@ -210,13 +210,14 @@
             <div class="coupon-applied">
               <div class="d-flex justify-content-between align-items-center">
                 <div>
-                  <span class="coupon-badge d-none">✓</span>
+                  <!-- <span class="coupon-badge d-none">✓</span>
                   <span class="coupon-name">{{ couponResult.coupon_name }}</span>
-                  <span class="coupon-code">({{ couponResult.coupon_code }})</span>
+                  <span class="coupon-code">({{ couponResult.coupon_code }})</span> -->
+                  <div class="coupon-message">{{ couponResult.message }}</div>
                 </div>
                 <span class="coupon-discount">-₹{{ couponResult.discount_value | number:'1.2-2' }}</span>
               </div>
-              <div class="coupon-message">{{ couponResult.message }}</div>
+              <!-- <div class="coupon-message">{{ couponResult.message }}</div> -->
             </div>
           </div>
 

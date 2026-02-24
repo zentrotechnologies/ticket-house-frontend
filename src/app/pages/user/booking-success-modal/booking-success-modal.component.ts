@@ -141,12 +141,39 @@ export class BookingSuccessModalComponent implements OnInit, OnDestroy {
     });
   }
   
+  // viewBookingDetails(): void {
+  //   this.closeModal();
+  //   if (this.bookingDetails?.booking_id) {
+  //     this.router.navigate(['/booking-details', this.bookingDetails.booking_id]);
+  //   } else {
+  //     this.router.navigate(['/my-bookings']);
+  //   }
+  // }
+
   viewBookingDetails(): void {
     this.closeModal();
-    if (this.bookingDetails?.booking_id) {
-      this.router.navigate(['/booking-details', this.bookingDetails.booking_id]);
+    
+    // Check if we have user_id in bookingDetails
+    if (this.bookingDetails?.user_id) {
+      // Navigate to my-bookings with the user ID
+      this.router.navigate(['/my-bookings', this.bookingDetails.user_id]);
     } else {
-      this.router.navigate(['/my-bookings']);
+      // Fallback: try to get user_id from localStorage or redirect to events
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          if (user?.user_id) {
+            this.router.navigate(['/my-bookings', user.user_id]);
+            return;
+          }
+        } catch (e) {
+          console.error('Error parsing user from localStorage', e);
+        }
+      }
+      
+      // If all else fails, go to events page
+      this.router.navigate(['/events']);
     }
   }
   

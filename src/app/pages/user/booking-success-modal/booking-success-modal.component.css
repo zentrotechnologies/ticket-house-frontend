@@ -733,3 +733,42 @@
     font-size: 13px;
   }
 }
+
+/* Coupon Row Styles */
+.coupon-row {
+    background-color: rgba(16, 185, 129, 0.05);
+    border-radius: 4px;
+    padding: 4px 8px;
+    margin: 4px 0;
+    border-left: 3px solid #10b981;
+}
+
+.coupon-label {
+    color: #10b981;
+    font-weight: 600;
+}
+
+.coupon-code {
+    background: linear-gradient(135deg, rgb(146, 52, 234) 0%, rgb(226, 54, 163) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 700;
+    padding: 0 2px;
+}
+
+.coupon-discount {
+    color: #10b981;
+    font-weight: 700;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .coupon-row {
+        padding: 3px 6px;
+    }
+    
+    .coupon-label {
+        font-size: 11px;
+    }
+}
