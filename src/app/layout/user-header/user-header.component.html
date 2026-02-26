@@ -99,6 +99,32 @@
   </div>
 </header>
 
+<div class="coupon-marque" [class.scrolled]="isScrolled">
+  <div class="marquee-track">
+
+    <div class="marquee-content">
+      <span class="offer-badge">🔥 LIMITED OFFER</span>
+      <span class="offer-text">
+        Buy <strong>any 5 or more tickets</strong> get upto 
+        <span class="highlight">₹500 OFF</span> •
+        
+        <span class="tnc">T&C apply</span>
+      </span>
+    </div>
+
+    <!-- Duplicate for seamless loop -->
+    <div class="marquee-content">
+      <span class="offer-badge">🔥 LIMITED OFFER</span>
+      <span class="offer-text">
+        Buy <strong>any 5 or more tickets</strong> get upto 
+        <span class="highlight">₹500 OFF</span> •
+        
+        <span class="tnc">T&C apply</span>
+      </span>
+    </div>
+
+  </div>
+</div>
 <!-- Auth Modal -->
 <div *ngIf="showAuthModal" class="modal-overlay">
   <div class="modal-content auth-modal">

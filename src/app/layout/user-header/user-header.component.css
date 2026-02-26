@@ -42,7 +42,102 @@
   /* Remove animation to prevent any visible movement */
   animation: none;
 }
+.coupon-marque {
+  background: black;
+  color: white;
+  padding: 6px 0;
+}
 
+/* When header becomes fixed */
+.coupon-marque.scrolled {
+  position: fixed;
+  top: 90px; /* SAME as header height */
+  left: 0;
+  right: 0;
+  z-index: 1999;
+}
+.coupon-marque.scrolled {
+  top: 90px; /* match your compact header height */
+}
+.coupon-marque {
+  position: relative;
+  overflow: hidden;
+  padding: 8px 0;
+  background: linear-gradient(90deg, #111, #1a1a1a, #111);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Scrolling animation */
+.coupon-marque {
+  overflow: hidden;
+  position: relative;
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: scrollLoop 12s linear infinite;
+}
+
+.marquee-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-right: 60px;
+  white-space: nowrap;
+
+  min-width: 100%;   /* 🔥 KEY FIX */
+  justify-content: center; /* optional for better alignment */
+}
+
+/* Seamless infinite scroll */
+@keyframes scrollLoop {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* Badge */
+.offer-badge {
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  box-shadow: 0 0 12px rgba(255, 75, 43, 0.6);
+  animation: pulseBadge 1.8s infinite;
+}
+
+@keyframes pulseBadge {
+  0% { box-shadow: 0 0 8px rgba(255, 75, 43, 0.4); }
+  50% { box-shadow: 0 0 18px rgba(255, 75, 43, 0.8); }
+  100% { box-shadow: 0 0 8px rgba(255, 75, 43, 0.4); }
+}
+
+/* Main text */
+.offer-text {
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Highlight discount */
+.highlight {
+  background: linear-gradient(135deg, #ffd700, #ffae00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.highlight.big {
+  font-size: 16px;
+  text-shadow: 0 0 10px rgba(255, 174, 0, 0.5);
+}
 /* OPTIONAL: Very subtle effect when scrolled - barely noticeable */
 .audience-header.scrolled {
   /* Just a hint of extra transparency - almost invisible */
@@ -795,7 +890,6 @@
 
 /* When header is fixed, add padding to the next element */
 .audience-header.scrolled ~ * {
-  padding-top: 70px;
   transition: padding-top 0.3s ease;
 }
 
@@ -953,10 +1047,7 @@
     margin: 0 1px;
   }
   
-  /* Adjust content padding for fixed header */
-  .audience-header.scrolled ~ * {
-    padding-top: 55px;
-  }
+
 }
 
 /* Print styles */
@@ -1239,10 +1330,9 @@
     right: -10px;
   }
   
-  /* Adjust content padding for fixed header */
-  .audience-header.scrolled ~ * {
-    padding-top: 55px;
-  }
+.coupon-marque.scrolled {
+    top: 50px;
+}
 }
 
 /* Desktop styles - hide mobile icon and show welcome text */
@@ -1558,4 +1648,10 @@
     font-size: 13px;
     padding: 8px 16px;
   }
+}
+.tnc {
+  font-size: 14px;
+  opacity: 0.7;
+  margin-left: 8px;
+  letter-spacing: 0.3px;
 }
