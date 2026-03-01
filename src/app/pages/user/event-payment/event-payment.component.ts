@@ -1007,12 +1007,16 @@ export class EventPaymentComponent implements OnInit {
       accent: '#ef4343', // Red
     };
 
+    // Sanitize the event title - remove any special characters that might cause issues
+    const sanitizedTitle = this.eventTitle ? this.eventTitle.replace(/[^\w\s-]/g, '').trim() : 'Event';
+
     const options = {
       key: razorpayKey,
       amount: Math.round(orderData.amount * 100),
       currency: orderData.currency || 'INR',
       name: orderData.companyName || 'TicketHouse',
-      description: `Payment for ${this.eventTitle}`,
+      // description: `Payment for ${this.eventTitle}`,
+      description: `Payment for ${sanitizedTitle}`, // Use sanitized title
       order_id: orderData.orderId,
       image: 'https://tickethouse.in/assets/th_transparent_logo.png', // Add your logo URL here
       handler: (response: any) => {

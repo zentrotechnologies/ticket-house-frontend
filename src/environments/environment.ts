@@ -3,12 +3,11 @@
     encb64: 'ZW5jcnlwdGlvbl9raXRvcnRfaWxfZ2NtX2VuY3J5cHQ=',
     authmode: 0,
     encmode: 0,
-    reqexpirymode: 0,
-    // THapibaseurl: 'https://localhost:7289/',
-    THapibaseurl: 'https://api.tickethouse.in/',
-    // kitapibaseurl: 'https://api.keepintouch.life/kitversion01/',
-    // kitapiwaurl: 'https://wahost.keepintouch.life/',
-    googlclientid: '799019299860-p005irmef0hrjp3drn62ij6tuu30v085.apps.googleusercontent.com',
+    // reqexpirymode: 0,
+    // THapibaseurl: 'https://localhost:7289/',        //local
+    // THapibaseurl: 'https://api.tickethouse.in/', //Live Server
+    THapibaseurl: 'https://uat-api.tickethouse.in/', //UAT Server
+    // googlclientid: '799019299860-p005irmef0hrjp3drn62ij6tuu30v085.apps.googleusercontent.com',
     appVersion: '1.0',
     USERDATA_KEY: 'authf649fc9a5f55',
     isMockEnabled: false,

@@ -4,10 +4,9 @@
     authmode: 0,
     encmode: 0,
     reqexpirymode: 0,
-    // THapibaseurl: 'https://localhost:7289/',
-    THapibaseurl: 'https://api.tickethouse.in/',
-    // kitapibaseurl: 'https://kitapp.ortdemo.com/kitversion01/',
-    // kitapiwaurl: 'https://kitapp.ortdemo.com/',
+    // THapibaseurl: 'https://localhost:7289/',        //local
+    // THapibaseurl: 'https://api.tickethouse.in/', //Live Server
+    THapibaseurl: 'https://uat-api.tickethouse.in/', //UAT Server
     // googlclientid: '799019299860-kc86am2cokfgabuqspr3ts477ronttq5.apps.googleusercontent.com',
     appVersion: '1.0',
     USERDATA_KEY: 'authf649fc9a5f55',
