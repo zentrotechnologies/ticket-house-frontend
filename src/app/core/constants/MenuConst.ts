@@ -47,7 +47,7 @@ export const MENU_ITEMS: MenuItem[] = [
     title: 'Banner Management',
     icon: 'image', // You can change the icon as needed
     route: '/admin/banner-management',
-    roles: [1, 2] // Role 1 and 2 can access
+    roles: [1] // Role 1 and 2 can access
   },
   {
     title: 'Testimonial',
