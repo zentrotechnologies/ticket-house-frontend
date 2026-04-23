@@ -1,6 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+
 import {
   EventCompleteResponseModel,
   EventDetailsModel,
@@ -18,11 +21,244 @@ import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-admin-events',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, CKEditorModule],
   templateUrl: './admin-events.component.html',
   styleUrl: './admin-events.component.css',
 })
 export class AdminEventsComponent implements OnInit {
+  // CKEditor configuration - using default import (not namespace import)
+  public Editor = ClassicEditor as any;
+
+  // CKEditor configuration options (using 'any' to avoid type conflicts)
+  public editorConfig: any = {
+    toolbar: {
+      items: [
+        'heading',
+        '|',
+        'bold',
+        'italic',
+        'underline',
+        'strikethrough',
+        'subscript',
+        'superscript',
+        'code',
+        '|',
+        'fontSize',
+        'fontFamily',
+        'fontColor',
+        'fontBackgroundColor',
+        'highlight',
+        '|',
+        'alignment',
+        '|',
+        'bulletedList',
+        'numberedList',
+        'todoList',
+        '|',
+        'outdent',
+        'indent',
+        '|',
+        'blockQuote',
+        'insertTable',
+        'mediaEmbed',
+        'link',
+        'imageUpload',
+        '|',
+        'horizontalLine',
+        'pageBreak',
+        '|',
+        'specialCharacters',
+        '|',
+        'undo',
+        'redo',
+        '|',
+        'removeFormat',
+        'sourceEditing'
+      ]
+    },
+    table: {
+      contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells', 'tableProperties', 'tableCellProperties']
+    },
+    image: {
+      toolbar: ['imageTextAlternative', 'imageStyle:full', 'imageStyle:side', 'linkImage']
+    },
+    heading: {
+      options: [
+        { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
+        { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
+        { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
+        { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' },
+        { model: 'heading4', view: 'h4', title: 'Heading 4', class: 'ck-heading_heading4' },
+        { model: 'heading5', view: 'h5', title: 'Heading 5', class: 'ck-heading_heading5' },
+        { model: 'heading6', view: 'h6', title: 'Heading 6', class: 'ck-heading_heading6' }
+      ]
+    },
+    fontSize: {
+      options: ['tiny', 'small', 'default', 'big', 'huge'],
+      supportAllValues: true
+    },
+    fontFamily: {
+      options: [
+        'default',
+        'Arial, Helvetica, sans-serif',
+        'Courier New, Courier, monospace',
+        'Georgia, serif',
+        'Lucida Sans Unicode, Lucida Grande, sans-serif',
+        'Tahoma, Geneva, sans-serif',
+        'Times New Roman, Times, serif',
+        'Trebuchet MS, Helvetica, sans-serif',
+        'Verdana, Geneva, sans-serif'
+      ],
+      supportAllValues: true
+    },
+    fontColor: {
+      colors: [
+        { color: 'hsl(0, 0%, 0%)', label: 'Black' },
+        { color: 'hsl(0, 0%, 30%)', label: 'Dim grey' },
+        { color: 'hsl(0, 0%, 60%)', label: 'Grey' },
+        { color: 'hsl(0, 0%, 90%)', label: 'Light grey' },
+        { color: 'hsl(0, 0%, 100%)', label: 'White', hasBorder: true },
+        { color: 'hsl(0, 75%, 60%)', label: 'Red' },
+        { color: 'hsl(30, 75%, 60%)', label: 'Orange' },
+        { color: 'hsl(60, 75%, 60%)', label: 'Yellow' },
+        { color: 'hsl(90, 75%, 60%)', label: 'Light green' },
+        { color: 'hsl(120, 75%, 60%)', label: 'Green' },
+        { color: 'hsl(150, 75%, 60%)', label: 'Aquamarine' },
+        { color: 'hsl(180, 75%, 60%)', label: 'Turquoise' },
+        { color: 'hsl(210, 75%, 60%)', label: 'Light blue' },
+        { color: 'hsl(240, 75%, 60%)', label: 'Blue' },
+        { color: 'hsl(270, 75%, 60%)', label: 'Purple' }
+      ]
+    },
+    fontBackgroundColor: {
+      colors: [
+        { color: 'hsl(0, 0%, 0%)', label: 'Black' },
+        { color: 'hsl(0, 0%, 30%)', label: 'Dim grey' },
+        { color: 'hsl(0, 0%, 60%)', label: 'Grey' },
+        { color: 'hsl(0, 0%, 90%)', label: 'Light grey' },
+        { color: 'hsl(0, 75%, 60%)', label: 'Red' },
+        { color: 'hsl(30, 75%, 60%)', label: 'Orange' },
+        { color: 'hsl(60, 75%, 60%)', label: 'Yellow' },
+        { color: 'hsl(90, 75%, 60%)', label: 'Light green' },
+        { color: 'hsl(120, 75%, 60%)', label: 'Green' },
+        { color: 'hsl(180, 75%, 60%)', label: 'Turquoise' },
+        { color: 'hsl(210, 75%, 60%)', label: 'Light blue' },
+        { color: 'hsl(240, 75%, 60%)', label: 'Blue' },
+        { color: 'hsl(270, 75%, 60%)', label: 'Purple' }
+      ]
+    },
+    alignment: {
+      options: ['left', 'center', 'right', 'justify']
+    },
+    placeholder: 'Enter event description here...',
+    link: {
+      addTargetToExternalLinks: true,
+      defaultProtocol: 'https://'
+    },
+    list: {
+      properties: {
+        styles: true,
+        startIndex: true,
+        reversed: true
+      }
+    },
+    codeBlock: {
+      languages: [
+        { language: 'plaintext', label: 'Plain text' },
+        { language: 'html', label: 'HTML' },
+        { language: 'css', label: 'CSS' },
+        { language: 'javascript', label: 'JavaScript' },
+        { language: 'typescript', label: 'TypeScript' },
+        { language: 'json', label: 'JSON' },
+        { language: 'sql', label: 'SQL' },
+        { language: 'python', label: 'Python' },
+        { language: 'java', label: 'Java' },
+        { language: 'csharp', label: 'C#' },
+        { language: 'php', label: 'PHP' }
+      ]
+    },
+    language: 'en'
+  };
+
+  public termsEditorConfig: any = {
+    toolbar: {
+      items: [
+        'heading',
+        '|',
+        'bold',
+        'italic',
+        'underline',
+        'strikethrough',
+        'subscript',
+        'superscript',
+        '|',
+        'fontSize',
+        'fontFamily',
+        'fontColor',
+        'fontBackgroundColor',
+        'highlight',
+        '|',
+        'alignment',
+        '|',
+        'bulletedList',
+        'numberedList',
+        '|',
+        'blockQuote',
+        'insertTable',
+        'link',
+        '|',
+        'horizontalLine',
+        '|',
+        'specialCharacters',
+        '|',
+        'undo',
+        'redo',
+        '|',
+        'removeFormat'
+      ]
+    },
+    table: {
+      contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells', 'tableProperties', 'tableCellProperties']
+    },
+    heading: {
+      options: [
+        { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
+        { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
+        { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
+        { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' },
+        { model: 'heading4', view: 'h4', title: 'Heading 4', class: 'ck-heading_heading4' },
+        { model: 'heading5', view: 'h5', title: 'Heading 5', class: 'ck-heading_heading5' },
+        { model: 'heading6', view: 'h6', title: 'Heading 6', class: 'ck-heading_heading6' }
+      ]
+    },
+    fontSize: {
+      options: ['tiny', 'small', 'default', 'big', 'huge'],
+      supportAllValues: true
+    },
+    fontFamily: {
+      options: [
+        'default',
+        'Arial, Helvetica, sans-serif',
+        'Courier New, Courier, monospace',
+        'Georgia, serif',
+        'Lucida Sans Unicode, Lucida Grande, sans-serif',
+        'Tahoma, Geneva, sans-serif',
+        'Times New Roman, Times, serif',
+        'Trebuchet MS, Helvetica, sans-serif',
+        'Verdana, Geneva, sans-serif'
+      ],
+      supportAllValues: true
+    },
+    alignment: {
+      options: ['left', 'center', 'right', 'justify']
+    },
+    placeholder: 'Enter terms and conditions here...',
+    link: {
+      addTargetToExternalLinks: true,
+      defaultProtocol: 'https://'
+    }
+  };
+
   @ViewChild('artistPhotoInput') artistPhotoInput!: ElementRef<HTMLInputElement>;
   @ViewChild('artistPhotoInputEdit') artistPhotoInputEdit!: ElementRef<HTMLInputElement>;
   @ViewChild('closeAddModalBtn') closeAddModalBtn!: ElementRef<HTMLButtonElement>; // Add this
@@ -116,7 +352,7 @@ export class AdminEventsComponent implements OnInit {
   eventSummary: EventSummaryData | null = null;
   isLoadingSummary: boolean = false;
 
-  constructor(private apiService: ApiService, private authService: AuthService, private toastr: ToastrService) {}
+  constructor(private apiService: ApiService, private authService: AuthService, private toastr: ToastrService) { }
 
   ngOnInit(): void {
     // Get current user from localStorage or AuthService
@@ -780,13 +1016,13 @@ export class AdminEventsComponent implements OnInit {
     formData.append('EventGalleries', JSON.stringify(galleriesWithData));
 
     const seatTypesWithUserIds = this.seatTypes.map(seatType => {
-        const seatTypeCopy = { ...seatType };
-        seatTypeCopy.created_on = new Date().toISOString();
-        seatTypeCopy.updated_on = new Date().toISOString();
-        seatTypeCopy.created_by = this.userId;
-        seatTypeCopy.updated_by = this.userId;
-        seatTypeCopy.event_id = 0;
-        return seatTypeCopy;
+      const seatTypeCopy = { ...seatType };
+      seatTypeCopy.created_on = new Date().toISOString();
+      seatTypeCopy.updated_on = new Date().toISOString();
+      seatTypeCopy.created_by = this.userId;
+      seatTypeCopy.updated_by = this.userId;
+      seatTypeCopy.event_id = 0;
+      return seatTypeCopy;
     });
 
     formData.append('SeatTypes', JSON.stringify(seatTypesWithUserIds));
@@ -822,11 +1058,51 @@ export class AdminEventsComponent implements OnInit {
     });
   }
 
+  // Helper method to format date for input field
+  formatDateForInput(dateValue: any): string {
+    if (!dateValue) return '';
+
+    // If it's already a string in YYYY-MM-DD format
+    if (typeof dateValue === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
+      return dateValue;
+    }
+
+    // If it's a Date object
+    if (dateValue instanceof Date) {
+      return dateValue.toISOString().split('T')[0];
+    }
+
+    // If it's an ISO string like "2026-04-30T00:00:00"
+    if (typeof dateValue === 'string' && dateValue.includes('T')) {
+      return dateValue.split('T')[0];
+    }
+
+    return '';
+  }
+
   editEvent(event: EventCompleteResponseModel): void {
     this.isEditMode = true;
     this.selectedEvent = event;
 
     this.eventForm = { ...event.eventDetails };
+
+    // FIX: Format the date properly for the date input field
+    this.eventForm.event_date = this.formatDateForInput(this.eventForm.event_date);
+
+    // Also format start_time and end_time
+    if (this.eventForm.start_time) {
+      const timeParts = this.eventForm.start_time.split(':');
+      if (timeParts.length >= 2) {
+        this.eventForm.start_time = `${timeParts[0]}:${timeParts[1]}`;
+      }
+    }
+
+    if (this.eventForm.end_time) {
+      const timeParts = this.eventForm.end_time.split(':');
+      if (timeParts.length >= 2) {
+        this.eventForm.end_time = `${timeParts[0]}:${timeParts[1]}`;
+      }
+    }
 
     if (typeof this.eventForm.gallery_media === 'string') {
       try {
@@ -902,11 +1178,11 @@ export class AdminEventsComponent implements OnInit {
       artists:
         this.artists.length > 0
           ? JSON.stringify(
-              this.artists.map((a) => ({
-                name: a.artist_name,
-                photo: a.artist_photo,
-              }))
-            )
+            this.artists.map((a) => ({
+              name: a.artist_name,
+              photo: a.artist_photo,
+            }))
+          )
           : JSON.stringify([]),
     };
 
@@ -932,10 +1208,10 @@ export class AdminEventsComponent implements OnInit {
     formData.append('EventGalleries', JSON.stringify(galleriesWithUserIds));
 
     const seatTypesWithUserIds = this.seatTypes.map(seatType => {
-        const seatTypeCopy = { ...seatType };
-        seatTypeCopy.updated_by = this.userId;
-        seatTypeCopy.updated_on = new Date().toISOString();
-        return seatTypeCopy;
+      const seatTypeCopy = { ...seatType };
+      seatTypeCopy.updated_by = this.userId;
+      seatTypeCopy.updated_on = new Date().toISOString();
+      return seatTypeCopy;
     });
 
     formData.append('SeatTypes', JSON.stringify(seatTypesWithUserIds));
@@ -1030,7 +1306,14 @@ export class AdminEventsComponent implements OnInit {
       return false;
     }
 
-    if (!this.eventForm.event_description.trim()) {
+    // if (!this.eventForm.event_description.trim()) {
+    //   this.toastr.warning('Event description is required', 'Warning');
+    //   return false;
+    // }
+
+    // Check if event_description contains actual content (not just empty HTML)
+    const descriptionText = this.stripHtmlTags(this.eventForm.event_description || '');
+    if (!descriptionText.trim()) {
       this.toastr.warning('Event description is required', 'Warning');
       return false;
     }
@@ -1175,13 +1458,13 @@ export class AdminEventsComponent implements OnInit {
 
   getPageNumbers(): number[] {
     const pages: number[] = [];
-    
+
     if (this.totalPages <= 0) {
       return [1]; // Show page 1 when no pages yet
     }
-    
+
     const maxVisiblePages = 5;
-    
+
     if (this.totalPages <= maxVisiblePages) {
       for (let i = 1; i <= this.totalPages; i++) {
         pages.push(i);
@@ -1189,16 +1472,16 @@ export class AdminEventsComponent implements OnInit {
     } else {
       let startPage = Math.max(1, this.currentPage - 2);
       let endPage = Math.min(this.totalPages, startPage + maxVisiblePages - 1);
-      
+
       if (endPage - startPage + 1 < maxVisiblePages) {
         startPage = Math.max(1, endPage - maxVisiblePages + 1);
       }
-      
+
       for (let i = startPage; i <= endPage; i++) {
         pages.push(i);
       }
     }
-    
+
     return pages;
   }
 
@@ -1208,14 +1491,14 @@ export class AdminEventsComponent implements OnInit {
     console.log('=== PAGE SIZE CHANGE ===');
     console.log('Previous pageSize:', this.pageSize, 'Type:', typeof this.pageSize);
     console.log('New pageSize (converted):', newSize, 'Type:', typeof newSize);
-    
+
     // Update with numeric value
     this.pageSize = newSize;
     this.currentPage = 1; // Reset to first page
-    
+
     console.log('Updated pageSize property:', this.pageSize, 'Type:', typeof this.pageSize);
     console.log('Current page reset to:', this.currentPage);
-    
+
     this.loadEvents();
   }
 
@@ -1240,7 +1523,7 @@ export class AdminEventsComponent implements OnInit {
       modalElement.setAttribute('aria-modal', 'true');
       modalElement.setAttribute('role', 'dialog');
       document.body.classList.add('modal-open');
-      
+
       // Add backdrop
       let backdrop = document.querySelector('.modal-backdrop');
       if (!backdrop) {
@@ -1268,7 +1551,7 @@ export class AdminEventsComponent implements OnInit {
         // If Bootstrap is not available, use manual close
         this.manualCloseModal(modalElement);
       }
-      
+
       // Clear any pending modal backdrops
       setTimeout(() => {
         const backdrops = document.querySelectorAll('.modal-backdrop');
@@ -1389,7 +1672,7 @@ export class AdminEventsComponent implements OnInit {
   viewEventSummary(eventId: number): void {
     this.isLoadingSummary = true;
     this.eventSummary = null;
-    
+
     this.apiService.getEventSummary(eventId).subscribe({
       next: (response) => {
         if (response.status === 'Success' && response.data) {
@@ -1407,5 +1690,13 @@ export class AdminEventsComponent implements OnInit {
         this.isLoadingSummary = false;
       }
     });
+  }
+
+  // Helper method to strip HTML tags for preview display (optional)
+  stripHtmlTags(html: string): string {
+    if (!html) return '';
+    const temp = document.createElement('div');
+    temp.innerHTML = html;
+    return temp.textContent || temp.innerText || '';
   }
 }
