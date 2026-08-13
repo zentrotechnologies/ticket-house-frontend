@@ -25,7 +25,7 @@ export class EventsComponent implements OnInit {
   isLoadingArtists = false;
   isLoadingTestimonials = false;
 
-  sectionTitle = 'Coming This Week';
+  sectionTitle = 'Upcoming Events';
 
   // Auth properties
   isUserLoggedIn = false;
