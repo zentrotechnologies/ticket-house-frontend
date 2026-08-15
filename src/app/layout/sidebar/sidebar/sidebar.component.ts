@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, OnInit, Output } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { MenuItem } from '../../../core/constants/MenuConst';
 import { AuthService } from '../../../core/services/auth.service';
@@ -16,16 +16,46 @@ export class SidebarComponent implements OnInit {
   
   menuItems: MenuItem[] = [];
   isCollapsed = false;
+  isMobileView = false;
+  isMobileSidebarOpen = false;
 
   constructor(private authService: AuthService) {}
 
   ngOnInit(): void {
     this.menuItems = this.authService.getMenuItems();
+    this.checkScreenSize();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: any) {
+    this.checkScreenSize();
+  }
+
+  checkScreenSize(): void {
+    this.isMobileView = window.innerWidth <= 768;
+    if (!this.isMobileView) {
+      this.isMobileSidebarOpen = false;
+    }
   }
 
   toggleSidebar(): void {
     this.isCollapsed = !this.isCollapsed;
-    this.toggle.emit(this.isCollapsed); // Emit the collapsed state
+    this.toggle.emit(this.isCollapsed);
+  }
+
+  toggleMobileSidebar(): void {
+    this.isMobileSidebarOpen = !this.isMobileSidebarOpen;
+    // Prevent body scroll when mobile sidebar is open
+    if (this.isMobileSidebarOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  }
+
+  closeMobileSidebar(): void {
+    this.isMobileSidebarOpen = false;
+    document.body.style.overflow = '';
   }
 
   hasChildren(menuItem: MenuItem): boolean {

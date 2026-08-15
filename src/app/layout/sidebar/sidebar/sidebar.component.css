@@ -5,7 +5,7 @@
   height: 100vh;
   background: #111;
   color: var(--text-light);
-  transition: var(--transition);
+  transition: all 0.3s ease;
   position: fixed;
   left: 0;
   top: 0;
@@ -13,6 +13,7 @@
   border-right: 1px solid rgba(255, 255, 255, 0.05);
   box-shadow: var(--shadow);
   overflow-y: auto;
+  overflow-x: hidden;
   scrollbar-width: thin;
   scrollbar-color: var(--gradient-main) rgba(255, 255, 255, 0.05);
 }
@@ -39,6 +40,127 @@
   width: 60px;
 }
 
+/* Mobile styles */
+.sidebar.mobile-view {
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  width: 280px !important;
+}
+
+.sidebar.mobile-view.mobile-open {
+  transform: translateX(0);
+}
+
+/* Hide everything when mobile sidebar is closed */
+.sidebar.mobile-view:not(.mobile-open) .sidebar-header h3,
+.sidebar.mobile-view:not(.mobile-open) .menu-text,
+.sidebar.mobile-view:not(.mobile-open) .menu-arrow,
+.sidebar.mobile-view:not(.mobile-open) .submenu {
+  display: none !important;
+}
+
+/* Show everything when mobile sidebar is open */
+.sidebar.mobile-view.mobile-open .sidebar-header h3,
+.sidebar.mobile-view.mobile-open .menu-text,
+.sidebar.mobile-view.mobile-open .menu-arrow,
+.sidebar.mobile-view.mobile-open .submenu {
+  display: block;
+}
+
+/* Ensure menu items are visible when mobile sidebar is open */
+.sidebar.mobile-view.mobile-open .menu-link {
+  display: flex;
+  align-items: center;
+}
+
+.sidebar.mobile-view.mobile-open .menu-icon {
+  display: inline-block;
+  margin-right: 0.75rem;
+}
+
+/* Hide desktop toggle button on mobile */
+.sidebar.mobile-view .toggle-btn {
+  display: none !important;
+}
+
+/* Show close button only when mobile sidebar is open */
+.sidebar.mobile-view .close-btn {
+  display: none;
+}
+
+.sidebar.mobile-view.mobile-open .close-btn {
+  display: block;
+}
+
+/* Mobile toggle button */
+.mobile-toggle-btn {
+  display: none;
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 1001;
+  background: linear-gradient(135deg, rgb(146, 52, 234), rgb(226, 54, 163));
+  border: none;
+  color: white;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(146, 52, 234, 0.4);
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-toggle-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(146, 52, 234, 0.5);
+}
+
+.hamburger-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+/* Mobile overlay */
+.mobile-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 999;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Close button for mobile */
+.close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-light);
+  cursor: pointer;
+  padding: 0.5rem;
+  font-size: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+  transform: rotate(90deg);
+  color: rgb(226, 54, 163);
+}
+
 .sidebar-header {
   padding: 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -47,11 +169,12 @@
   align-items: center;
   height: 60px;
   background: rgba(0, 0, 0, 0.2);
+  min-height: 60px;
 }
 
 .sidebar-header h3 {
   margin: 0;
-  background: var(--gradient-main);
+  background: linear-gradient(135deg, rgb(146, 52, 234), rgb(226, 54, 163));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -60,6 +183,7 @@
   white-space: nowrap;
 }
 
+/* Desktop toggle button */
 .toggle-btn {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -67,7 +191,7 @@
   cursor: pointer;
   padding: 0.5rem 0.8rem;
   border-radius: 30px;
-  transition: var(--transition);
+  transition: all 0.3s ease;
   font-size: 1rem;
   min-width: 32px;
   display: flex;
@@ -76,7 +200,7 @@
 }
 
 .toggle-btn:hover {
-  background: var(--gradient-main);
+  background: linear-gradient(135deg, rgb(146, 52, 234), rgb(226, 54, 163));
   transform: translateX(2px);
   border-color: transparent;
   box-shadow: var(--shadow);
@@ -103,7 +227,7 @@
   padding: 0.75rem 1rem;
   color: var(--text-muted);
   text-decoration: none;
-  transition: var(--transition);
+  transition: all 0.3s ease;
   cursor: pointer;
   border-left: 3px solid transparent;
   position: relative;
@@ -146,7 +270,7 @@
   font-size: 1.2rem;
   min-width: 24px;
   text-align: center;
-  transition: var(--transition);
+  transition: all 0.3s ease;
 }
 
 .menu-text {
@@ -183,7 +307,7 @@
   top: 0;
   bottom: 0;
   width: 2px;
-  background: var(--gradient-main);
+  background: linear-gradient(135deg, rgb(146, 52, 234), rgb(226, 54, 163));
   opacity: 0.3;
   border-radius: 2px;
 }
@@ -197,7 +321,7 @@
   padding: 0.5rem 1rem;
   color: var(--text-muted);
   text-decoration: none;
-  transition: var(--transition);
+  transition: all 0.3s ease;
   font-size: 0.85rem;
   border-radius: 6px;
   position: relative;
@@ -232,27 +356,27 @@
   padding-left: calc(1rem - 3px);
 }
 
-/* Collapsed state styles */
-.sidebar.collapsed .menu-text,
-.sidebar.collapsed .menu-arrow {
+/* Desktop Collapsed state */
+.sidebar.collapsed:not(.mobile-view) .menu-text,
+.sidebar.collapsed:not(.mobile-view) .menu-arrow {
   display: none;
 }
 
-.sidebar.collapsed .menu-link {
+.sidebar.collapsed:not(.mobile-view) .menu-link {
   justify-content: center;
   padding: 0.75rem 0;
 }
 
-.sidebar.collapsed .menu-icon {
+.sidebar.collapsed:not(.mobile-view) .menu-icon {
   margin-right: 0;
   font-size: 1.3rem;
 }
 
-.sidebar.collapsed .submenu {
+.sidebar.collapsed:not(.mobile-view) .submenu {
   display: none;
 }
 
-.sidebar.collapsed .menu-item:hover .submenu {
+.sidebar.collapsed:not(.mobile-view) .menu-item:hover .submenu {
   display: block;
   position: absolute;
   left: 60px;
@@ -266,25 +390,160 @@
   z-index: 1001;
 }
 
-.sidebar.collapsed .menu-item:hover .submenu::before {
+.sidebar.collapsed:not(.mobile-view) .menu-item:hover .submenu::before {
   display: none;
 }
 
-.sidebar.collapsed .menu-item:hover .submenu .submenu-link {
+.sidebar.collapsed:not(.mobile-view) .menu-item:hover .submenu .submenu-link {
   padding: 0.5rem 1rem;
 }
 
-.sidebar.collapsed .menu-item:hover .submenu .submenu-link:hover {
+.sidebar.collapsed:not(.mobile-view) .menu-item:hover .submenu .submenu-link:hover {
   padding-left: 1.5rem;
 }
 
-/* Responsive */
+/* Hide sidebar header text when collapsed on desktop */
+.sidebar.collapsed:not(.mobile-view) .sidebar-header h3 {
+  display: none;
+}
+
+/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
+  /* Show mobile toggle button */
+  .mobile-toggle-btn {
+    display: flex;
+  }
+
+  .mobile-overlay {
+    display: block;
+  }
+
+  /* Hide mobile toggle button when sidebar is open */
+  .mobile-toggle-btn.hidden {
+    display: none;
+  }
+
+  /* Ensure sidebar takes full height and proper width */
   .sidebar {
+    width: 280px !important;
     transform: translateX(-100%);
   }
-  
-  .sidebar.show {
+
+  .sidebar.mobile-open {
     transform: translateX(0);
   }
+
+  /* On mobile, when sidebar is closed, hide everything */
+  .sidebar.mobile-view:not(.mobile-open) * {
+    /* Hide all content when closed */
+    visibility: hidden;
+  }
+
+  .sidebar.mobile-view:not(.mobile-open) {
+    /* Keep the sidebar container itself but hidden */
+    transform: translateX(-100%);
+    visibility: visible;
+  }
+
+  /* When open, show everything */
+  .sidebar.mobile-view.mobile-open * {
+    visibility: visible;
+  }
+
+  .sidebar.mobile-view.mobile-open {
+    transform: translateX(0);
+  }
+
+  /* Override collapsed styles on mobile when open */
+  .sidebar.mobile-view.mobile-open.collapsed .menu-text,
+  .sidebar.mobile-view.mobile-open.collapsed .menu-arrow,
+  .sidebar.mobile-view.mobile-open.collapsed .submenu {
+    display: block !important;
+  }
+
+  .sidebar.mobile-view.mobile-open.collapsed .menu-link {
+    justify-content: flex-start;
+    padding: 0.75rem 1rem;
+  }
+
+  .sidebar.mobile-view.mobile-open.collapsed .menu-icon {
+    margin-right: 0.75rem;
+  }
+
+  .sidebar.mobile-view.mobile-open.collapsed .submenu {
+    display: block !important;
+    position: static;
+    min-width: auto;
+    background: rgba(0, 0, 0, 0.2);
+    border: none;
+    border-radius: 0 8px 8px 0;
+    box-shadow: none;
+    padding: 0.25rem 0 0.25rem 2.5rem;
+  }
+
+  .sidebar.mobile-view.mobile-open.collapsed .menu-item:hover .submenu {
+    display: block !important;
+    position: static;
+    min-width: auto;
+    background: rgba(0, 0, 0, 0.2);
+    border: none;
+    border-radius: 0 8px 8px 0;
+    box-shadow: none;
+    padding: 0.25rem 0 0.25rem 2.5rem;
+  }
+
+  .sidebar.mobile-view.mobile-open.collapsed .menu-item:hover .submenu::before {
+    display: block;
+  }
+
+  .sidebar.mobile-view.mobile-open.collapsed .menu-item:hover .submenu .submenu-link {
+    padding: 0.5rem 1rem;
+  }
+
+  .sidebar.mobile-view.mobile-open.collapsed .menu-item:hover .submenu .submenu-link:hover {
+    padding-left: 1.5rem;
+  }
+
+  /* Show close button only when mobile sidebar is open */
+  .sidebar.mobile-view .close-btn {
+    display: none !important;
+  }
+
+  .sidebar.mobile-view.mobile-open .close-btn {
+    display: block !important;
+  }
+
+  /* Hide desktop toggle button on mobile */
+  .sidebar.mobile-view .toggle-btn {
+    display: none !important;
+  }
+
+  /* Ensure proper visibility for sidebar header */
+  .sidebar.mobile-view.mobile-open .sidebar-header h3 {
+    display: block !important;
+  }
+
+  .sidebar.mobile-view:not(.mobile-open) .sidebar-header h3 {
+    display: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+    width: 100% !important;
+    max-width: 320px;
+  }
+}
+
+/* Ensure proper z-index stacking */
+.sidebar {
+  z-index: 1000;
+}
+
+.mobile-overlay {
+  z-index: 999;
+}
+
+.mobile-toggle-btn {
+  z-index: 1001;
 }

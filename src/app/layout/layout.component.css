@@ -53,6 +53,7 @@
   .main-content {
     margin-left: 0 !important;
     padding: 15px;
+    padding-top: 70px; /* Add top padding for mobile toggle button */
   }
   
   .main-content.sidebar-collapsed {

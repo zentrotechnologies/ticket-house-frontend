@@ -8,7 +8,7 @@
   left: 250px;
   right: 0;
   height: 60px;
-  z-index: 999;
+  z-index: 998;
   transition: left 0.3s ease;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
@@ -196,7 +196,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 998;
+  z-index: 997;
   background: transparent;
 }
 
@@ -204,6 +204,7 @@
 @media (max-width: 768px) {
   .header {
     left: 0;
+    z-index: 997;
   }
   
   .header.sidebar-collapsed {
@@ -212,6 +213,7 @@
   
   .header-content {
     padding: 0 1rem;
+    padding-left: 70px; /* Make room for mobile toggle button */
   }
   
   .app-title {
@@ -230,5 +232,9 @@
 @media (max-width: 480px) {
   .app-title::after {
     display: none;
+  }
+  
+  .header-content {
+    padding-left: 65px;
   }
 }
