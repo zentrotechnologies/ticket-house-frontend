@@ -894,3 +894,49 @@ export interface ResetPasswordResponse {
   errorCode: string | null;
   data: any | null;
 }
+
+//super admin events
+// Add this to auth.model.ts
+export interface AdminEventResponse {
+  event_id: number;
+  organizer_id: string;
+  event_name: string;
+  event_description: string;
+  event_date: string | Date;
+  start_time: string;
+  end_time: string;
+  total_duration_minutes: number;
+  location: string;
+  full_address: string;
+  geo_map_url: string;
+  latitude: number | null;
+  longitude: number | null;
+  language: string;
+  event_category_id: number;
+  banner_image: string;
+  gallery_media: string;
+  age_limit: number | null;
+  artists: string;
+  terms_and_conditions: string;
+  min_price: number | null;
+  max_price: number | null;
+  is_featured: boolean;
+  status: string;
+  no_of_seats: number | null;
+  created_by: string;
+  created_at: string;
+  updated_by: string;
+  updated_at: string | null;
+  active: number;
+  convenience_fee: number | null;
+  
+  // Organizer Info from Users table
+  organizer_name: string;
+  organizer_email: string;
+  organizer_mobile: string;
+  organizer_country_code: string;
+  
+  // Related data
+  artist_list: EventArtistModel[];
+  gallery_list: EventGalleryModel[];
+}

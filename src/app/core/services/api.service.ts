@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { BannerBooleanResponse, BannerIdResponse, BannerResponse, BookingDetailsResponse, BookingHistoryRequest, BookingQRResponse, BookingResponse, BookingScanSummaryResponse, CommonResponse, CommonResponseModel, CreateBannerRequest, CreateBookingRequest, EventCategoryModel, EventCategoryRequest, EventCompleteResponseModel, EventCreateRequestModel, EventDetailsModel, EventPaginationRequest, EventSeatTypeInventoryModel, EventSummaryData, GenerateOTPRequest, GetShowsByArtistsRequest, MyBookingsResponse, OrganizerModel, OrganizerPagedResponse, OrganizerRequest, OTPResponse, PagedBookingHistoryResponse, PagedResponse, PaginationRequest, PartialScanRequest, PaymentOrderResponse, PaymentStatusResponse, PaymentVerificationResponse, QRCodeDataResponse, ResendOTPRequest, ResendOTPResponse, ScanTicketRequest, SeatAvailabilityRequest, ShowsByArtistsResponse, SignUpRequest, SignUpResponse, SimilarEventsRequest, SingleBannerResponse, TestimonialModel, TestimonialsResponse, TicketScanResponse, UpcomingEventResponse, UpcomingEventsRequest, UpcomingEventsResponse, UpdateBannerRequest, UpdateEventCategoryStatusRequest, UpdateOrganizerStatusRequest, UpdateTestimonialStatusRequest, UserIdRequest, VerifyOTPRequest } from '../models/auth.model';
+import { AdminEventResponse, BannerBooleanResponse, BannerIdResponse, BannerResponse, BookingDetailsResponse, BookingHistoryRequest, BookingQRResponse, BookingResponse, BookingScanSummaryResponse, CommonResponse, CommonResponseModel, CreateBannerRequest, CreateBookingRequest, EventCategoryModel, EventCategoryRequest, EventCompleteResponseModel, EventCreateRequestModel, EventDetailsModel, EventPaginationRequest, EventSeatTypeInventoryModel, EventSummaryData, GenerateOTPRequest, GetShowsByArtistsRequest, MyBookingsResponse, OrganizerModel, OrganizerPagedResponse, OrganizerRequest, OTPResponse, PagedBookingHistoryResponse, PagedResponse, PaginationRequest, PartialScanRequest, PaymentOrderResponse, PaymentStatusResponse, PaymentVerificationResponse, QRCodeDataResponse, ResendOTPRequest, ResendOTPResponse, ScanTicketRequest, SeatAvailabilityRequest, ShowsByArtistsResponse, SignUpRequest, SignUpResponse, SimilarEventsRequest, SingleBannerResponse, TestimonialModel, TestimonialsResponse, TicketScanResponse, UpcomingEventResponse, UpcomingEventsRequest, UpcomingEventsResponse, UpdateBannerRequest, UpdateEventCategoryStatusRequest, UpdateOrganizerStatusRequest, UpdateTestimonialStatusRequest, UserIdRequest, VerifyOTPRequest } from '../models/auth.model';
 
 @Injectable({
   providedIn: 'root',
@@ -261,6 +261,12 @@ export class ApiService {
   getPaginatedEventsByCreatedBy(request: EventPaginationRequest): Observable<PagedResponse<EventCompleteResponseModel[]>> {
     const url = `${this.ThApi}api/EventDetails/GetPaginatedEventsByCreatedBy`;
     return this.httpClient.post<PagedResponse<EventCompleteResponseModel[]>>(url, request);
+  }
+
+  // Get paginated events for admin (all organizers)
+  getPaginatedAdminEvents(request: any): Observable<PagedResponse<AdminEventResponse[]>> {
+    const url = `${this.ThApi}api/EventDetails/GetPaginatedAdminEvents`;
+    return this.httpClient.post<PagedResponse<AdminEventResponse[]>>(url, request);
   }
 
   // Delete event with artists and galleries

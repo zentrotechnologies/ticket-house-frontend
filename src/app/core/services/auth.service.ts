@@ -31,7 +31,7 @@ export class AuthService {
   constructor(private http: HttpClient) {
     // Always load user from storage first, regardless of environment
     this.loadUserFromStorage();
-    
+
     // Only clear in development if explicitly needed (remove or comment this)
     // if (!environment.production) {
     //   this.clearAuthData();
@@ -48,7 +48,7 @@ export class AuthService {
           this.setCurrentUser(response);
         }
       }),
-      catchError(this.handleError)
+      catchError(this.handleError),
     );
   }
 
@@ -95,7 +95,7 @@ export class AuthService {
       }
       return true;
     }
-    
+
     // If no expiry but token exists, consider logged in
     return true;
   }
@@ -323,5 +323,13 @@ export class AuthService {
       }
     }
     return null;
+  }
+
+  isAdminUser(): boolean {
+    return this.getCurrentUserRole() === 1;
+  }
+
+  isOrganizerUser(): boolean {
+    return this.getCurrentUserRole() === 2;
   }
 }

@@ -1851,9 +1851,13 @@ export class EventPaymentComponent implements OnInit {
     const totalSeats = this.getTotalTickets();
 
     // First calculate the fees
+    // const feePercentage = this.convenienceFeePercentage > 0
+    //   ? this.convenienceFeePercentage / 100
+    //   : 0.06;
+
     const feePercentage = this.convenienceFeePercentage > 0
       ? this.convenienceFeePercentage / 100
-      : 0.06;
+      : 0.00;
 
     const calculatedConvenienceFee = this.totalAmount * feePercentage;
     const calculatedGstTotal = calculatedConvenienceFee * 0.18; // 18% GST
@@ -1909,7 +1913,7 @@ export class EventPaymentComponent implements OnInit {
     // Use dynamic convenience fee percentage from API, default to 6% if not available
     const feePercentage = this.convenienceFeePercentage > 0
       ? this.convenienceFeePercentage / 100
-      : 0.06;
+      : 0.00;
 
     // Calculate convenience fee based on subtotal
     this.convenienceFee = this.totalAmount * feePercentage;
@@ -1943,7 +1947,7 @@ export class EventPaymentComponent implements OnInit {
     // Recalculate fees first (based on subtotal)
     const feePercentage = this.convenienceFeePercentage > 0
       ? this.convenienceFeePercentage / 100
-      : 0.06;
+      : 0.00;
 
     this.convenienceFee = this.totalAmount * feePercentage;
     this.gstTotal = this.convenienceFee * 0.18;

@@ -13,10 +13,12 @@ import {
   EventCreateRequestModel,
   EventCategoryModel,
   EventSummaryData,
+  AdminEventResponse,
 } from '../../../core/models/auth.model';
 import { ApiService } from '../../../core/services/api.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastrService } from 'ngx-toastr';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-events',
@@ -73,14 +75,20 @@ export class AdminEventsComponent implements OnInit {
         'redo',
         '|',
         'removeFormat',
-        'sourceEditing'
-      ]
+        'sourceEditing',
+      ],
     },
     table: {
-      contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells', 'tableProperties', 'tableCellProperties']
+      contentToolbar: [
+        'tableColumn',
+        'tableRow',
+        'mergeTableCells',
+        'tableProperties',
+        'tableCellProperties',
+      ],
     },
     image: {
-      toolbar: ['imageTextAlternative', 'imageStyle:full', 'imageStyle:side', 'linkImage']
+      toolbar: ['imageTextAlternative', 'imageStyle:full', 'imageStyle:side', 'linkImage'],
     },
     heading: {
       options: [
@@ -90,12 +98,12 @@ export class AdminEventsComponent implements OnInit {
         { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' },
         { model: 'heading4', view: 'h4', title: 'Heading 4', class: 'ck-heading_heading4' },
         { model: 'heading5', view: 'h5', title: 'Heading 5', class: 'ck-heading_heading5' },
-        { model: 'heading6', view: 'h6', title: 'Heading 6', class: 'ck-heading_heading6' }
-      ]
+        { model: 'heading6', view: 'h6', title: 'Heading 6', class: 'ck-heading_heading6' },
+      ],
     },
     fontSize: {
       options: ['tiny', 'small', 'default', 'big', 'huge'],
-      supportAllValues: true
+      supportAllValues: true,
     },
     fontFamily: {
       options: [
@@ -107,9 +115,9 @@ export class AdminEventsComponent implements OnInit {
         'Tahoma, Geneva, sans-serif',
         'Times New Roman, Times, serif',
         'Trebuchet MS, Helvetica, sans-serif',
-        'Verdana, Geneva, sans-serif'
+        'Verdana, Geneva, sans-serif',
       ],
-      supportAllValues: true
+      supportAllValues: true,
     },
     fontColor: {
       colors: [
@@ -127,8 +135,8 @@ export class AdminEventsComponent implements OnInit {
         { color: 'hsl(180, 75%, 60%)', label: 'Turquoise' },
         { color: 'hsl(210, 75%, 60%)', label: 'Light blue' },
         { color: 'hsl(240, 75%, 60%)', label: 'Blue' },
-        { color: 'hsl(270, 75%, 60%)', label: 'Purple' }
-      ]
+        { color: 'hsl(270, 75%, 60%)', label: 'Purple' },
+      ],
     },
     fontBackgroundColor: {
       colors: [
@@ -144,23 +152,23 @@ export class AdminEventsComponent implements OnInit {
         { color: 'hsl(180, 75%, 60%)', label: 'Turquoise' },
         { color: 'hsl(210, 75%, 60%)', label: 'Light blue' },
         { color: 'hsl(240, 75%, 60%)', label: 'Blue' },
-        { color: 'hsl(270, 75%, 60%)', label: 'Purple' }
-      ]
+        { color: 'hsl(270, 75%, 60%)', label: 'Purple' },
+      ],
     },
     alignment: {
-      options: ['left', 'center', 'right', 'justify']
+      options: ['left', 'center', 'right', 'justify'],
     },
     placeholder: 'Enter event description here...',
     link: {
       addTargetToExternalLinks: true,
-      defaultProtocol: 'https://'
+      defaultProtocol: 'https://',
     },
     list: {
       properties: {
         styles: true,
         startIndex: true,
-        reversed: true
-      }
+        reversed: true,
+      },
     },
     codeBlock: {
       languages: [
@@ -174,10 +182,10 @@ export class AdminEventsComponent implements OnInit {
         { language: 'python', label: 'Python' },
         { language: 'java', label: 'Java' },
         { language: 'csharp', label: 'C#' },
-        { language: 'php', label: 'PHP' }
-      ]
+        { language: 'php', label: 'PHP' },
+      ],
     },
-    language: 'en'
+    language: 'en',
   };
 
   public termsEditorConfig: any = {
@@ -214,11 +222,17 @@ export class AdminEventsComponent implements OnInit {
         'undo',
         'redo',
         '|',
-        'removeFormat'
-      ]
+        'removeFormat',
+      ],
     },
     table: {
-      contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells', 'tableProperties', 'tableCellProperties']
+      contentToolbar: [
+        'tableColumn',
+        'tableRow',
+        'mergeTableCells',
+        'tableProperties',
+        'tableCellProperties',
+      ],
     },
     heading: {
       options: [
@@ -228,12 +242,12 @@ export class AdminEventsComponent implements OnInit {
         { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' },
         { model: 'heading4', view: 'h4', title: 'Heading 4', class: 'ck-heading_heading4' },
         { model: 'heading5', view: 'h5', title: 'Heading 5', class: 'ck-heading_heading5' },
-        { model: 'heading6', view: 'h6', title: 'Heading 6', class: 'ck-heading_heading6' }
-      ]
+        { model: 'heading6', view: 'h6', title: 'Heading 6', class: 'ck-heading_heading6' },
+      ],
     },
     fontSize: {
       options: ['tiny', 'small', 'default', 'big', 'huge'],
-      supportAllValues: true
+      supportAllValues: true,
     },
     fontFamily: {
       options: [
@@ -245,18 +259,18 @@ export class AdminEventsComponent implements OnInit {
         'Tahoma, Geneva, sans-serif',
         'Times New Roman, Times, serif',
         'Trebuchet MS, Helvetica, sans-serif',
-        'Verdana, Geneva, sans-serif'
+        'Verdana, Geneva, sans-serif',
       ],
-      supportAllValues: true
+      supportAllValues: true,
     },
     alignment: {
-      options: ['left', 'center', 'right', 'justify']
+      options: ['left', 'center', 'right', 'justify'],
     },
     placeholder: 'Enter terms and conditions here...',
     link: {
       addTargetToExternalLinks: true,
-      defaultProtocol: 'https://'
-    }
+      defaultProtocol: 'https://',
+    },
   };
 
   @ViewChild('artistPhotoInput') artistPhotoInput!: ElementRef<HTMLInputElement>;
@@ -320,7 +334,7 @@ export class AdminEventsComponent implements OnInit {
     updated_by: '',
     updated_at: null,
     active: 1,
-    convenience_fee: 0.00, // Add this line
+    convenience_fee: 0.0, // Add this line
   };
 
   // Artists and Galleries
@@ -352,11 +366,30 @@ export class AdminEventsComponent implements OnInit {
   eventSummary: EventSummaryData | null = null;
   isLoadingSummary: boolean = false;
 
-  constructor(private apiService: ApiService, private authService: AuthService, private toastr: ToastrService) { }
+  isAdmin: boolean = false;
+  adminEvents: AdminEventResponse[] = [];
+
+  constructor(
+    private apiService: ApiService,
+    private authService: AuthService,
+    private toastr: ToastrService,
+  ) {}
 
   ngOnInit(): void {
     // Get current user from localStorage or AuthService
     this.loadCurrentUser();
+    // this.isAdmin = this.authService.isAdminUser();
+
+    // Debug logging
+    console.log('Current user:', this.currentUser);
+    console.log('User role_id:', this.currentUser?.role_id);
+    console.log('Is admin from authService:', this.authService.isAdminUser());
+    console.log('Is admin from direct check:', this.currentUser?.role_id === 1);
+
+    // Check if user is admin using the currentUser object
+    this.isAdmin = this.currentUser?.role_id === 1 || this.authService.isAdminUser();
+    console.log('Final isAdmin value:', this.isAdmin);
+
     this.loadCategories();
     this.loadEvents();
 
@@ -372,39 +405,151 @@ export class AdminEventsComponent implements OnInit {
     // }
   }
 
+  // loadCurrentUser(): void {
+  //   const currentUserStr = localStorage.getItem('currentUser');
+  //   if (currentUserStr) {
+  //     try {
+  //       this.currentUser = JSON.parse(currentUserStr);
+  //       this.userId = this.currentUser.user_id || '';
+
+  //       // Log for debugging
+  //       console.log('Current User ID:', this.userId);
+
+  //       if (!this.userId) {
+  //         console.error('User ID not found in currentUser object');
+  //         // Try to get from AuthService
+  //         this.userId = this.authService.getCurrentUserId() || '';
+  //       }
+
+  //       // Set user ID in event form
+  //       this.eventForm.created_by = this.userId;
+  //       this.eventForm.updated_by = this.userId;
+  //       this.eventForm.organizer_id = this.userId; // Set organizer_id with user_id
+  //     } catch (error) {
+  //       console.error('Error parsing current user:', error);
+  //     }
+  //   } else {
+  //     // Try to get from AuthService
+  //     this.userId = this.authService.getCurrentUserId() || '';
+  //     if (this.userId) {
+  //       this.eventForm.created_by = this.userId;
+  //       this.eventForm.updated_by = this.userId;
+  //       this.eventForm.organizer_id = this.userId;
+  //     }
+  //   }
+  // }
+
   loadCurrentUser(): void {
-    const currentUserStr = localStorage.getItem('currentUser');
-    if (currentUserStr) {
+  console.log('=== loadCurrentUser called ===');
+  
+  // Method 1: Try to get from AuthService's BehaviorSubject
+  const user = this.authService.getCurrentUser();
+  if (user) {
+    this.currentUser = user;
+    this.userId = user.user_id || '';
+    console.log('User loaded from AuthService:', this.currentUser);
+    return;
+  }
+
+  // Method 2: Try to get from localStorage using the correct key
+  const userDataStr = localStorage.getItem(environment.USERDATA_KEY);
+  console.log('USERDATA_KEY:', environment.USERDATA_KEY);
+  console.log('Raw user data from localStorage:', userDataStr);
+  
+  if (userDataStr) {
+    try {
+      // Parse the login response
+      const loginResponse = JSON.parse(userDataStr);
+      console.log('Parsed login response:', loginResponse);
+      
+      // Extract user data from the login response
+      this.currentUser = {
+        user_id: loginResponse.user_id || '',
+        first_name: loginResponse.first_name || '',
+        last_name: loginResponse.last_name || '',
+        email: loginResponse.email || '',
+        mobile: loginResponse.mobile || '',
+        country_code: loginResponse.country_code || '',
+        profile_img: loginResponse.profile_img || null,
+        role_id: loginResponse.role_id || 0,
+      };
+      
+      this.userId = this.currentUser.user_id || '';
+      console.log('User loaded successfully:', this.currentUser);
+      console.log('User role_id:', this.currentUser.role_id);
+      
+      // Also update AuthService's BehaviorSubject
+      this.authService.setcurrentUser(this.currentUser);
+      
+      return;
+    } catch (error) {
+      console.error('Error parsing user data from USERDATA_KEY:', error);
+    }
+  }
+
+  // Method 3: Try alternative keys
+  const alternativeKeys = ['user', 'currentUser', 'user_data', 'auth_user'];
+  for (const key of alternativeKeys) {
+    const data = localStorage.getItem(key);
+    if (data) {
       try {
-        this.currentUser = JSON.parse(currentUserStr);
-        this.userId = this.currentUser.user_id || '';
-
-        // Log for debugging
-        console.log('Current User ID:', this.userId);
-
-        if (!this.userId) {
-          console.error('User ID not found in currentUser object');
-          // Try to get from AuthService
-          this.userId = this.authService.getCurrentUserId() || '';
+        const parsed = JSON.parse(data);
+        console.log(`Found data in key "${key}":`, parsed);
+        
+        // Check if it has user data
+        if (parsed.user_id || parsed.role_id) {
+          this.currentUser = {
+            user_id: parsed.user_id || '',
+            first_name: parsed.first_name || '',
+            last_name: parsed.last_name || '',
+            email: parsed.email || '',
+            mobile: parsed.mobile || '',
+            country_code: parsed.country_code || '',
+            profile_img: parsed.profile_img || null,
+            role_id: parsed.role_id || 0,
+          };
+          this.userId = this.currentUser.user_id || '';
+          console.log('User loaded from key:', key, this.currentUser);
+          return;
         }
-
-        // Set user ID in event form
-        this.eventForm.created_by = this.userId;
-        this.eventForm.updated_by = this.userId;
-        this.eventForm.organizer_id = this.userId; // Set organizer_id with user_id
-      } catch (error) {
-        console.error('Error parsing current user:', error);
-      }
-    } else {
-      // Try to get from AuthService
-      this.userId = this.authService.getCurrentUserId() || '';
-      if (this.userId) {
-        this.eventForm.created_by = this.userId;
-        this.eventForm.updated_by = this.userId;
-        this.eventForm.organizer_id = this.userId;
+      } catch (e) {
+        // Continue to next key
       }
     }
   }
+
+  // Method 4: Try to get from JWT token
+  const token = localStorage.getItem('jwt_token');
+  if (token) {
+    try {
+      // Decode JWT token to get user info
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      console.log('JWT payload:', payload);
+      
+      if (payload.email || payload.sub) {
+        this.currentUser = {
+          user_id: payload.sub || payload.user_id || '',
+          first_name: payload.first_name || '',
+          last_name: payload.last_name || '',
+          email: payload.email || '',
+          mobile: payload.mobile || '',
+          country_code: payload.country_code || '',
+          profile_img: payload.profile_img || null,
+          role_id: parseInt(payload.role_id) || 0,
+        };
+        this.userId = this.currentUser.user_id || '';
+        console.log('User loaded from JWT token:', this.currentUser);
+        return;
+      }
+    } catch (e) {
+      console.error('Error decoding JWT token:', e);
+    }
+  }
+
+  console.error('Could not load user data from any source');
+  this.currentUser = null;
+  this.userId = '';
+}
 
   loadCategories(): void {
     this.isLoadingCategories = true;
@@ -429,7 +574,133 @@ export class AdminEventsComponent implements OnInit {
     });
   }
 
+  // loadEvents(): void {
+  //   const request: EventPaginationRequest = {
+  //     created_by: this.userId,
+  //     PageNumber: this.currentPage,
+  //     PageSize: this.pageSize,
+  //     SearchText: this.searchText,
+  //     Status: this.statusFilter,
+  //     FromDate: this.fromDate || null,
+  //     ToDate: this.toDate || null,
+  //   };
+
+  //   this.apiService.getPaginatedEventsByCreatedBy(request).subscribe({
+  //     next: (response) => {
+  //       if (response.status === 'Success' && response.data) {
+  //         this.events = response.data;
+  //         this.totalEvents = response.totalCount || 0;
+  //         this.totalPages = response.totalPages || 0;
+  //       }
+  //     },
+  //     error: (error) => {
+  //       console.error('Error loading events:', error);
+  //       alert('Failed to load events');
+  //     },
+  //   });
+
+  //   // Add this to your loadEvents method temporarily to debug
+  //   console.log('Sending request with PageSize:', Number(this.pageSize), 'Type:', typeof Number(this.pageSize));
+  // }
+
   loadEvents(): void {
+    // Check if user is admin
+    const isAdmin = this.currentUser?.role_id === 1 || this.authService.isAdminUser();
+    
+    if (isAdmin) {
+      // Admin - get all events from all organizers
+      this.loadAdminEvents();
+    } else {
+      // Organizer - get only their events
+      this.loadOrganizerEvents();
+    }
+  }
+
+  loadAdminEvents(): void {
+    const request: any = {
+      PageNumber: this.currentPage,
+      PageSize: this.pageSize,
+      SearchText: this.searchText,
+      Status: this.statusFilter,
+      FromDate: this.fromDate || null,
+      ToDate: this.toDate || null,
+    };
+
+    this.apiService.getPaginatedAdminEvents(request).subscribe({
+      next: (response) => {
+        if (response.status === 'Success' && response.data) {
+          this.adminEvents = response.data;
+          // Fix: Map to full EventCompleteResponseModel structure
+          this.events = response.data.map((event: AdminEventResponse) => ({
+            eventDetails: {
+              event_id: event.event_id,
+              organizer_id: event.organizer_id,
+              event_name: event.event_name,
+              event_description: event.event_description,
+              event_date: event.event_date,
+              start_time: event.start_time,
+              end_time: event.end_time,
+              total_duration_minutes: event.total_duration_minutes,
+              location: event.location,
+              full_address: event.full_address,
+              geo_map_url: event.geo_map_url,
+              latitude: event.latitude,
+              longitude: event.longitude,
+              language: event.language,
+              event_category_id: event.event_category_id,
+              banner_image: event.banner_image,
+              gallery_media: event.gallery_media,
+              age_limit: event.age_limit,
+              artists: event.artists,
+              terms_and_conditions: event.terms_and_conditions,
+              min_price: event.min_price,
+              max_price: event.max_price,
+              is_featured: event.is_featured,
+              status: event.status,
+              no_of_seats: event.no_of_seats,
+              created_by: event.created_by,
+              created_at: event.created_at,
+              updated_by: event.updated_by,
+              updated_at: event.updated_at,
+              active: event.active,
+              convenience_fee: event.convenience_fee || 0,
+              // Store organizer info for display
+              organizer_name: event.organizer_name,
+              organizer_email: event.organizer_email,
+              organizer_mobile: event.organizer_mobile,
+              organizer_country_code: event.organizer_country_code,
+            } as any,
+            // Add these required properties with empty arrays
+            // eventArtists: event.artist_list || [],
+            // eventGalleries: event.gallery_list || [],
+            eventArtists: event.artist_list || [],  // Changed from event.artists
+            eventGalleries: event.gallery_list || [],  // Changed from event.galleries
+            // Add optional properties if needed
+            eventMedia: [],
+            seatTypes: []
+          }));
+          this.totalEvents = response.totalCount || 0;
+          this.totalPages = response.totalPages || 0;
+        }
+      },
+      error: (error) => {
+        console.error('Error loading admin events:', error);
+        this.toastr.error('Failed to load events', 'Error');
+      },
+    });
+  }
+
+  // Helper method to get organizer display name
+  getOrganizerDisplayName(event: any): string {
+    if (this.isAdmin) {
+      return event.eventDetails.organizer_name || 
+            event.eventDetails.organizer_email || 
+            'N/A';
+    }
+    return '';
+  }
+
+  loadOrganizerEvents(): void {
     const request: EventPaginationRequest = {
       created_by: this.userId,
       PageNumber: this.currentPage,
@@ -450,12 +721,9 @@ export class AdminEventsComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading events:', error);
-        alert('Failed to load events');
+        this.toastr.error('Failed to load events', 'Error');
       },
     });
-
-    // Add this to your loadEvents method temporarily to debug
-    console.log('Sending request with PageSize:', Number(this.pageSize), 'Type:', typeof Number(this.pageSize));
   }
 
   // Banner methods
@@ -986,7 +1254,7 @@ export class AdminEventsComponent implements OnInit {
       gallery_media: '[]',
       artists: '[]',
       banner_image: '',
-      convenience_fee: this.eventForm.convenience_fee || 0.00, // Add this line
+      convenience_fee: this.eventForm.convenience_fee || 0.0, // Add this line
     };
 
     formData.append('EventDetails', JSON.stringify(eventDetails));
@@ -1015,7 +1283,7 @@ export class AdminEventsComponent implements OnInit {
     });
     formData.append('EventGalleries', JSON.stringify(galleriesWithData));
 
-    const seatTypesWithUserIds = this.seatTypes.map(seatType => {
+    const seatTypesWithUserIds = this.seatTypes.map((seatType) => {
       const seatTypeCopy = { ...seatType };
       seatTypeCopy.created_on = new Date().toISOString();
       seatTypeCopy.updated_on = new Date().toISOString();
@@ -1170,7 +1438,7 @@ export class AdminEventsComponent implements OnInit {
       max_price: this.eventForm.max_price || 0,
       age_limit: this.eventForm.age_limit || 0,
       no_of_seats: this.eventForm.no_of_seats || 0,
-      convenience_fee: this.eventForm.convenience_fee || 0.00, // Add this line
+      convenience_fee: this.eventForm.convenience_fee || 0.0, // Add this line
       gallery_media:
         this.galleries.length > 0
           ? JSON.stringify(this.galleries.map((g) => ({ image: g.event_img })))
@@ -1178,11 +1446,11 @@ export class AdminEventsComponent implements OnInit {
       artists:
         this.artists.length > 0
           ? JSON.stringify(
-            this.artists.map((a) => ({
-              name: a.artist_name,
-              photo: a.artist_photo,
-            }))
-          )
+              this.artists.map((a) => ({
+                name: a.artist_name,
+                photo: a.artist_photo,
+              })),
+            )
           : JSON.stringify([]),
     };
 
@@ -1207,7 +1475,7 @@ export class AdminEventsComponent implements OnInit {
     }));
     formData.append('EventGalleries', JSON.stringify(galleriesWithUserIds));
 
-    const seatTypesWithUserIds = this.seatTypes.map(seatType => {
+    const seatTypesWithUserIds = this.seatTypes.map((seatType) => {
       const seatTypeCopy = { ...seatType };
       seatTypeCopy.updated_by = this.userId;
       seatTypeCopy.updated_on = new Date().toISOString();
@@ -1279,7 +1547,7 @@ export class AdminEventsComponent implements OnInit {
       complete: () => {
         this.isDeleting = false;
         this.eventIdToDelete = 0;
-      }
+      },
     });
   }
 
@@ -1369,7 +1637,7 @@ export class AdminEventsComponent implements OnInit {
       updated_by: '',
       updated_at: currentDate.toISOString(),
       active: 1,
-      convenience_fee: 0.00, // Add this line
+      convenience_fee: 0.0, // Add this line
     };
 
     this.artists = [];
@@ -1555,7 +1823,7 @@ export class AdminEventsComponent implements OnInit {
       // Clear any pending modal backdrops
       setTimeout(() => {
         const backdrops = document.querySelectorAll('.modal-backdrop');
-        backdrops.forEach(backdrop => backdrop.remove());
+        backdrops.forEach((backdrop) => backdrop.remove());
         document.body.classList.remove('modal-open');
         document.body.style.removeProperty('padding-right');
         document.body.style.removeProperty('overflow');
@@ -1664,7 +1932,7 @@ export class AdminEventsComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading seat types:', error);
-      }
+      },
     });
   }
 
@@ -1688,7 +1956,7 @@ export class AdminEventsComponent implements OnInit {
       },
       complete: () => {
         this.isLoadingSummary = false;
-      }
+      },
     });
   }
 

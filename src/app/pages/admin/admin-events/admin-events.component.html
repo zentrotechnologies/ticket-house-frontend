@@ -49,10 +49,12 @@
   <div class="card card-white">
     <div class="table-responsive">
       <table class="table list-table">
+        <!-- Update the table header to show organizer column for admin -->
         <thead>
           <tr>
             <th class="col-sr">Sr. No</th>
             <th class="col-name">Event Name</th>
+            <th class="col-organizer" *ngIf="isAdmin">Organizer</th>
             <th class="col-desc">Description</th>
             <th class="col-date">Event Date</th>
             <th class="col-time">Time</th>
@@ -63,31 +65,10 @@
           </tr>
         </thead>
         <tbody>
-          <!-- In the table row: -->
           <tr *ngFor="let event of events; let i = index">
             <td>{{ (currentPage - 1) * pageSize + i + 1 }}</td>
-            <td>
-              <!-- <div class="event-name-with-media">
-                <div class="event-banner-small" *ngIf="event.eventDetails.banner_image">
-                  <img
-                    [src]="event.eventDetails.banner_image"
-                    [alt]="event.eventDetails.event_name"
-                    class="banner-img"
-                  />
-                </div>
-                <div class="event-banner-small" *ngIf="!event.eventDetails.banner_image">
-                  <div class="banner-placeholder">
-                    <i class="fa fa-image"></i>
-                  </div>
-                </div>
-                <span>{{ event.eventDetails.event_name }}</span>
-              </div> -->
-              {{ event.eventDetails.event_name }}
-            </td>
-            <!-- <td>
-              {{ event.eventDetails.event_description | slice : 0 : 100
-              }}{{ event.eventDetails.event_description.length > 100 ? '...' : '' }}
-            </td> -->
+            <td>{{ event.eventDetails.event_name }}</td>
+            <td *ngIf="isAdmin">{{ getOrganizerDisplayName(event) }}</td>
             <td [innerHTML]="event.eventDetails.event_description | slice : 0 : 100"></td>
             <td>{{ event.eventDetails.event_date | date : 'dd MMM yyyy' }}</td>
             <td>{{ event.eventDetails.start_time }} - {{ event.eventDetails.end_time }}</td>
@@ -95,33 +76,27 @@
             <td>{{ event.eventDetails.location }}</td>
             <td class="text-center">
               <span [ngClass]="{
-                  'status-badge status-active': event.eventDetails.status === 'active',
-                  'status-badge status-inactive': event.eventDetails.status === 'inactive',
-                  'status-badge status-draft': event.eventDetails.status === 'draft'
-                }">
+                'status-badge status-active': event.eventDetails.status === 'active',
+                'status-badge status-inactive': event.eventDetails.status === 'inactive',
+                'status-badge status-draft': event.eventDetails.status === 'draft'
+              }">
                 {{ event.eventDetails.status | titlecase }}
               </span>
             </td>
             <td class="text-center">
-              <!-- Update these click handlers too -->
-              <!-- <button class="icon-btn me-1" title="View" (click)="viewEvent(event.eventDetails.event_id)">
-                <i class="fa fa-eye"></i>
-              </button> -->
               <button class="icon-btn me-1" title="Edit" (click)="editEvent(event)">
                 <i class="bi bi-pencil"></i>
               </button>
               <button class="icon-btn danger" title="Delete" (click)="deleteEvent(event.eventDetails.event_id)">
                 <i class="bi bi-trash"></i>
               </button>
-              <!-- Info/Summary Icon Button - Add this -->
-              <button class="icon-btn info me-1" title="View Event Summary"
-                (click)="viewEventSummary(event.eventDetails.event_id)">
+              <button class="icon-btn info me-1" title="View Event Summary" (click)="viewEventSummary(event.eventDetails.event_id)">
                 <i class="bi bi-info-circle"></i>
               </button>
             </td>
           </tr>
           <tr *ngIf="events.length === 0">
-            <td colspan="9" class="text-center py-4">No events found. Create your first event!</td>
+            <td colspan="10" class="text-center py-4">No events found.</td>
           </tr>
         </tbody>
       </table>
