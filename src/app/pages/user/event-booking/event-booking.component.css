@@ -2128,3 +2128,212 @@ html {
 .about-text {
     transition: all 0.3s ease;
 }
+
+/* Fix for booking-main-content - reduce padding */
+.booking-main-content {
+  width: 100%;
+  min-width: 0;
+  padding-bottom: 0; /* Remove extra padding */
+}
+
+/* Fix about section spacing */
+.about-section {
+  margin-bottom: 24px; /* Reduced from 32px */
+}
+
+.about-section .section-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 12px; /* Reduced from 16px */
+  position: relative;
+  display: inline-block;
+}
+
+/* Fix description text spacing */
+.about-text {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--text-muted);
+  margin: 0;
+  padding: 0;
+}
+
+/* Remove extra spacing from paragraph tags inside description */
+.about-text p {
+  margin: 0 0 8px 0; /* Reduced bottom margin */
+}
+
+.about-text p:last-child {
+  margin-bottom: 0;
+}
+
+/* Fix ellipsis styling - remove extra white space */
+.truncation-ellipsis {
+  display: inline !important;
+  font-weight: 600;
+  color: rgb(146, 52, 234);
+  margin-left: 2px !important;
+  padding: 0 !important;
+}
+
+/* Fix read more button spacing */
+.read-more-btn {
+  background: none;
+  border: none;
+  color: #2c2e72;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 0 0 0; /* Reduced padding */
+  margin-top: 4px; /* Reduced from 8px */
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.2s ease;
+}
+
+/* Fix CTA section spacing on mobile */
+.cta-section {
+  margin: 30px 0; /* Reduced from 60px */
+  width: 100%;
+}
+
+/* Mobile responsive fixes */
+@media (max-width: 768px) {
+  .about-section {
+    margin-bottom: 16px;
+  }
+  
+  .about-text {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  
+  .about-text p {
+    margin: 0 0 6px 0;
+  }
+  
+  .cta-section {
+    margin: 20px 0; /* Further reduced on mobile */
+  }
+  
+  .cta {
+    padding: 24px 20px; /* Reduced padding */
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+  
+  .cta-text {
+    font-size: 22px; /* Reduced from 32px */
+  }
+  
+  /* Fix event details section spacing */
+  .event-details-section {
+    margin-bottom: 16px;
+    padding: 14px 16px;
+  }
+  
+  .event-details-grid {
+    gap: 10px;
+  }
+  
+  /* Quick info section spacing */
+  .quick-info-section {
+    margin-bottom: 20px;
+    padding: 14px 16px;
+  }
+  
+  .quick-info-grid {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  /* Similar shows spacing */
+  .similar-shows {
+    margin-bottom: 20px;
+  }
+  
+  /* Remove extra padding from booking main content */
+  .booking-main-content {
+    padding-bottom: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .about-section {
+    margin-bottom: 12px;
+  }
+  
+  .about-text {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  
+  .about-text p {
+    margin: 0 0 4px 0;
+  }
+  
+  .cta-section {
+    margin: 16px 0;
+  }
+  
+  .cta {
+    padding: 20px 16px;
+  }
+  
+  .cta-text {
+    font-size: 18px;
+  }
+  
+  .event-details-section {
+    padding: 12px 14px;
+    margin-bottom: 12px;
+  }
+  
+  .quick-info-section {
+    padding: 12px 14px;
+    margin-bottom: 16px;
+  }
+  
+  .section-title {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+}
+
+/* Remove extra spacing from about text */
+.about-text {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--text-muted);
+  margin: 0;
+  padding: 0;
+}
+
+/* Force inline display for ellipsis span */
+.about-text .ellipsis-text,
+.about-text .truncation-ellipsis {
+  display: inline !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-weight: 600;
+  color: rgb(146, 52, 234);
+}
+
+/* Remove extra spacing from paragraphs */
+.about-text p {
+  margin: 0 0 8px 0;
+  padding: 0;
+}
+
+.about-text p:last-child {
+  margin-bottom: 0;
+}
+
+/* If the ellipsis is inside a paragraph, ensure it stays inline */
+.about-text p .ellipsis-text,
+.about-text p .truncation-ellipsis {
+  display: inline !important;
+}

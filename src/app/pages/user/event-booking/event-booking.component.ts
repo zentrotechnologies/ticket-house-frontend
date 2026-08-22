@@ -6,11 +6,12 @@ import { ApiService } from '../../../core/services/api.service';
 import { DateworkerService } from '../../../core/services/dateworker.service';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../../core/services/auth.service';
+import { SafeHtmlPipe } from '../../../core/pipes/safe-html-pipe';
 
 @Component({
   selector: 'app-event-booking',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, SafeHtmlPipe],
   templateUrl: './event-booking.component.html',
   styleUrl: './event-booking.component.css',
 })
@@ -1192,106 +1193,106 @@ export class EventBookingComponent implements OnInit {
     return false;
   }
 
-  get truncatedDescription(): string {
-    if (!this.eventDetails?.event_description) return '';
+  // get truncatedDescription(): string {
+  //   if (!this.eventDetails?.event_description) return '';
 
-    const htmlContent = this.eventDetails.event_description;
-    const plainText = this.stripHtmlTags(htmlContent);
+  //   const htmlContent = this.eventDetails.event_description;
+  //   const plainText = this.stripHtmlTags(htmlContent);
 
-    // Check if it's Marathi or Devanagari script
-    const isDevanagari = /[\u0900-\u097F]/.test(plainText);
+  //   // Check if it's Marathi or Devanagari script
+  //   const isDevanagari = /[\u0900-\u097F]/.test(plainText);
 
-    // Adjust limit for Devanagari script (Marathi/Hindi) - reduce by 40% because characters are wider
-    let effectiveLimit = this.descriptionCharLimit;
-    if (isDevanagari) {
-      effectiveLimit = Math.floor(this.descriptionCharLimit * 0.6); // 60% of original for Marathi
-    }
+  //   // Adjust limit for Devanagari script (Marathi/Hindi) - reduce by 40% because characters are wider
+  //   let effectiveLimit = this.descriptionCharLimit;
+  //   if (isDevanagari) {
+  //     effectiveLimit = Math.floor(this.descriptionCharLimit * 0.6); // 60% of original for Marathi
+  //   }
 
-    if (plainText.length <= effectiveLimit) {
-      return htmlContent;
-    }
+  //   if (plainText.length <= effectiveLimit) {
+  //     return htmlContent;
+  //   }
 
-    // Smart truncation that preserves HTML structure
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = htmlContent;
+  //   // Smart truncation that preserves HTML structure
+  //   const tempDiv = document.createElement('div');
+  //   tempDiv.innerHTML = htmlContent;
 
-    let accumulatedLength = 0;
-    let result = '';
+  //   let accumulatedLength = 0;
+  //   let result = '';
 
-    const processNode = (node: Node): boolean => {
-      if (accumulatedLength >= effectiveLimit) return false;
+  //   const processNode = (node: Node): boolean => {
+  //     if (accumulatedLength >= effectiveLimit) return false;
 
-      if (node.nodeType === Node.TEXT_NODE) {
-        const text = node.textContent || '';
-        const remaining = effectiveLimit - accumulatedLength;
+  //     if (node.nodeType === Node.TEXT_NODE) {
+  //       const text = node.textContent || '';
+  //       const remaining = effectiveLimit - accumulatedLength;
 
-        if (text.length > remaining) {
-          // Need to truncate this text
-          let truncatedText = text.substring(0, remaining);
-          // Don't cut in the middle of a word if possible
-          const lastSpace = truncatedText.lastIndexOf(' ');
-          if (lastSpace > remaining * 0.7) {
-            truncatedText = truncatedText.substring(0, lastSpace);
-          }
-          result += truncatedText;
-          accumulatedLength += truncatedText.length;
-          return false;
-        } else {
-          result += text;
-          accumulatedLength += text.length;
-          return true;
-        }
-      } else if (node.nodeType === Node.ELEMENT_NODE) {
-        const element = node as HTMLElement;
-        const tagName = element.tagName.toLowerCase();
+  //       if (text.length > remaining) {
+  //         // Need to truncate this text
+  //         let truncatedText = text.substring(0, remaining);
+  //         // Don't cut in the middle of a word if possible
+  //         const lastSpace = truncatedText.lastIndexOf(' ');
+  //         if (lastSpace > remaining * 0.7) {
+  //           truncatedText = truncatedText.substring(0, lastSpace);
+  //         }
+  //         result += truncatedText;
+  //         accumulatedLength += truncatedText.length;
+  //         return false;
+  //       } else {
+  //         result += text;
+  //         accumulatedLength += text.length;
+  //         return true;
+  //       }
+  //     } else if (node.nodeType === Node.ELEMENT_NODE) {
+  //       const element = node as HTMLElement;
+  //       const tagName = element.tagName.toLowerCase();
 
-        // Don't process script or style tags
-        if (tagName === 'script' || tagName === 'style') {
-          return true;
-        }
+  //       // Don't process script or style tags
+  //       if (tagName === 'script' || tagName === 'style') {
+  //         return true;
+  //       }
 
-        // Open tag
-        result += `<${tagName}`;
+  //       // Open tag
+  //       result += `<${tagName}`;
 
-        // Copy attributes
-        if (element.attributes) {
-          for (let i = 0; i < element.attributes.length; i++) {
-            const attr = element.attributes[i];
-            result += ` ${attr.name}="${attr.value}"`;
-          }
-        }
-        result += '>';
+  //       // Copy attributes
+  //       if (element.attributes) {
+  //         for (let i = 0; i < element.attributes.length; i++) {
+  //           const attr = element.attributes[i];
+  //           result += ` ${attr.name}="${attr.value}"`;
+  //         }
+  //       }
+  //       result += '>';
 
-        // Process children
-        let continueProcessing = true;
-        for (const child of Array.from(element.childNodes)) {
-          if (!continueProcessing) break;
-          continueProcessing = processNode(child);
-        }
+  //       // Process children
+  //       let continueProcessing = true;
+  //       for (const child of Array.from(element.childNodes)) {
+  //         if (!continueProcessing) break;
+  //         continueProcessing = processNode(child);
+  //       }
 
-        // Close tag if we processed all children or this is a void element
-        const voidElements = ['br', 'hr', 'img', 'input', 'link', 'meta'];
-        if (!voidElements.includes(tagName)) {
-          result += `</${tagName}>`;
-        }
+  //       // Close tag if we processed all children or this is a void element
+  //       const voidElements = ['br', 'hr', 'img', 'input', 'link', 'meta'];
+  //       if (!voidElements.includes(tagName)) {
+  //         result += `</${tagName}>`;
+  //       }
 
-        return continueProcessing;
-      }
+  //       return continueProcessing;
+  //     }
 
-      return true;
-    };
+  //     return true;
+  //   };
 
-    // Process the document
-    for (const node of Array.from(tempDiv.childNodes)) {
-      if (!processNode(node)) break;
-    }
+  //   // Process the document
+  //   for (const node of Array.from(tempDiv.childNodes)) {
+  //     if (!processNode(node)) break;
+  //   }
 
-    // Remove any incomplete tags at the end
-    result = this.closeOpenTags(result);
+  //   // Remove any incomplete tags at the end
+  //   result = this.closeOpenTags(result);
 
-    // Add ellipsis with proper styling
-    return result + '<span class="truncation-ellipsis">...</span>';
-  }
+  //   // Add ellipsis with proper styling
+  //   return result + '<span class="truncation-ellipsis">...</span>';
+  // }
 
   // Helper method to close any open HTML tags
   private closeOpenTags(html: string): string {
@@ -1320,9 +1321,9 @@ export class EventBookingComponent implements OnInit {
     return html;
   }
 
-  get fullDescription(): string {
-    return this.eventDetails?.event_description || '';
-  }
+  // get fullDescription(): string {
+  //   return this.eventDetails?.event_description || '';
+  // }
 
   get displayDescription(): string {
     if (this.isDescriptionExpanded || !this.shouldTruncateDescription) {
@@ -1342,4 +1343,66 @@ export class EventBookingComponent implements OnInit {
     temp.innerHTML = html;
     return temp.textContent || temp.innerText || '';
   }
+
+  // Add this helper method to clean up HTML content
+private cleanHtmlContent(html: string): string {
+    if (!html) return '';
+    
+    // Create a temporary div to parse HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    
+    // Remove empty paragraph tags
+    const paragraphs = tempDiv.querySelectorAll('p');
+    paragraphs.forEach(p => {
+        if (p.innerHTML.trim() === '' || p.innerHTML.trim() === '<br>' || p.innerHTML.trim() === '&nbsp;') {
+            p.remove();
+        }
+    });
+    
+    // Remove consecutive <br> tags (keep only one)
+    let htmlString = tempDiv.innerHTML;
+    htmlString = htmlString.replace(/(<br\s*\/?>)\s*(<br\s*\/?>)+/gi, '<br>');
+    htmlString = htmlString.replace(/(<p>\s*<\/p>)/gi, '');
+    htmlString = htmlString.replace(/(<p>\s*<br\s*\/?>\s*<\/p>)/gi, '');
+    
+    return htmlString;
+}
+
+// Update the truncatedDescription getter
+get truncatedDescription(): string {
+    if (!this.eventDetails?.event_description) return '';
+
+    const htmlContent = this.eventDetails.event_description;
+    const cleanedHtml = this.cleanHtmlContent(htmlContent);
+    const plainText = this.stripHtmlTags(cleanedHtml);
+
+    const isDevanagari = /[\u0900-\u097F]/.test(plainText);
+    let effectiveLimit = this.descriptionCharLimit;
+    if (isDevanagari) {
+        effectiveLimit = Math.floor(this.descriptionCharLimit * 0.6);
+    }
+
+    if (plainText.length <= effectiveLimit) {
+        return cleanedHtml;
+    }
+
+    // Simple truncation - strip all HTML, truncate text, then wrap in paragraphs
+    let truncatedText = plainText.substring(0, effectiveLimit);
+    const lastSpace = truncatedText.lastIndexOf(' ');
+    if (lastSpace > effectiveLimit * 0.7) {
+        truncatedText = truncatedText.substring(0, lastSpace);
+    }
+    
+    // Remove trailing punctuation
+    truncatedText = truncatedText.replace(/[,.;:!?]+$/, '');
+    
+    // Wrap in paragraph with ellipsis
+    return `<p>${truncatedText}<span class="ellipsis-text">...</span></p>`;
+}
+
+// Update fullDescription getter
+get fullDescription(): string {
+    return this.cleanHtmlContent(this.eventDetails?.event_description || '');
+}
 }
