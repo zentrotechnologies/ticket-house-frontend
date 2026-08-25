@@ -18,10 +18,12 @@ export class SidebarComponent implements OnInit {
   isCollapsed = false;
   isMobileView = false;
   isMobileSidebarOpen = false;
+  userRoleId: number = 0;
 
   constructor(private authService: AuthService) {}
 
   ngOnInit(): void {
+    this.userRoleId = this.authService.getUserRoleId();
     this.menuItems = this.authService.getMenuItems();
     this.checkScreenSize();
   }
@@ -60,5 +62,12 @@ export class SidebarComponent implements OnInit {
 
   hasChildren(menuItem: MenuItem): boolean {
     return !!menuItem.children && menuItem.children.length > 0;
+  }
+
+  // Add this getter to check if sidebar should be visible
+  get shouldShowSidebar(): boolean {
+    // Only show sidebar for Super Admin (role 1)
+    // Hide for Organizer (role 2) and other roles
+    return this.userRoleId === 1;
   }
 }

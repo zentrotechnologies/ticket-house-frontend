@@ -1,70 +1,73 @@
-<!-- Mobile toggle button - placed before sidebar as sibling -->
-<button class="mobile-toggle-btn" 
-        (click)="toggleMobileSidebar()" 
-        *ngIf="isMobileView && !isMobileSidebarOpen">
-  <span class="hamburger-icon">☰</span>
-</button>
+<!-- Only render sidebar if user is Super Admin (role_id: 1) -->
+<ng-container *ngIf="shouldShowSidebar">
+  <!-- Mobile toggle button - placed before sidebar as sibling -->
+  <button class="mobile-toggle-btn" 
+          (click)="toggleMobileSidebar()" 
+          *ngIf="isMobileView && !isMobileSidebarOpen">
+    <span class="hamburger-icon">☰</span>
+  </button>
 
-<!-- Overlay for mobile -->
-<div class="mobile-overlay" *ngIf="isMobileSidebarOpen" (click)="closeMobileSidebar()"></div>
+  <!-- Overlay for mobile -->
+  <div class="mobile-overlay" *ngIf="isMobileSidebarOpen" (click)="closeMobileSidebar()"></div>
 
-<div class="sidebar" 
-     [class.collapsed]="isCollapsed" 
-     [class.mobile-open]="isMobileSidebarOpen"
-     [class.mobile-view]="isMobileView">
-  <div class="sidebar-header">
-    <h3 *ngIf="!isCollapsed || isMobileSidebarOpen">Ticket House</h3>
-    <button class="toggle-btn" (click)="toggleSidebar()" *ngIf="!isMobileView">
-      {{ isCollapsed ? '→' : '←' }}
-    </button>
-    <button class="close-btn" (click)="closeMobileSidebar()" *ngIf="isMobileView && isMobileSidebarOpen">
-      ✕
-    </button>
-  </div>
+  <div class="sidebar" 
+       [class.collapsed]="isCollapsed" 
+       [class.mobile-open]="isMobileSidebarOpen"
+       [class.mobile-view]="isMobileView">
+    <div class="sidebar-header">
+      <h3 *ngIf="!isCollapsed || isMobileSidebarOpen">Ticket House</h3>
+      <button class="toggle-btn" (click)="toggleSidebar()" *ngIf="!isMobileView">
+        {{ isCollapsed ? '→' : '←' }}
+      </button>
+      <button class="close-btn" (click)="closeMobileSidebar()" *ngIf="isMobileView && isMobileSidebarOpen">
+        ✕
+      </button>
+    </div>
 
-  <nav class="sidebar-nav">
-    <ul class="menu-list">
-      <li *ngFor="let menuItem of menuItems" class="menu-item">
-        <div class="menu-header">
-          <a 
-            *ngIf="!hasChildren(menuItem) && menuItem.route" 
-            [routerLink]="menuItem.route"
-            routerLinkActive="active"
-            class="menu-link"
-            (click)="closeMobileSidebar()"
-          >
-            <span class="menu-icon">📊</span>
-            <span class="menu-text" *ngIf="!isCollapsed || isMobileSidebarOpen">{{ menuItem.title }}</span>
-          </a>
-          
-          <div 
-            *ngIf="hasChildren(menuItem)" 
-            class="menu-parent"
-          >
-            <span class="menu-link">
-              <span class="menu-icon">📋</span>
+    <nav class="sidebar-nav">
+      <ul class="menu-list">
+        <li *ngFor="let menuItem of menuItems" class="menu-item">
+          <div class="menu-header">
+            <a 
+              *ngIf="!hasChildren(menuItem) && menuItem.route" 
+              [routerLink]="menuItem.route"
+              routerLinkActive="active"
+              class="menu-link"
+              (click)="closeMobileSidebar()"
+            >
+              <span class="menu-icon">📊</span>
               <span class="menu-text" *ngIf="!isCollapsed || isMobileSidebarOpen">{{ menuItem.title }}</span>
-              <span class="menu-arrow" *ngIf="!isCollapsed || isMobileSidebarOpen">▼</span>
-            </span>
+            </a>
             
-            <ul class="submenu" *ngIf="!isCollapsed || isMobileSidebarOpen">
-              <li *ngFor="let child of menuItem.children" class="submenu-item">
-                <a 
-                  [routerLink]="child.route"
-                  routerLinkActive="active"
-                  class="submenu-link"
-                  (click)="closeMobileSidebar()"
-                >
-                  {{ child.title }}
-                </a>
-              </li>
-            </ul>
+            <div 
+              *ngIf="hasChildren(menuItem)" 
+              class="menu-parent"
+            >
+              <span class="menu-link">
+                <span class="menu-icon">📋</span>
+                <span class="menu-text" *ngIf="!isCollapsed || isMobileSidebarOpen">{{ menuItem.title }}</span>
+                <span class="menu-arrow" *ngIf="!isCollapsed || isMobileSidebarOpen">▼</span>
+              </span>
+              
+              <ul class="submenu" *ngIf="!isCollapsed || isMobileSidebarOpen">
+                <li *ngFor="let child of menuItem.children" class="submenu-item">
+                  <a 
+                    [routerLink]="child.route"
+                    routerLinkActive="active"
+                    class="submenu-link"
+                    (click)="closeMobileSidebar()"
+                  >
+                    {{ child.title }}
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
-        </div>
-      </li>
-    </ul>
-  </nav>
-</div>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</ng-container>
 
 <!-- <div class="sidebar" [class.collapsed]="isCollapsed">
   <div class="sidebar-header">

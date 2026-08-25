@@ -15,12 +15,6 @@ import { UserHeaderComponent } from "./user-header/user-header.component";
   styleUrls: ['./layout.component.css']
 })
 export class LayoutComponent {
-  // isSidebarCollapsed = false;
-
-  // onSidebarToggle(collapsed: boolean): void {
-  //   this.isSidebarCollapsed = collapsed;
-  // }
-
   isSidebarCollapsed = false;
   userRole: number | null = null;
 
@@ -41,17 +35,23 @@ export class LayoutComponent {
     this.isSidebarCollapsed = collapsed;
   }
 
-  // Check if user is admin (role_id 1 or 2)
-  // In layout.component.ts - add to isAdminUser() and isAudienceOrPublic()
-  isAdminUser(): boolean {
-    const isAdmin = this.userRole === 1 || this.userRole === 2;
-    // console.log('Layout - isAdminUser:', isAdmin, 'role:', this.userRole);
-    return isAdmin;
+  // Check if user is Super Admin (role_id 1)
+  isSuperAdmin(): boolean {
+    return this.userRole === 1;
   }
 
+  // Check if user is Organizer (role_id 2)
+  isOrganizer(): boolean {
+    return this.userRole === 2;
+  }
+
+  // Check if user is Admin (role_id 1 or 2)
+  isAdminUser(): boolean {
+    return this.userRole === 1 || this.userRole === 2;
+  }
+
+  // Check if user is Audience (role_id 3) or Public (not logged in)
   isAudienceOrPublic(): boolean {
-    const isAudienceOrPublic = !this.userRole || this.userRole === 3;
-    // console.log('Layout - isAudienceOrPublic:', isAudienceOrPublic, 'role:', this.userRole);
-    return isAudienceOrPublic;
+    return !this.userRole || this.userRole === 3;
   }
 }

@@ -5,6 +5,43 @@ import { ToastrService } from 'ngx-toastr';
 import { environment } from '../../../../environments/environment';
 import { ApiService } from '../../../core/services/api.service';
 
+// Add this interface for event summary
+interface EventSummaryData {
+  eventId: number;
+  eventName: string;
+  eventDate: string;
+  startTime: string;
+  endTime: string;
+  location: string;
+  currency: string;
+  totalSeats: number;
+  bookedSeats: number;
+  availableSeats: number;
+  occupancyPercentage: number;
+  totalProfit: number;
+  seatTypeDetails: SeatTypeDetail[];
+  paymentDetails: PaymentDetail | null;
+}
+
+interface SeatTypeDetail {
+  seatName: string;
+  price: number;
+  totalSeats: number;
+  bookedSeats: number;
+  availableSeats: number;
+  revenue: number;
+  occupancyPercentage: number;
+}
+
+interface PaymentDetail {
+  totalSuccessfulBookings: number;
+  totalAmount: number;
+  totalConvenienceFee: number;
+  totalGST: number;
+  firstBookingDate: string;
+  lastBookingDate: string;
+}
+
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
@@ -25,6 +62,10 @@ export class AdminDashboardComponent implements OnInit {
   totalRecentEvents: number = 0;
   currentPage: number = 1;
   pageSize: number = 5; // Show only 5 recent events on dashboard
+  
+  // Event Summary
+  isLoadingSummary: boolean = false;
+  eventSummary: EventSummaryData | null = null;
   
   dashboardStats = {
     totalEvents: 0,
@@ -249,6 +290,87 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
+  // NEW: View Event Summary - same as admin-events component
+  viewEventSummary(eventId: number): void {
+    this.isLoadingSummary = true;
+    this.eventSummary = null;
+
+    this.apiService.getEventSummary(eventId).subscribe({
+      next: (response) => {
+        if (response.status === 'Success' && response.data) {
+          this.eventSummary = response.data;
+          this.showModal('eventSummaryModal');
+        } else {
+          this.toastr.error(response.message || 'Failed to load event summary', 'Error');
+        }
+      },
+      error: (error) => {
+        console.error('Error loading event summary:', error);
+        this.toastr.error('Failed to load event summary', 'Error');
+      },
+      complete: () => {
+        this.isLoadingSummary = false;
+      },
+    });
+  }
+
+  // NEW: Modal methods - same as admin-events component
+  showModal(modalId: string): void {
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+      modalElement.classList.add('show');
+      modalElement.style.display = 'block';
+      modalElement.setAttribute('aria-modal', 'true');
+      modalElement.setAttribute('role', 'dialog');
+      document.body.classList.add('modal-open');
+
+      // Add backdrop
+      let backdrop = document.querySelector('.modal-backdrop');
+      if (!backdrop) {
+        backdrop = document.createElement('div');
+        backdrop.className = 'modal-backdrop fade show';
+        document.body.appendChild(backdrop);
+      }
+    }
+  }
+
+  closeModalProperly(modalId: string): void {
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+      // Use Bootstrap's modal API if available
+      try {
+        // @ts-ignore
+        const bootstrapModal = bootstrap.Modal.getInstance(modalElement);
+        if (bootstrapModal) {
+          bootstrapModal.hide();
+        } else {
+          // Fallback to manual closing
+          this.manualCloseModal(modalElement);
+        }
+      } catch (error) {
+        // If Bootstrap is not available, use manual close
+        this.manualCloseModal(modalElement);
+      }
+
+      // Clear any pending modal backdrops
+      setTimeout(() => {
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach((backdrop) => backdrop.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.removeProperty('padding-right');
+        document.body.style.removeProperty('overflow');
+      }, 150);
+    }
+  }
+
+  private manualCloseModal(modalElement: HTMLElement): void {
+    modalElement.classList.remove('show');
+    modalElement.style.display = 'none';
+    modalElement.setAttribute('aria-hidden', 'true');
+    modalElement.removeAttribute('aria-modal');
+    modalElement.removeAttribute('role');
+  }
+
   // Helper method to strip HTML tags for description preview
   stripHtmlTags(html: string): string {
     if (!html) return '';
@@ -291,14 +413,5 @@ export class AdminDashboardComponent implements OnInit {
     } catch {
       return date;
     }
-  }
-
-  // View event summary (navigate to events page or open modal)
-  viewEventSummary(eventId: number): void {
-    // You can navigate to the events page or open a modal
-    // For now, we'll just show a toast
-    this.toastr.info('Viewing event summary', 'Info');
-    // Navigate to events page with filter
-    // this.router.navigate(['/admin/events'], { queryParams: { eventId: eventId } });
   }
 }

@@ -332,4 +332,9 @@ export class AuthService {
   isOrganizerUser(): boolean {
     return this.getCurrentUserRole() === 2;
   }
+
+  getUserRoleId(): number {
+    const user = this.getCurrentUser();
+    return user?.role_id || 0;
+  }
 }

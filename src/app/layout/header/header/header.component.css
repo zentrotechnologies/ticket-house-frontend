@@ -17,6 +17,11 @@
   left: 60px;
 }
 
+/* NEW: Full width mode - when sidebar is completely hidden */
+.header.full-width {
+  left: 0 !important;
+}
+
 .header-content {
   display: flex;
   justify-content: space-between;
@@ -203,12 +208,16 @@
 /* Responsive */
 @media (max-width: 768px) {
   .header {
-    left: 0;
+    left: 0 !important;
     z-index: 997;
   }
   
   .header.sidebar-collapsed {
-    left: 0;
+    left: 0 !important;
+  }
+  
+  .header.full-width {
+    left: 0 !important;
   }
   
   .header-content {

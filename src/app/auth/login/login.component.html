@@ -69,11 +69,17 @@
                                 placeholder=" "
                                 [class.invalid]="isFieldInvalid('password')">
                             <label for="password">Password<span class="text-danger">*</span></label>
-                            <i 
+                            <!-- <i 
                                 class="fas toggle-eye-icon" 
                                 [class.fa-eye]="!showPassword" 
                                 [class.fa-eye-slash]="showPassword"
-                                (click)="togglePasswordVisibility()"></i>
+                                (click)="togglePasswordVisibility()"></i> -->
+                            <i 
+                            class="bi toggle-eye-icon" 
+                            [class.bi-eye]="!showPassword" 
+                            [class.bi-eye-slash]="showPassword"
+                            (click)="togglePasswordVisibility()">
+                            </i>
                             <div class="error-message" *ngIf="isFieldInvalid('password')">
                                 {{ getFieldError('password') }}
                             </div>

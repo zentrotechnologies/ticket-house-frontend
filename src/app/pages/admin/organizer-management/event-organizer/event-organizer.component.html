@@ -42,7 +42,7 @@
             <i class="fa fa-search"></i>
           </button>
           <button *ngIf="searchText" class="btn btn-outline-secondary" type="button" (click)="clearSearch()">
-            <i class="fa fa-times"></i>
+            <i class="bi bi-x"></i>
           </button>
         </div>
       </div>
@@ -113,7 +113,7 @@
                   <button *ngIf="organizer.verification_status === 'pending'" 
                           class="btn btn-sm btn-outline-warning" title="Reject"
                           (click)="updateOrganizerStatus(organizer.organizer_id!, 0)">
-                    <i class="fa fa-times"></i>
+                    <i class="bi bi-x"></i>
                   </button>
                 </div>
               </div>

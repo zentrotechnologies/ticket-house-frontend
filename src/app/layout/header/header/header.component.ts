@@ -12,6 +12,7 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class HeaderComponent implements OnInit {
   @Input() isSidebarCollapsed = false;
+  @Input() isFullWidth = false; // NEW: When true, header takes full width
   
   isProfileMenuOpen = false;
   userName: string = '';
