@@ -273,6 +273,24 @@ export class AdminEventsComponent implements OnInit {
     },
   };
 
+  editingSeatIndex: number = -1;
+  editingSeatType: any = {
+    event_seat_type_inventory_id: 0,
+    event_id: 0,
+    seat_name: '',
+    price: 0,
+    total_seats: 0,
+    available_seats: 0,
+    is_sold_out: false,
+    created_by: '',
+    created_on: '',
+    updated_by: '',
+    updated_on: null,
+    active: 1
+  };
+
+  isUpdatingSeatType: boolean = false;
+
   @ViewChild('artistPhotoInput') artistPhotoInput!: ElementRef<HTMLInputElement>;
   @ViewChild('artistPhotoInputEdit') artistPhotoInputEdit!: ElementRef<HTMLInputElement>;
   @ViewChild('closeAddModalBtn') closeAddModalBtn!: ElementRef<HTMLButtonElement>; // Add this
@@ -373,7 +391,7 @@ export class AdminEventsComponent implements OnInit {
     private apiService: ApiService,
     private authService: AuthService,
     private toastr: ToastrService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     // Get current user from localStorage or AuthService
@@ -440,116 +458,116 @@ export class AdminEventsComponent implements OnInit {
   // }
 
   loadCurrentUser(): void {
-  console.log('=== loadCurrentUser called ===');
-  
-  // Method 1: Try to get from AuthService's BehaviorSubject
-  const user = this.authService.getCurrentUser();
-  if (user) {
-    this.currentUser = user;
-    this.userId = user.user_id || '';
-    console.log('User loaded from AuthService:', this.currentUser);
-    return;
-  }
+    console.log('=== loadCurrentUser called ===');
 
-  // Method 2: Try to get from localStorage using the correct key
-  const userDataStr = localStorage.getItem(environment.USERDATA_KEY);
-  console.log('USERDATA_KEY:', environment.USERDATA_KEY);
-  console.log('Raw user data from localStorage:', userDataStr);
-  
-  if (userDataStr) {
-    try {
-      // Parse the login response
-      const loginResponse = JSON.parse(userDataStr);
-      console.log('Parsed login response:', loginResponse);
-      
-      // Extract user data from the login response
-      this.currentUser = {
-        user_id: loginResponse.user_id || '',
-        first_name: loginResponse.first_name || '',
-        last_name: loginResponse.last_name || '',
-        email: loginResponse.email || '',
-        mobile: loginResponse.mobile || '',
-        country_code: loginResponse.country_code || '',
-        profile_img: loginResponse.profile_img || null,
-        role_id: loginResponse.role_id || 0,
-      };
-      
-      this.userId = this.currentUser.user_id || '';
-      console.log('User loaded successfully:', this.currentUser);
-      console.log('User role_id:', this.currentUser.role_id);
-      
-      // Also update AuthService's BehaviorSubject
-      this.authService.setcurrentUser(this.currentUser);
-      
+    // Method 1: Try to get from AuthService's BehaviorSubject
+    const user = this.authService.getCurrentUser();
+    if (user) {
+      this.currentUser = user;
+      this.userId = user.user_id || '';
+      console.log('User loaded from AuthService:', this.currentUser);
       return;
-    } catch (error) {
-      console.error('Error parsing user data from USERDATA_KEY:', error);
     }
-  }
 
-  // Method 3: Try alternative keys
-  const alternativeKeys = ['user', 'currentUser', 'user_data', 'auth_user'];
-  for (const key of alternativeKeys) {
-    const data = localStorage.getItem(key);
-    if (data) {
+    // Method 2: Try to get from localStorage using the correct key
+    const userDataStr = localStorage.getItem(environment.USERDATA_KEY);
+    console.log('USERDATA_KEY:', environment.USERDATA_KEY);
+    console.log('Raw user data from localStorage:', userDataStr);
+
+    if (userDataStr) {
       try {
-        const parsed = JSON.parse(data);
-        console.log(`Found data in key "${key}":`, parsed);
-        
-        // Check if it has user data
-        if (parsed.user_id || parsed.role_id) {
+        // Parse the login response
+        const loginResponse = JSON.parse(userDataStr);
+        console.log('Parsed login response:', loginResponse);
+
+        // Extract user data from the login response
+        this.currentUser = {
+          user_id: loginResponse.user_id || '',
+          first_name: loginResponse.first_name || '',
+          last_name: loginResponse.last_name || '',
+          email: loginResponse.email || '',
+          mobile: loginResponse.mobile || '',
+          country_code: loginResponse.country_code || '',
+          profile_img: loginResponse.profile_img || null,
+          role_id: loginResponse.role_id || 0,
+        };
+
+        this.userId = this.currentUser.user_id || '';
+        console.log('User loaded successfully:', this.currentUser);
+        console.log('User role_id:', this.currentUser.role_id);
+
+        // Also update AuthService's BehaviorSubject
+        this.authService.setcurrentUser(this.currentUser);
+
+        return;
+      } catch (error) {
+        console.error('Error parsing user data from USERDATA_KEY:', error);
+      }
+    }
+
+    // Method 3: Try alternative keys
+    const alternativeKeys = ['user', 'currentUser', 'user_data', 'auth_user'];
+    for (const key of alternativeKeys) {
+      const data = localStorage.getItem(key);
+      if (data) {
+        try {
+          const parsed = JSON.parse(data);
+          console.log(`Found data in key "${key}":`, parsed);
+
+          // Check if it has user data
+          if (parsed.user_id || parsed.role_id) {
+            this.currentUser = {
+              user_id: parsed.user_id || '',
+              first_name: parsed.first_name || '',
+              last_name: parsed.last_name || '',
+              email: parsed.email || '',
+              mobile: parsed.mobile || '',
+              country_code: parsed.country_code || '',
+              profile_img: parsed.profile_img || null,
+              role_id: parsed.role_id || 0,
+            };
+            this.userId = this.currentUser.user_id || '';
+            console.log('User loaded from key:', key, this.currentUser);
+            return;
+          }
+        } catch (e) {
+          // Continue to next key
+        }
+      }
+    }
+
+    // Method 4: Try to get from JWT token
+    const token = localStorage.getItem('jwt_token');
+    if (token) {
+      try {
+        // Decode JWT token to get user info
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        console.log('JWT payload:', payload);
+
+        if (payload.email || payload.sub) {
           this.currentUser = {
-            user_id: parsed.user_id || '',
-            first_name: parsed.first_name || '',
-            last_name: parsed.last_name || '',
-            email: parsed.email || '',
-            mobile: parsed.mobile || '',
-            country_code: parsed.country_code || '',
-            profile_img: parsed.profile_img || null,
-            role_id: parsed.role_id || 0,
+            user_id: payload.sub || payload.user_id || '',
+            first_name: payload.first_name || '',
+            last_name: payload.last_name || '',
+            email: payload.email || '',
+            mobile: payload.mobile || '',
+            country_code: payload.country_code || '',
+            profile_img: payload.profile_img || null,
+            role_id: parseInt(payload.role_id) || 0,
           };
           this.userId = this.currentUser.user_id || '';
-          console.log('User loaded from key:', key, this.currentUser);
+          console.log('User loaded from JWT token:', this.currentUser);
           return;
         }
       } catch (e) {
-        // Continue to next key
+        console.error('Error decoding JWT token:', e);
       }
     }
-  }
 
-  // Method 4: Try to get from JWT token
-  const token = localStorage.getItem('jwt_token');
-  if (token) {
-    try {
-      // Decode JWT token to get user info
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      console.log('JWT payload:', payload);
-      
-      if (payload.email || payload.sub) {
-        this.currentUser = {
-          user_id: payload.sub || payload.user_id || '',
-          first_name: payload.first_name || '',
-          last_name: payload.last_name || '',
-          email: payload.email || '',
-          mobile: payload.mobile || '',
-          country_code: payload.country_code || '',
-          profile_img: payload.profile_img || null,
-          role_id: parseInt(payload.role_id) || 0,
-        };
-        this.userId = this.currentUser.user_id || '';
-        console.log('User loaded from JWT token:', this.currentUser);
-        return;
-      }
-    } catch (e) {
-      console.error('Error decoding JWT token:', e);
-    }
+    console.error('Could not load user data from any source');
+    this.currentUser = null;
+    this.userId = '';
   }
-
-  console.error('Could not load user data from any source');
-  this.currentUser = null;
-  this.userId = '';
-}
 
   loadCategories(): void {
     this.isLoadingCategories = true;
@@ -606,7 +624,7 @@ export class AdminEventsComponent implements OnInit {
   loadEvents(): void {
     // Check if user is admin
     const isAdmin = this.currentUser?.role_id === 1 || this.authService.isAdminUser();
-    
+
     if (isAdmin) {
       // Admin - get all events from all organizers
       this.loadAdminEvents();
@@ -693,9 +711,9 @@ export class AdminEventsComponent implements OnInit {
   // Helper method to get organizer display name
   getOrganizerDisplayName(event: any): string {
     if (this.isAdmin) {
-      return event.eventDetails.organizer_name || 
-            event.eventDetails.organizer_email || 
-            'N/A';
+      return event.eventDetails.organizer_name ||
+        event.eventDetails.organizer_email ||
+        'N/A';
     }
     return '';
   }
@@ -1446,11 +1464,11 @@ export class AdminEventsComponent implements OnInit {
       artists:
         this.artists.length > 0
           ? JSON.stringify(
-              this.artists.map((a) => ({
-                name: a.artist_name,
-                photo: a.artist_photo,
-              })),
-            )
+            this.artists.map((a) => ({
+              name: a.artist_name,
+              photo: a.artist_photo,
+            })),
+          )
           : JSON.stringify([]),
     };
 
@@ -1651,6 +1669,15 @@ export class AdminEventsComponent implements OnInit {
     this.selectedEvent = null;
     this.seatTypes = [];
     this.resetSeatTypeForm();
+
+    this.editingSeatIndex = -1;
+    this.editingSeatType = {
+      seat_name: '',
+      price: 0,
+      total_seats: 0,
+      available_seats: 0,
+      event_seat_type_inventory_id: 0
+    };
   }
 
   calculateDuration(): void {
@@ -1878,7 +1905,6 @@ export class AdminEventsComponent implements OnInit {
     console.log('=========================');
   }
 
-  // Add seat type methods
   addSeatType(): void {
     if (!this.isValidSeatType()) {
       this.toastr.warning('Please fill all seat type fields correctly', 'Warning');
@@ -1895,11 +1921,14 @@ export class AdminEventsComponent implements OnInit {
       created_by: this.userId,
       updated_by: this.userId,
       active: 1,
+      is_sold_out: false
     };
 
     this.seatTypes.push(seatType);
     this.resetSeatTypeForm();
     this.toastr.success('Seat type added successfully', 'Success');
+    // Force change detection
+    this.seatTypes = [...this.seatTypes];
   }
 
   isValidSeatType(): boolean {
@@ -1966,5 +1995,200 @@ export class AdminEventsComponent implements OnInit {
     const temp = document.createElement('div');
     temp.innerHTML = html;
     return temp.textContent || temp.innerText || '';
+  }
+
+  // Start editing a seat type - FIXED to properly populate all fields
+  startEditSeatType(index: number): void {
+    const seatType = this.seatTypes[index];
+    console.log('Starting edit for seat type:', seatType);
+    
+    // Make a deep copy to avoid reference issues - ensure ALL fields are copied
+    this.editingSeatType = {
+      event_seat_type_inventory_id: seatType.event_seat_type_inventory_id || 0,
+      event_id: seatType.event_id || this.eventForm.event_id || 0,
+      seat_name: seatType.seat_name || '',
+      price: seatType.price || 0,
+      total_seats: seatType.total_seats || 0,
+      available_seats: seatType.available_seats || 0,
+      is_sold_out: seatType.is_sold_out || false,
+      created_by: seatType.created_by || '',
+      created_on: seatType.created_on || '',
+      updated_by: seatType.updated_by || '',
+      updated_on: seatType.updated_on || null,
+      active: seatType.active !== undefined ? seatType.active : 1
+    };
+    
+    this.editingSeatIndex = index;
+    console.log('Editing seat type after copy:', this.editingSeatType);
+  }
+
+  // Save edited seat type - FIXED to use the updated values
+  saveEditSeatType(index: number): void {
+    console.log('Saving seat type with values:', this.editingSeatType);
+    
+    // Validate edited data
+    if (!this.editingSeatType.seat_name?.trim()) {
+      this.toastr.warning('Seat name is required', 'Warning');
+      return;
+    }
+
+    if (this.editingSeatType.price <= 0) {
+      this.toastr.warning('Price must be greater than 0', 'Warning');
+      return;
+    }
+
+    if (this.editingSeatType.total_seats <= 0) {
+      this.toastr.warning('Total seats must be greater than 0', 'Warning');
+      return;
+    }
+
+    // If this is an existing event (edit mode), update via API
+    if (this.isEditMode && this.eventForm.event_id > 0 && this.editingSeatType.event_seat_type_inventory_id > 0) {
+      // Call API to update with the current editingSeatType values
+      this.updateSeatTypeViaAPI(this.editingSeatType, index);
+    } else {
+      // For new events, just update locally
+      this.seatTypes[index] = {
+        ...this.editingSeatType
+      };
+      this.toastr.success('Seat type updated successfully', 'Success');
+      this.cancelEditSeatType();
+    }
+  }
+
+  // Update seat type via API - FIXED to use the updated values
+  updateSeatTypeViaAPI(seatTypeData: any, index: number): void {
+    // Show loading state
+    this.isUpdatingSeatType = true;
+
+    // Prepare the update request with the CURRENT values from editingSeatType
+    const updateData = {
+      event_seat_type_inventory_id: seatTypeData.event_seat_type_inventory_id,
+      event_id: this.eventForm.event_id || 0,
+      seat_name: seatTypeData.seat_name,  // This should be the updated value
+      price: seatTypeData.price,          // This should be the updated value
+      total_seats: seatTypeData.total_seats, // This should be the updated value
+      updated_by: this.userId
+    };
+
+    console.log('Sending update data:', updateData);
+
+    this.apiService.updateEventSeatType(updateData).subscribe({
+      next: (response) => {
+        this.isUpdatingSeatType = false;
+        console.log('Update response:', response);
+
+        if (response.status === 'Success') {
+          this.toastr.success('Seat type updated successfully', 'Success');
+
+          // Update the local array with the response data
+          if (response.data) {
+            // Find the seat type in the array by its ID
+            const foundIndex = this.seatTypes.findIndex(
+              st => st.event_seat_type_inventory_id === response.data.event_seat_type_inventory_id
+            );
+
+            if (foundIndex !== -1) {
+              this.seatTypes[foundIndex] = {
+                ...this.seatTypes[foundIndex],
+                seat_name: response.data.seat_name,
+                price: response.data.price,
+                total_seats: response.data.total_seats,
+                available_seats: response.data.available_seats,
+                is_sold_out: response.data.is_sold_out,
+                updated_by: response.data.updated_by,
+                updated_on: response.data.updated_on
+              };
+            }
+          }
+
+          // Cancel edit mode
+          this.cancelEditSeatType();
+
+          // Force change detection
+          this.seatTypes = [...this.seatTypes];
+        } else {
+          this.toastr.error(response.message || 'Failed to update seat type', 'Error');
+        }
+      },
+      error: (error) => {
+        this.isUpdatingSeatType = false;
+        console.error('Error updating seat type:', error);
+        this.toastr.error('Failed to update seat type: ' + (error.error?.message || error.message), 'Error');
+      }
+    });
+  }
+
+  // Cancel editing
+  cancelEditSeatType(): void {
+    this.editingSeatIndex = -1;
+    this.editingSeatType = {
+      seat_name: '',
+      price: 0,
+      total_seats: 0,
+      available_seats: 0,
+      event_seat_type_inventory_id: 0
+    };
+    this.isUpdatingSeatType = false;
+  }
+
+  // Mark seat type as sold out
+  markSeatTypeAsSoldOut(index: number): void {
+    const seatType = this.seatTypes[index];
+
+    if (seatType.available_seats === 0) {
+      this.toastr.info('This seat type is already sold out', 'Info');
+      return;
+    }
+
+    // Confirmation dialog
+    if (!confirm(`Are you sure you want to mark "${seatType.seat_name}" as SOLD OUT? This will set remaining seats to 0.`)) {
+      return;
+    }
+
+    // If this is an existing event, update via API
+    if (this.isEditMode && this.eventForm.event_id > 0) {
+      this.apiService.markSeatTypeAsSoldOut(seatType.event_seat_type_inventory_id, this.userId).subscribe({
+        next: (response) => {
+          if (response.status === 'Success') {
+            this.toastr.success(`"${seatType.seat_name}" marked as sold out successfully`, 'Success');
+            // Update the local array
+            this.seatTypes[index].available_seats = 0;
+            this.seatTypes[index].is_sold_out = true;
+            // Force change detection
+            this.seatTypes = [...this.seatTypes];
+          } else {
+            this.toastr.error(response.message || 'Failed to mark as sold out', 'Error');
+          }
+        },
+        error: (error) => {
+          console.error('Error marking seat type as sold out:', error);
+          this.toastr.error('Failed to mark seat type as sold out', 'Error');
+        }
+      });
+    } else {
+      // For new events, just update locally
+      this.seatTypes[index].available_seats = 0;
+      this.seatTypes[index].is_sold_out = true;
+      this.seatTypes = [...this.seatTypes];
+      this.toastr.success(`"${seatType.seat_name}" marked as sold out`, 'Success');
+    }
+  }
+
+  // Reload seat types from API
+  reloadSeatTypes(): void {
+    if (this.eventForm.event_id > 0) {
+      this.apiService.getEventSeatTypes(this.eventForm.event_id).subscribe({
+        next: (response) => {
+          if (response.status === 'Success' && response.data) {
+            this.seatTypes = response.data;
+            console.log('Reloaded seat types:', this.seatTypes);
+          }
+        },
+        error: (error) => {
+          console.error('Error reloading seat types:', error);
+        }
+      });
+    }
   }
 }

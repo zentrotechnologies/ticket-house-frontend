@@ -871,7 +871,7 @@
                   <small class="text-muted">Add different seat types with pricing and capacity</small>
                 </div>
 
-                <!-- Seat Types List -->
+                <!-- Seat Types List with Edit and Sold Out -->
                 <div class="seat-types-list" *ngIf="seatTypes.length > 0">
                   <h6>Current Seat Types ({{ seatTypes.length }})</h6>
                   <div class="table-responsive">
@@ -881,21 +881,68 @@
                           <th>Seat Name</th>
                           <th>Price (₹)</th>
                           <th>Total Seats</th>
-                          <!-- <th>Available</th> -->
+                          <th>Available</th>
                           <th>Action</th>
                         </tr>
                       </thead>
                       <tbody>
                         <tr *ngFor="let seatType of seatTypes; let i = index">
-                          <td>{{ seatType.seat_name }}</td>
-                          <td>₹{{ seatType.price | number:'1.2-2' }}</td>
-                          <td>{{ seatType.total_seats }}</td>
-                          <!-- <td>{{ seatType.available_seats || seatType.total_seats }}</td> -->
-                          <td>
-                            <button type="button" class="btn btn-sm text-danger" (click)="removeSeatType(i)">
-                              <i class="bi bi-trash"></i>
-                            </button>
-                          </td>
+                          <!-- Edit mode row -->
+                          <ng-container *ngIf="editingSeatIndex !== i; else editRow">
+                            <td>{{ seatType.seat_name }}</td>
+                            <td>₹{{ seatType.price | number:'1.2-2' }}</td>
+                            <td>{{ seatType.total_seats }}</td>
+                            <!-- <td>{{ seatType.available_seats || seatType.total_seats }}</td> -->
+                            <td>
+                              <span *ngIf="seatType.available_seats === 0" class="badge bg-danger">SOLD OUT</span>
+                              <span *ngIf="seatType.available_seats > 0">{{ seatType.available_seats }}</span>
+                            </td>
+                            <td>
+                              <button type="button" class="btn btn-sm btn-primary me-1 seatTypeBtn" (click)="startEditSeatType(i)" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                              </button>
+                              <button type="button" class="btn btn-sm btn-warning me-1 seatTypeBtn" (click)="markSeatTypeAsSoldOut(i)" 
+                                [disabled]="seatType.available_seats === 0" title="Mark as Sold Out">
+                                <i class="bi bi-x-circle"></i> Sold Out
+                              </button>
+                              <button type="button" class="btn btn-sm btn-danger seatTypeBtn" (click)="removeSeatType(i)" title="Delete">
+                                <i class="bi bi-trash"></i>
+                              </button>
+                            </td>
+                          </ng-container>
+                          
+                          <!-- Edit mode row -->
+                          <ng-template #editRow>
+                            <td>
+                              <input type="text" class="form-control form-control-sm" 
+                                    [(ngModel)]="editingSeatType.seat_name" 
+                                    name="editSeatName_{{ i }}"
+                                    placeholder="Seat Name" style="min-width: 100px;" />
+                            </td>
+                            <td>
+                              <input type="number" class="form-control form-control-sm" 
+                                    [(ngModel)]="editingSeatType.price" 
+                                    name="editSeatPrice_{{ i }}"
+                                    placeholder="Price" min="0" step="0.01" style="min-width: 80px;" />
+                            </td>
+                            <td>
+                              <input type="number" class="form-control form-control-sm" 
+                                    [(ngModel)]="editingSeatType.total_seats" 
+                                    name="editSeatTotal_{{ i }}"
+                                    placeholder="Total Seats" min="1" style="min-width: 80px;" />
+                            </td>
+                            <td>{{ editingSeatType.available_seats || editingSeatType.total_seats }}</td>
+                            <td>
+                              <button type="button" class="btn btn-sm btn-success me-1" 
+                                      (click)="saveEditSeatType(i)" title="Save" [disabled]="isUpdatingSeatType">
+                                <i class="bi bi-check-lg"></i> {{ isUpdatingSeatType ? 'Saving...' : '' }}
+                              </button>
+                              <button type="button" class="btn btn-sm btn-secondary" 
+                                      (click)="cancelEditSeatType()" title="Cancel">
+                                <i class="bi bi-x-lg"></i>
+                              </button>
+                            </td>
+                          </ng-template>
                         </tr>
                       </tbody>
                     </table>

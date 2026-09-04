@@ -549,4 +549,44 @@ export class ApiService {
       headers: this.getAuthHeaders()
     });
   }
+
+  // Update a single seat type
+  updateEventSeatType(seatType: any): Observable<CommonResponseModel<any>> {
+    // Only send the fields that are needed for update
+    const updateData = {
+      event_seat_type_inventory_id: seatType.event_seat_type_inventory_id,
+      event_id: seatType.event_id || 0,
+      seat_name: seatType.seat_name,
+      price: seatType.price,
+      total_seats: seatType.total_seats,
+      updated_by: seatType.updated_by 
+      // || this.getUserId()
+    };
+    
+    const url = `${this.ThApi}api/EventDetails/UpdateEventSeatType`;
+    return this.httpClient.post<CommonResponseModel<any>>(url, updateData);
+  }
+
+  // // Helper method to get user ID
+  // private getUserId(): string {
+  //   const userDataStr = localStorage.getItem(environment.USERDATA_KEY);
+  //   if (userDataStr) {
+  //     try {
+  //       const userData = JSON.parse(userDataStr);
+  //       return userData.user_id || '';
+  //     } catch (e) {
+  //       return '';
+  //     }
+  //   }
+  //   return '';
+  // }
+
+  // Mark seat type as sold out
+  markSeatTypeAsSoldOut(seatTypeId: number, updatedBy: string): Observable<CommonResponseModel<any>> {
+    const url = `${this.ThApi}api/EventDetails/MarkSeatTypeAsSoldOut`;
+    return this.httpClient.post<CommonResponseModel<any>>(url, {
+      seatTypeId: seatTypeId,
+      updatedBy: updatedBy
+    });
+  }
 }
