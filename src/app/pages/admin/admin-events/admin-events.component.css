@@ -958,7 +958,7 @@ select:disabled {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 1rem;
+  padding: 10px 2px;
   border-radius: 10px;
   background: white;
   border: 1px solid #eef2f6;
@@ -1166,7 +1166,8 @@ select:disabled {
   }
 
   .seatTypeBtn{
-    padding: 5px 10px;
+    padding: 5px;
+    font-size: 10px;
   }
 }
 
@@ -1180,10 +1181,12 @@ select:disabled {
   }
 
   .seatTypeBtn{
-    padding: 5px 10px;
+    padding: 5px;
+    font-size: 10px;
   }
 }
 
 .seatTypeBtn{
-  padding: 5px 10px;
+  padding: 5px;
+  font-size: 10px;
 }

@@ -90,7 +90,8 @@
               <button class="icon-btn danger" title="Delete" (click)="deleteEvent(event.eventDetails.event_id)">
                 <i class="bi bi-trash"></i>
               </button>
-              <button class="icon-btn info me-1" title="View Event Summary" (click)="viewEventSummary(event.eventDetails.event_id)">
+              <button class="icon-btn info me-1" title="View Event Summary"
+                (click)="viewEventSummary(event.eventDetails.event_id)">
                 <i class="bi bi-info-circle"></i>
               </button>
             </td>
@@ -200,13 +201,8 @@
               <!-- Replace the existing event description textarea with: -->
               <div class="form-row full-width">
                 <label>Event Description *</label>
-                <ckeditor
-                  [editor]="Editor"
-                  [config]="editorConfig"
-                  [(ngModel)]="eventForm.event_description"
-                  name="eventDescription"
-                  required
-                ></ckeditor>
+                <ckeditor [editor]="Editor" [config]="editorConfig" [(ngModel)]="eventForm.event_description"
+                  name="eventDescription" required></ckeditor>
                 <small class="text-muted">You can format your event description using the toolbar above</small>
               </div>
 
@@ -446,8 +442,8 @@
                         <tr>
                           <th>Seat Name</th>
                           <th>Price (₹)</th>
-                          <th>Total Seats</th>
-                          <th>Available</th>
+                          <th>Total Tickets</th>
+                          <th>Available Tickets</th>
                           <th>Action</th>
                         </tr>
                       </thead>
@@ -510,12 +506,8 @@
               <!-- Replace the existing terms & conditions textarea with: -->
               <div class="form-row full-width">
                 <label>Terms & Conditions</label>
-                <ckeditor
-                  [editor]="Editor"
-                  [config]="termsEditorConfig"
-                  [(ngModel)]="eventForm.terms_and_conditions"
-                  name="termsAndConditions"
-                ></ckeditor>
+                <ckeditor [editor]="Editor" [config]="termsEditorConfig" [(ngModel)]="eventForm.terms_and_conditions"
+                  name="termsAndConditions"></ckeditor>
                 <small class="text-muted">Add terms and conditions with proper formatting</small>
               </div>
             </div>
@@ -630,13 +622,8 @@
               <!-- Replace the existing event description textarea with: -->
               <div class="form-row full-width">
                 <label>Event Description *</label>
-                <ckeditor
-                  [editor]="Editor"
-                  [config]="editorConfig"
-                  [(ngModel)]="eventForm.event_description"
-                  name="eventDescription"
-                  required
-                ></ckeditor>
+                <ckeditor [editor]="Editor" [config]="editorConfig" [(ngModel)]="eventForm.event_description"
+                  name="eventDescription" required></ckeditor>
                 <small class="text-muted">You can format your event description using the toolbar above</small>
               </div>
 
@@ -880,65 +867,99 @@
                         <tr>
                           <th>Seat Name</th>
                           <th>Price (₹)</th>
-                          <th>Total Seats</th>
-                          <th>Available</th>
+                          <th>Total Tickets</th>
+                          <th>Available Tickets</th>
+                          <th *ngIf="isEditMode">Booked Tickets</th> <!-- Only show in edit mode -->
                           <th>Action</th>
                         </tr>
                       </thead>
                       <tbody>
                         <tr *ngFor="let seatType of seatTypes; let i = index">
-                          <!-- Edit mode row -->
+                          <!-- View mode row -->
                           <ng-container *ngIf="editingSeatIndex !== i; else editRow">
                             <td>{{ seatType.seat_name }}</td>
                             <td>₹{{ seatType.price | number:'1.2-2' }}</td>
-                            <td>{{ seatType.total_seats }}</td>
-                            <!-- <td>{{ seatType.available_seats || seatType.total_seats }}</td> -->
                             <td>
-                              <span *ngIf="seatType.available_seats === 0" class="badge bg-danger">SOLD OUT</span>
-                              <span *ngIf="seatType.available_seats > 0">{{ seatType.available_seats }}</span>
+                              <span class="fw-bold">{{ seatType.total_seats }}</span>
                             </td>
                             <td>
-                              <button type="button" class="btn btn-sm btn-primary me-1 seatTypeBtn" (click)="startEditSeatType(i)" title="Edit">
+                              <span *ngIf="seatType.available_seats === 0" class="badge bg-danger">SOLD OUT</span>
+                              <span *ngIf="seatType.available_seats > 0" class="fw-bold">{{ seatType.available_seats
+                                }}</span>
+                              <!-- <small class="d-block text-muted"
+                                *ngIf="(seatType.total_seats - seatType.available_seats) > 0">
+                                {{ seatType.total_seats - seatType.available_seats }} booked
+                              </small> -->
+                            </td>
+                            <td>
+                              <span class="fw-bold">{{ seatType.total_seats - seatType.available_seats }}</span>
+                            </td>
+                            <td>
+                              <button type="button" class="btn btn-sm btn-primary me-1 seatTypeBtn"
+                                (click)="startEditSeatType(i)" title="Edit">
                                 <i class="bi bi-pencil"></i>
                               </button>
-                              <button type="button" class="btn btn-sm btn-warning me-1 seatTypeBtn" (click)="markSeatTypeAsSoldOut(i)" 
-                                [disabled]="seatType.available_seats === 0" title="Mark as Sold Out">
-                                <i class="bi bi-x-circle"></i> Sold Out
+                              <button type="button" class="btn btn-sm btn-warning me-1 seatTypeBtn"
+                                (click)="markSeatTypeAsSoldOut(i)" [disabled]="seatType.available_seats === 0"
+                                title="Mark as Sold Out">
+                                <!-- <i class="bi bi-x-circle"></i> -->
+                                Sold
                               </button>
-                              <button type="button" class="btn btn-sm btn-danger seatTypeBtn" (click)="removeSeatType(i)" title="Delete">
+                              <!-- <button type="button" class="btn btn-sm btn-danger seatTypeBtn"
+                                (click)="removeSeatType(i)" title="Delete">
                                 <i class="bi bi-trash"></i>
+                              </button> -->
+
+                              <button type="button" class="btn btn-sm btn-danger seatTypeBtn"
+                                  (click)="removeSeatType(i)" 
+                                  title="Delete"
+                                  [disabled]="isUpdatingSeatType">
+                                  <i class="bi bi-trash"></i>
                               </button>
                             </td>
                           </ng-container>
-                          
+
                           <!-- Edit mode row -->
                           <ng-template #editRow>
                             <td>
-                              <input type="text" class="form-control form-control-sm" 
-                                    [(ngModel)]="editingSeatType.seat_name" 
-                                    name="editSeatName_{{ i }}"
-                                    placeholder="Seat Name" style="min-width: 100px;" />
+                              <input type="text" class="form-control form-control-sm"
+                                [(ngModel)]="editingSeatType.seat_name" name="editSeatName_{{ i }}"
+                                placeholder="Seat Name" style="min-width: 100px;" />
                             </td>
                             <td>
-                              <input type="number" class="form-control form-control-sm" 
-                                    [(ngModel)]="editingSeatType.price" 
-                                    name="editSeatPrice_{{ i }}"
-                                    placeholder="Price" min="0" step="0.01" style="min-width: 80px;" />
+                              <input type="number" class="form-control form-control-sm"
+                                [(ngModel)]="editingSeatType.price" name="editSeatPrice_{{ i }}" placeholder="Price"
+                                min="0" step="0.01" style="min-width: 80px;" />
                             </td>
                             <td>
-                              <input type="number" class="form-control form-control-sm" 
-                                    [(ngModel)]="editingSeatType.total_seats" 
-                                    name="editSeatTotal_{{ i }}"
-                                    placeholder="Total Seats" min="1" style="min-width: 80px;" />
+                              <!-- Total Seats - Auto-calculated, Read-only -->
+                              <span class="form-control-static fw-bold">{{ editingSeatType.total_seats }}</span>
+                              <small class="d-block text-muted">
+                                ({{ editingSeatType.booked_seats || 0 }} booked + {{ editingSeatType.available_seats ||
+                                0 }} available)
+                              </small>
                             </td>
-                            <td>{{ editingSeatType.available_seats || editingSeatType.total_seats }}</td>
                             <td>
-                              <button type="button" class="btn btn-sm btn-success me-1" 
-                                      (click)="saveEditSeatType(i)" title="Save" [disabled]="isUpdatingSeatType">
+                              <!-- Available Seats - Editable -->
+                              <input type="number" class="form-control form-control-sm"
+                                [(ngModel)]="editingSeatType.available_seats" name="editAvailableSeats_{{ i }}"
+                                placeholder="Available Seats" min="0" style="min-width: 80px;"
+                                (change)="recalculateTotalSeats()" />
+                              <!-- <small class="d-block text-muted" *ngIf="(editingSeatType.booked_seats || 0) > 0">
+                                {{ editingSeatType.booked_seats }} already booked
+                              </small> -->
+                            </td>
+                            <td>
+                              <span class="fw-bold">{{ editingSeatType.booked_seats || 0 }}</span>
+                              <!-- <small class="d-block text-muted">(read-only)</small> -->
+                            </td>
+                            <td>
+                              <button type="button" class="btn btn-sm btn-success me-1 seatTypeBtn" (click)="saveEditSeatType(i)"
+                                title="Save" [disabled]="isUpdatingSeatType">
                                 <i class="bi bi-check-lg"></i> {{ isUpdatingSeatType ? 'Saving...' : '' }}
                               </button>
-                              <button type="button" class="btn btn-sm btn-secondary" 
-                                      (click)="cancelEditSeatType()" title="Cancel">
+                              <button type="button" class="btn btn-sm btn-secondary seatTypeBtn" (click)="cancelEditSeatType()"
+                                title="Cancel">
                                 <i class="bi bi-x-lg"></i>
                               </button>
                             </td>
@@ -993,12 +1014,8 @@
               <!-- Replace the existing terms & conditions textarea with: -->
               <div class="form-row full-width">
                 <label>Terms & Conditions</label>
-                <ckeditor
-                  [editor]="Editor"
-                  [config]="termsEditorConfig"
-                  [(ngModel)]="eventForm.terms_and_conditions"
-                  name="termsAndConditions"
-                ></ckeditor>
+                <ckeditor [editor]="Editor" [config]="termsEditorConfig" [(ngModel)]="eventForm.terms_and_conditions"
+                  name="termsAndConditions"></ckeditor>
                 <small class="text-muted">Add terms and conditions with proper formatting</small>
               </div>
             </div>
@@ -1095,7 +1112,7 @@
       <div class="modal-header">
         <h5 class="modal-title" id="eventSummaryLabel">
           <!-- <i class="fa fa-info-circle me-2" style="color: #2c2e72;"></i> -->
-           <i class="bi bi-info-circle me-2" style="color: #2c2e72;"></i>
+          <i class="bi bi-info-circle me-2" style="color: #2c2e72;"></i>
           Event Summary
         </h5>
         <button type="button" class="btn-close" aria-label="Close"
@@ -1135,7 +1152,7 @@
             <div class="stat-card total">
               <div class="stat-icon"><i class="bi bi-cup-straw"></i></div>
               <div class="stat-content">
-                <div class="stat-label">Total Seats</div>
+                <div class="stat-label">Total Tickets</div>
                 <div class="stat-value">{{ eventSummary.totalSeats | number }}</div>
               </div>
             </div>
@@ -1143,7 +1160,7 @@
             <div class="stat-card booked">
               <div class="stat-icon"><i class="bi bi-ticket-perforated"></i></div>
               <div class="stat-content">
-                <div class="stat-label">Booked Seats</div>
+                <div class="stat-label">Booked Tickets</div>
                 <div class="stat-value">{{ eventSummary.bookedSeats | number }}</div>
               </div>
             </div>
@@ -1151,7 +1168,7 @@
             <div class="stat-card available">
               <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
               <div class="stat-content">
-                <div class="stat-label">Available Seats</div>
+                <div class="stat-label">Available Tickets</div>
                 <div class="stat-value">{{ eventSummary.availableSeats | number }}</div>
               </div>
             </div>
@@ -1177,9 +1194,9 @@
                   <tr>
                     <th>Seat Type</th>
                     <th class="text-end">Price ({{ eventSummary.currency }})</th>
-                    <th class="text-center">Total</th>
-                    <th class="text-center">Booked</th>
-                    <th class="text-center">Available</th>
+                    <th class="text-center">Total Tickets</th>
+                    <th class="text-center">Booked Tickets</th>
+                    <th class="text-center">Available Tickets</th>
                     <th class="text-end">Revenue</th>
                     <th class="text-center">Occupancy</th>
                   </tr>

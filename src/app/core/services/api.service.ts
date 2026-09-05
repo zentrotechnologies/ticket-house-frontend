@@ -551,20 +551,24 @@ export class ApiService {
   }
 
   // Update a single seat type
-  updateEventSeatType(seatType: any): Observable<CommonResponseModel<any>> {
-    // Only send the fields that are needed for update
-    const updateData = {
-      event_seat_type_inventory_id: seatType.event_seat_type_inventory_id,
-      event_id: seatType.event_id || 0,
-      seat_name: seatType.seat_name,
-      price: seatType.price,
-      total_seats: seatType.total_seats,
-      updated_by: seatType.updated_by 
-      // || this.getUserId()
-    };
-    
-    const url = `${this.ThApi}api/EventDetails/UpdateEventSeatType`;
-    return this.httpClient.post<CommonResponseModel<any>>(url, updateData);
+  // updateEventSeatType(seatType: any): Observable<CommonResponseModel<any>> {
+  //   // Only send the fields that are needed for update
+  //   const updateData = {
+  //     event_seat_type_inventory_id: seatType.event_seat_type_inventory_id,
+  //     event_id: seatType.event_id || 0,
+  //     seat_name: seatType.seat_name,
+  //     price: seatType.price,
+  //     total_seats: seatType.total_seats,
+  //     updated_by: seatType.updated_by 
+  //     // || this.getUserId()
+  //   };
+
+  //   const url = `${this.ThApi}api/EventDetails/UpdateEventSeatType`;
+  //   return this.httpClient.post<CommonResponseModel<any>>(url, updateData);
+  // }
+
+  updateEventSeatType(data: any): Observable<any> {
+    return this.httpClient.post(`${this.ThApi}api/EventDetails/UpdateEventSeatType`, data);
   }
 
   // // Helper method to get user ID
@@ -588,5 +592,21 @@ export class ApiService {
       seatTypeId: seatTypeId,
       updatedBy: updatedBy
     });
+  }
+
+  // Check if a seat type has any bookings
+  checkSeatTypeBookings(seatTypeId: number): Observable<CommonResponseModel<number>> {
+    return this.httpClient.get<CommonResponseModel<number>>(
+      `${this.ThApi}api/EventDetails/CheckSeatTypeBookings/${seatTypeId}`
+    );
+  }
+
+  // Delete seat type with booking validation
+  deleteEventSeatType(seatTypeId: number, updatedBy: string): Observable<CommonResponseModel<boolean>> {
+    const payload = { updatedBy: updatedBy };
+    return this.httpClient.post<CommonResponseModel<boolean>>(
+      `${this.ThApi}api/EventDetails/DeleteEventSeatType/${seatTypeId}`,
+      payload
+    );
   }
 }

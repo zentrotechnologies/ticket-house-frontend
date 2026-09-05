@@ -286,7 +286,7 @@ export class AdminEventsComponent implements OnInit {
     created_on: '',
     updated_by: '',
     updated_on: null,
-    active: 1
+    active: 1,
   };
 
   isUpdatingSeatType: boolean = false;
@@ -691,11 +691,11 @@ export class AdminEventsComponent implements OnInit {
             // Add these required properties with empty arrays
             // eventArtists: event.artist_list || [],
             // eventGalleries: event.gallery_list || [],
-            eventArtists: event.artist_list || [],  // Changed from event.artists
-            eventGalleries: event.gallery_list || [],  // Changed from event.galleries
+            eventArtists: event.artist_list || [], // Changed from event.artists
+            eventGalleries: event.gallery_list || [], // Changed from event.galleries
             // Add optional properties if needed
             eventMedia: [],
-            seatTypes: []
+            seatTypes: [],
           }));
           this.totalEvents = response.totalCount || 0;
           this.totalPages = response.totalPages || 0;
@@ -711,9 +711,7 @@ export class AdminEventsComponent implements OnInit {
   // Helper method to get organizer display name
   getOrganizerDisplayName(event: any): string {
     if (this.isAdmin) {
-      return event.eventDetails.organizer_name ||
-        event.eventDetails.organizer_email ||
-        'N/A';
+      return event.eventDetails.organizer_name || event.eventDetails.organizer_email || 'N/A';
     }
     return '';
   }
@@ -1676,7 +1674,7 @@ export class AdminEventsComponent implements OnInit {
       price: 0,
       total_seats: 0,
       available_seats: 0,
-      event_seat_type_inventory_id: 0
+      event_seat_type_inventory_id: 0,
     };
   }
 
@@ -1905,31 +1903,31 @@ export class AdminEventsComponent implements OnInit {
     console.log('=========================');
   }
 
-  addSeatType(): void {
-    if (!this.isValidSeatType()) {
-      this.toastr.warning('Please fill all seat type fields correctly', 'Warning');
-      return;
-    }
+  // addSeatType(): void {
+  //   if (!this.isValidSeatType()) {
+  //     this.toastr.warning('Please fill all seat type fields correctly', 'Warning');
+  //     return;
+  //   }
 
-    const seatType = {
-      event_seat_type_inventory_id: 0,
-      event_id: this.eventForm.event_id,
-      seat_name: this.newSeatType.seat_name,
-      price: this.newSeatType.price,
-      total_seats: this.newSeatType.total_seats,
-      available_seats: this.newSeatType.total_seats,
-      created_by: this.userId,
-      updated_by: this.userId,
-      active: 1,
-      is_sold_out: false
-    };
+  //   const seatType = {
+  //     event_seat_type_inventory_id: 0,
+  //     event_id: this.eventForm.event_id,
+  //     seat_name: this.newSeatType.seat_name,
+  //     price: this.newSeatType.price,
+  //     total_seats: this.newSeatType.total_seats,
+  //     available_seats: this.newSeatType.total_seats,
+  //     created_by: this.userId,
+  //     updated_by: this.userId,
+  //     active: 1,
+  //     is_sold_out: false
+  //   };
 
-    this.seatTypes.push(seatType);
-    this.resetSeatTypeForm();
-    this.toastr.success('Seat type added successfully', 'Success');
-    // Force change detection
-    this.seatTypes = [...this.seatTypes];
-  }
+  //   this.seatTypes.push(seatType);
+  //   this.resetSeatTypeForm();
+  //   this.toastr.success('Seat type added successfully', 'Success');
+  //   // Force change detection
+  //   this.seatTypes = [...this.seatTypes];
+  // }
 
   isValidSeatType(): boolean {
     return (
@@ -1947,9 +1945,117 @@ export class AdminEventsComponent implements OnInit {
     };
   }
 
+  // removeSeatType(index: number): void {
+  //   this.seatTypes.splice(index, 1);
+  //   this.toastr.info('Seat type removed', 'Info');
+  // }
+
   removeSeatType(index: number): void {
-    this.seatTypes.splice(index, 1);
-    this.toastr.info('Seat type removed', 'Info');
+    const seatType = this.seatTypes[index];
+    if (!seatType) return;
+
+    // Check if this is an existing seat type (has ID) or a new one
+    if (seatType.event_seat_type_inventory_id > 0 && this.eventForm.event_id > 0) {
+      // For existing seat types, check with API if bookings exist
+      this.checkSeatTypeBookingsAndDelete(seatType, index);
+    } else {
+      // For new seat types (not saved to DB yet), can delete directly
+      this.confirmAndDeleteSeatType(index);
+    }
+  }
+
+  private checkSeatTypeBookingsAndDelete(seatType: any, index: number): void {
+    this.isUpdatingSeatType = true;
+
+    // First check if the seat type has bookings
+    this.apiService.checkSeatTypeBookings(seatType.event_seat_type_inventory_id).subscribe({
+      next: (response) => {
+        this.isUpdatingSeatType = false;
+        if (response.status === 'Success' && response.data) {
+          // Seat type has bookings - show error message
+          this.toastr.error(
+            `Cannot delete "${seatType.seat_name}". ${response.data} ticket(s) have already been booked for this seat type.`,
+            'Delete Blocked'
+          );
+        } else {
+          // No bookings, proceed with delete confirmation
+          this.confirmAndDeleteSeatType(index);
+        }
+      },
+      error: (error) => {
+        this.isUpdatingSeatType = false;
+        console.error('Error checking seat type bookings:', error);
+        // If API check fails, ask user to try again or proceed with caution
+        this.toastr.warning('Unable to verify bookings. Please try again.', 'Verification Failed');
+      }
+    });
+  }
+
+  private confirmAndDeleteSeatType(index: number): void {
+    const seatType = this.seatTypes[index];
+    const seatName = seatType.seat_name || 'this seat type';
+
+    // Show confirmation dialog
+    if (!confirm(`Are you sure you want to delete "${seatName}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    // If this is an existing event (edit mode) and seat type has an ID, delete via API
+    if (this.isEditMode && this.eventForm.event_id > 0 &&
+      seatType.event_seat_type_inventory_id > 0) {
+      this.deleteSeatTypeViaAPI(index);
+    } else {
+      // For new events or unsaved seat types, just remove from local array
+      this.seatTypes.splice(index, 1);
+      this.toastr.success('Seat type removed successfully', 'Success');
+      this.seatTypes = [...this.seatTypes];
+    }
+  }
+
+  private deleteSeatTypeViaAPI(index: number): void {
+    const seatType = this.seatTypes[index];
+    this.isUpdatingSeatType = true;
+
+    this.apiService.deleteEventSeatType(seatType.event_seat_type_inventory_id, this.userId).subscribe({
+      next: (response) => {
+        this.isUpdatingSeatType = false;
+        if (response.status === 'Success' && response.data) {
+          // Remove from local array
+          this.seatTypes.splice(index, 1);
+          this.toastr.success('Seat type deleted successfully', 'Success');
+          this.seatTypes = [...this.seatTypes];
+        } else {
+          // Check if this is a booking conflict error
+          if (response.errorCode === '409') {
+            this.toastr.error(
+              response.message || 'Cannot delete seat type with existing bookings.',
+              'Delete Blocked'
+            );
+          } else {
+            this.toastr.error(response.message || 'Failed to delete seat type', 'Error');
+          }
+        }
+      },
+      error: (error) => {
+        this.isUpdatingSeatType = false;
+        console.error('Error deleting seat type:', error);
+
+        // Parse error response
+        let errorMessage = 'Failed to delete seat type';
+        if (error.error?.message) {
+          errorMessage = error.error.message;
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+
+        // Check if it's a conflict (409) 
+        if (error.status === 409) {
+          this.toastr.error(errorMessage || 'Cannot delete seat type with existing bookings.', 'Delete Blocked');
+        } else {
+          this.toastr.error(errorMessage, 'Error');
+        }
+      }
+    });
   }
 
   loadEventSeatTypes(eventId: number): void {
@@ -1997,12 +2103,15 @@ export class AdminEventsComponent implements OnInit {
     return temp.textContent || temp.innerText || '';
   }
 
-  // Start editing a seat type - FIXED to properly populate all fields
+  // Update the startEditSeatType method
   startEditSeatType(index: number): void {
     const seatType = this.seatTypes[index];
     console.log('Starting edit for seat type:', seatType);
-    
-    // Make a deep copy to avoid reference issues - ensure ALL fields are copied
+
+    // Calculate booked seats from total - available
+    const bookedSeats = (seatType.total_seats || 0) - (seatType.available_seats || 0);
+
+    // Make a deep copy - handle all fields with defaults
     this.editingSeatType = {
       event_seat_type_inventory_id: seatType.event_seat_type_inventory_id || 0,
       event_id: seatType.event_id || this.eventForm.event_id || 0,
@@ -2010,22 +2119,23 @@ export class AdminEventsComponent implements OnInit {
       price: seatType.price || 0,
       total_seats: seatType.total_seats || 0,
       available_seats: seatType.available_seats || 0,
+      booked_seats: bookedSeats,
       is_sold_out: seatType.is_sold_out || false,
       created_by: seatType.created_by || '',
-      created_on: seatType.created_on || '',
+      created_on: seatType.created_on || new Date().toISOString(),
       updated_by: seatType.updated_by || '',
       updated_on: seatType.updated_on || null,
       active: seatType.active !== undefined ? seatType.active : 1
     };
-    
+
     this.editingSeatIndex = index;
     console.log('Editing seat type after copy:', this.editingSeatType);
   }
 
-  // Save edited seat type - FIXED to use the updated values
+  // Update the saveEditSeatType method
   saveEditSeatType(index: number): void {
     console.log('Saving seat type with values:', this.editingSeatType);
-    
+
     // Validate edited data
     if (!this.editingSeatType.seat_name?.trim()) {
       this.toastr.warning('Seat name is required', 'Warning');
@@ -2037,37 +2147,53 @@ export class AdminEventsComponent implements OnInit {
       return;
     }
 
-    if (this.editingSeatType.total_seats <= 0) {
-      this.toastr.warning('Total seats must be greater than 0', 'Warning');
+    // Validate available seats - must not be negative
+    if (this.editingSeatType.available_seats < 0) {
+      this.toastr.warning('Available seats cannot be negative', 'Warning');
       return;
     }
 
+    // Calculate total_seats from booked + available
+    const bookedSeats = this.editingSeatType.booked_seats || 0;
+    const newTotalSeats = bookedSeats + this.editingSeatType.available_seats;
+
+    // Ensure total seats is at least available seats
+    if (newTotalSeats < this.editingSeatType.available_seats) {
+      this.toastr.warning('Total seats cannot be less than available seats', 'Warning');
+      return;
+    }
+
+    // Update the total_seats in editing object
+    this.editingSeatType.total_seats = newTotalSeats;
+
     // If this is an existing event (edit mode), update via API
-    if (this.isEditMode && this.eventForm.event_id > 0 && this.editingSeatType.event_seat_type_inventory_id > 0) {
-      // Call API to update with the current editingSeatType values
+    if (
+      this.isEditMode &&
+      this.eventForm.event_id > 0 &&
+      this.editingSeatType.event_seat_type_inventory_id > 0
+    ) {
       this.updateSeatTypeViaAPI(this.editingSeatType, index);
     } else {
       // For new events, just update locally
       this.seatTypes[index] = {
-        ...this.editingSeatType
+        ...this.editingSeatType,
       };
       this.toastr.success('Seat type updated successfully', 'Success');
       this.cancelEditSeatType();
     }
   }
 
-  // Update seat type via API - FIXED to use the updated values
+  // Update updateSeatTypeViaAPI to send the correct data
   updateSeatTypeViaAPI(seatTypeData: any, index: number): void {
-    // Show loading state
     this.isUpdatingSeatType = true;
 
-    // Prepare the update request with the CURRENT values from editingSeatType
     const updateData = {
       event_seat_type_inventory_id: seatTypeData.event_seat_type_inventory_id,
       event_id: this.eventForm.event_id || 0,
-      seat_name: seatTypeData.seat_name,  // This should be the updated value
-      price: seatTypeData.price,          // This should be the updated value
-      total_seats: seatTypeData.total_seats, // This should be the updated value
+      seat_name: seatTypeData.seat_name,
+      price: seatTypeData.price,
+      available_seats: seatTypeData.available_seats,
+      total_seats: seatTypeData.total_seats,
       updated_by: this.userId
     };
 
@@ -2081,31 +2207,34 @@ export class AdminEventsComponent implements OnInit {
         if (response.status === 'Success') {
           this.toastr.success('Seat type updated successfully', 'Success');
 
-          // Update the local array with the response data
           if (response.data) {
-            // Find the seat type in the array by its ID
+            // Update the local array with the response data
             const foundIndex = this.seatTypes.findIndex(
               st => st.event_seat_type_inventory_id === response.data.event_seat_type_inventory_id
             );
 
             if (foundIndex !== -1) {
+              // Calculate booked seats from the updated data
+              const updatedBookedSeats = (response.data.total_seats || 0) - (response.data.available_seats || 0);
+
               this.seatTypes[foundIndex] = {
                 ...this.seatTypes[foundIndex],
-                seat_name: response.data.seat_name,
-                price: response.data.price,
-                total_seats: response.data.total_seats,
-                available_seats: response.data.available_seats,
-                is_sold_out: response.data.is_sold_out,
-                updated_by: response.data.updated_by,
-                updated_on: response.data.updated_on
+                seat_name: response.data.seat_name || this.seatTypes[foundIndex].seat_name,
+                price: response.data.price || this.seatTypes[foundIndex].price,
+                total_seats: response.data.total_seats || 0,
+                available_seats: response.data.available_seats || 0,
+                booked_seats: updatedBookedSeats,
+                is_sold_out: response.data.is_sold_out || false,
+                updated_by: response.data.updated_by || this.userId,
+                updated_on: response.data.updated_on || new Date().toISOString(),
+                // Handle nullable fields properly
+                created_on: response.data.created_on || this.seatTypes[foundIndex].created_on || new Date().toISOString(),
+                created_by: response.data.created_by || this.seatTypes[foundIndex].created_by || this.userId
               };
             }
           }
 
-          // Cancel edit mode
           this.cancelEditSeatType();
-
-          // Force change detection
           this.seatTypes = [...this.seatTypes];
         } else {
           this.toastr.error(response.message || 'Failed to update seat type', 'Error');
@@ -2114,7 +2243,15 @@ export class AdminEventsComponent implements OnInit {
       error: (error) => {
         this.isUpdatingSeatType = false;
         console.error('Error updating seat type:', error);
-        this.toastr.error('Failed to update seat type: ' + (error.error?.message || error.message), 'Error');
+
+        // Parse error message if possible
+        let errorMessage = 'Failed to update seat type';
+        if (error.error?.message) {
+          errorMessage = error.error.message;
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+        this.toastr.error(errorMessage, 'Error');
       }
     });
   }
@@ -2127,9 +2264,38 @@ export class AdminEventsComponent implements OnInit {
       price: 0,
       total_seats: 0,
       available_seats: 0,
-      event_seat_type_inventory_id: 0
+      booked_seats: 0,
+      event_seat_type_inventory_id: 0,
     };
     this.isUpdatingSeatType = false;
+  }
+
+  // Add a new method to add seat types with correct calculation
+  addSeatType(): void {
+    if (!this.isValidSeatType()) {
+      this.toastr.warning('Please fill all seat type fields correctly', 'Warning');
+      return;
+    }
+
+    // When adding a new seat type, available = total (no bookings yet)
+    const seatType = {
+      event_seat_type_inventory_id: 0,
+      event_id: this.eventForm.event_id,
+      seat_name: this.newSeatType.seat_name,
+      price: this.newSeatType.price,
+      total_seats: this.newSeatType.total_seats,
+      available_seats: this.newSeatType.total_seats, // Initially available = total
+      booked_seats: 0, // No bookings initially
+      created_by: this.userId,
+      updated_by: this.userId,
+      active: 1,
+      is_sold_out: false,
+    };
+
+    this.seatTypes.push(seatType);
+    this.resetSeatTypeForm();
+    this.toastr.success('Seat type added successfully', 'Success');
+    this.seatTypes = [...this.seatTypes];
   }
 
   // Mark seat type as sold out
@@ -2142,30 +2308,39 @@ export class AdminEventsComponent implements OnInit {
     }
 
     // Confirmation dialog
-    if (!confirm(`Are you sure you want to mark "${seatType.seat_name}" as SOLD OUT? This will set remaining seats to 0.`)) {
+    if (
+      !confirm(
+        `Are you sure you want to mark "${seatType.seat_name}" as SOLD OUT? This will set remaining seats to 0.`,
+      )
+    ) {
       return;
     }
 
     // If this is an existing event, update via API
     if (this.isEditMode && this.eventForm.event_id > 0) {
-      this.apiService.markSeatTypeAsSoldOut(seatType.event_seat_type_inventory_id, this.userId).subscribe({
-        next: (response) => {
-          if (response.status === 'Success') {
-            this.toastr.success(`"${seatType.seat_name}" marked as sold out successfully`, 'Success');
-            // Update the local array
-            this.seatTypes[index].available_seats = 0;
-            this.seatTypes[index].is_sold_out = true;
-            // Force change detection
-            this.seatTypes = [...this.seatTypes];
-          } else {
-            this.toastr.error(response.message || 'Failed to mark as sold out', 'Error');
-          }
-        },
-        error: (error) => {
-          console.error('Error marking seat type as sold out:', error);
-          this.toastr.error('Failed to mark seat type as sold out', 'Error');
-        }
-      });
+      this.apiService
+        .markSeatTypeAsSoldOut(seatType.event_seat_type_inventory_id, this.userId)
+        .subscribe({
+          next: (response) => {
+            if (response.status === 'Success') {
+              this.toastr.success(
+                `"${seatType.seat_name}" marked as sold out successfully`,
+                'Success',
+              );
+              // Update the local array
+              this.seatTypes[index].available_seats = 0;
+              this.seatTypes[index].is_sold_out = true;
+              // Force change detection
+              this.seatTypes = [...this.seatTypes];
+            } else {
+              this.toastr.error(response.message || 'Failed to mark as sold out', 'Error');
+            }
+          },
+          error: (error) => {
+            console.error('Error marking seat type as sold out:', error);
+            this.toastr.error('Failed to mark seat type as sold out', 'Error');
+          },
+        });
     } else {
       // For new events, just update locally
       this.seatTypes[index].available_seats = 0;
@@ -2187,8 +2362,16 @@ export class AdminEventsComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error reloading seat types:', error);
-        }
+        },
       });
+    }
+  }
+
+  recalculateTotalSeats(): void {
+    if (this.editingSeatType) {
+      const bookedSeats = this.editingSeatType.booked_seats || 0;
+      const availableSeats = this.editingSeatType.available_seats || 0;
+      this.editingSeatType.total_seats = bookedSeats + availableSeats;
     }
   }
 }
