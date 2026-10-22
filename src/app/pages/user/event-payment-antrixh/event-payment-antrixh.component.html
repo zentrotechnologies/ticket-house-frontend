@@ -1,0 +1,223 @@
+<div class="payment-antrixh-page">
+  <!-- PAGE LOADER -->
+  <app-antrixh-loader *ngIf="isPageLoading"></app-antrixh-loader>
+
+  <!-- PAGE CONTENT -->
+  <main class="payment-page">
+    <div class="payment-container">
+      <!-- LEFT SECTION -->
+      <section class="payment-left">
+        <div class="payment-card">
+          <h3 class="card-title">Please select from the following option(s)</h3>
+
+          <!-- M Ticket -->
+          <label class="radio-row">
+            <input type="radio" checked />
+            <div class="radio-content">
+              <div class="radio-title">M-Ticket</div>
+              <div class="radio-sub">Save the planet. Use your phone as a ticket.</div>
+            </div>
+          </label>
+
+          <!-- Info Box -->
+          <div class="info-box">
+            <h4>M-Ticket Information</h4>
+            <ol>
+              <li>
+                Customer(s) can access their ticket(s) from the 'My Profile' section on the
+                app/mobile-web.
+              </li>
+              <li>It is mandatory to present the ticket(s) via app/mobile-web at the venue.</li>
+              <li>No physical ticket(s) are required.</li>
+            </ol>
+          </div>
+
+          <!-- Booking Summary -->
+          <div class="booking-summary" *ngIf="seatSelections.length > 0">
+            <h4>Your Booking Details</h4>
+            <div class="summary-item" *ngFor="let seat of seatSelections">
+              <div class="seat-info">
+                <span class="seat-name">{{ seat.SeatName || 'Seat Type ' + seat.SeatTypeId }}</span>
+                <span class="seat-quantity">× {{ seat.Quantity }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="payment-right">
+        <div class="summary-card" *ngIf="eventTitle">
+          <div class="ticket-information">
+            <span class="ticket-information-title">Important Information</span>
+            <div class="ticket-info-div">
+              <div class="check-out-title py-2">Ticket Access & Entry Guidelines</div>
+              <div class="ticket-information-points">1) Customer(s) can access their ticket(s) from the 'My Profile'
+                section on the app/mobile-web.</div>
+              <div class="ticket-information-points">2) It is mandatory to present the ticket(s) in my profile section
+                via app/mobile-web at the venue.</div>
+              <div class="ticket-information-points">3) No physical ticket(s) are required to enter the venue.</div>
+
+            </div>
+          </div>
+
+
+        </div>
+
+        <div class="price-breakup" *ngIf="totalAmount > 0">
+          <div class="details-box">
+            <div class="row my-0 pb-2 border-bottom">
+              <div class="d-flex justify-content-between mb-2"><span class="check-out-title">{{ eventTitle }}</span><span
+                  class="check-out-title">₹{{ totalAmount | number:'1.2-2' }}</span></div>
+              <span>{{ getTotalTickets() }} Tickets</span>
+            </div>
+
+            <div class="row my-0 date-row">
+              <span class="check-out-title" *ngIf="eventDate">{{ formatDate(eventDate) }}</span>
+              <span *ngIf="eventTime">{{ eventTime }}</span>
+            </div>
+
+            <div class="row my-0">
+              <span class="muted">Venue</span>
+              <span class="check-out-title" *ngIf="eventLocation">{{ eventLocation }}</span>
+            </div>
+
+            <div class="row selected-tickets">
+              <div class="ticket-line" *ngFor="let seat of seatSelections">
+                <div class="seat-name">{{ seat.SeatName || 'Seat Type ' + seat.SeatTypeId | uppercase}}({{seat.Price ||
+                  '1299'}}): {{ seat.Quantity }} ticket(s)</div>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="row my-0">
+            <div class="d-flex justify-content-between">
+              <span>Sub-total</span>
+              <span class="text-black">₹{{ totalAmount | number:'1.2-2' }}</span>
+            </div>
+          </div>
+
+          <div class="row my-0 border-bottom">
+
+            <!-- Header -->
+            <div class="d-flex justify-content-between booking-header" (click)="toggleFeeBreakup()">
+              <span>
+                Booking Fees
+                <span class="arrow-icon" [class.rotate]="showFeeBreakup">
+                  ▼
+                </span>
+              </span>
+
+              <span class="text-black">
+                ₹{{ (convenienceFee + gstTotal) | number:'1.2-2' }}
+              </span>
+            </div>
+
+            <!-- Accordion Content -->
+            <div class="accodian-content px-4" [class.open]="showFeeBreakup">
+
+              <!-- <div class="d-flex">
+                <span class="price-distribution">Convenience Fee (6%): </span>
+                <span class="price-distribution">&nbsp;₹{{ convenienceFee | number:'1.2-2' }}</span>
+              </div> -->
+
+              <div class="d-flex">
+                <span class="price-distribution">
+                  Convenience Fee:
+                </span>
+                <span class="price-distribution">
+                  &nbsp;₹{{ convenienceFee | number:'1.2-2' }}
+                </span>
+              </div>
+
+              <div class="d-flex mb-2">
+                <span class="price-distribution">GST (18%): </span>
+                <span class="price-distribution">&nbsp;₹{{ gstTotal | number:'1.2-2' }}</span>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Add this new line for total before coupon (only show when coupon is applied) -->
+          <div class="row my-0" *ngIf="couponResult?.is_applied">
+            <div class="d-flex justify-content-between">
+              <span>Total Amount</span>
+              <span class="text-black">₹{{ (totalAmount + convenienceFee + gstTotal) | number:'1.2-2' }}</span>
+            </div>
+          </div>
+
+          <!-- Coupon Section - Add right after booking fees section -->
+          <div class="row my-0" *ngIf="isCheckingCoupon">
+            <div class="d-flex justify-content-center">
+              <div class="spinner-small"></div>
+              <span class="ml-2">Checking for applicable coupons...</span>
+            </div>
+          </div>
+
+          <div class="row my-0" *ngIf="couponResult?.is_applied">
+            <div class="coupon-applied">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="coupon-message">{{ couponResult!.message }}</div>
+                </div>
+                <span class="coupon-discount">-₹{{ couponResult!.discount_value | number:'1.2-2' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="row my-0">
+
+            <div class="d-flex justify-content-between my-2">
+              <span class="check-out-total-title">Total Amount</span>
+              <span class="check-out-total-amount">₹{{ finalAmount | number:'1.2-2' }}</span>
+            </div>
+          </div>
+
+          <div class="state-select my-0 d-none">
+            <label>Select State</label>
+            <select [(ngModel)]="selectedState">
+              <option selected>Maharashtra</option>
+              <!-- <option>Delhi</option>
+              <option>Karnataka</option>
+              <option>Tamil Nadu</option>
+              <option>Gujarat</option> -->
+            </select>
+          </div>
+
+          <p class="my-0 pay-consent">By proceeding, I express my consent to complete this transaction.</p>
+
+          <div class="mobile-pay-bar">
+
+            <button class="pay-btn" (click)="onProceedToPay()" [disabled]="isProcessing || seatSelections.length === 0">
+              <span *ngIf="!isProcessing">Proceed to Pay ₹{{ finalAmount | number:'1.2-2' }}</span>
+              <span *ngIf="isProcessing">Processing...</span>
+            </button>
+
+          </div>
+
+          <div *ngIf="isProcessing" class="loading-state">
+            <div class="spinner"></div>
+            <p>Please wait while we process your request...</p>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+
+  <!-- Add this right before the booking success modal -->
+  <!-- Payment Processing Modal -->
+  <div *ngIf="showProcessingModal" class="processing-modal-overlay">
+    <div class="processing-modal-content">
+      <div class="processing-spinner"></div>
+      <p class="processing-text">Please wait while we generate your ticket and QR code...</p>
+      <p class="processing-subtext">This may take a few moments</p>
+    </div>
+  </div>
+
+  <!-- Booking Success Modal -->
+  <app-booking-success-modal *ngIf="showSuccessModal" [qrCodeBase64]="qrCodeBase64" [thankYouMessage]="thankYouMessage"
+    [bookingDetails]="bookingDetails" [bookingCode]="bookingCode" (close)="onSuccessModalClose()">
+  </app-booking-success-modal>
+</div>

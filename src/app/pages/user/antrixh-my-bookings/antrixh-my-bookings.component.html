@@ -1,0 +1,139 @@
+<div class="ax-bookings-page">
+  <div class="ax-bookings-container">
+    <!-- Header -->
+    <header class="ax-bookings-header">
+      <div class="ax-title-block">
+        <h1>My Bookings</h1>
+        <p class="ax-subtitle" *ngIf="bookings.length > 0">
+          {{ totalCount }} booking<span *ngIf="totalCount !== 1">s</span> found
+        </p>
+      </div>
+      <button class="ax-back-btn" (click)="onBackToEvents()">
+        <i class="bi bi-arrow-left"></i> Back to Events
+      </button>
+    </header>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="ax-state-card">
+      <div class="ax-spinner"></div>
+      <p>Loading your bookings...</p>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="!isLoading && bookings.length === 0" class="ax-state-card">
+      <i class="bi bi-ticket-perforated ax-empty-icon"></i>
+      <h2>No Bookings Yet</h2>
+      <p *ngIf="filterText">No bookings match your search criteria.</p>
+      <p *ngIf="!filterText">You haven't made any bookings yet.</p>
+      <button class="ax-browse-btn" (click)="onBackToEvents()">Browse Events</button>
+    </div>
+
+    <!-- Bookings list -->
+    <div *ngIf="!isLoading && bookings.length > 0" class="ax-bookings-list">
+      <div class="ax-list-header">
+        <h2 class="ax-section-title">Booking History</h2>
+        <div class="ax-page-size">
+          <label>Show:</label>
+          <select [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+            <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="ax-bookings-grid">
+        <article class="ax-booking-card" *ngFor="let booking of bookings">
+            <div class="ax-card-top">
+            <div class="ax-card-info">
+              <h3 class="ax-event-name">{{ booking.event_name }}</h3>
+              <div class="ax-meta-row">
+                <span class="ax-booking-code">{{ booking.booking_code }}</span>
+                <span class="ax-status" [ngClass]="getStatusClass(booking.booking_status)">
+                  {{ booking.booking_status }}
+                </span>
+              </div>
+              <p class="ax-meta">
+                <i class="bi bi-geo-alt-fill"></i> {{ booking.location }}
+              </p>
+              <p class="ax-meta">
+                <i class="bi bi-clock-fill"></i>
+                {{ formatDate(booking.event_date) }} · {{ formatTime(booking.start_time) }} -
+                {{ formatTime(booking.end_time) }}
+              </p>
+            </div>
+
+            <div class="ax-qr" *ngIf="booking.qr_code" (click)="showQRCodeModal(booking)" title="Click to enlarge QR code">
+              <img [src]="'data:image/png;base64,' + booking.qr_code" alt="QR Code" />
+            </div>
+          </div>
+
+          <div class="ax-detail-grid">
+            <div class="ax-detail">
+              <span class="ax-label">Tickets</span>
+              <span class="ax-value">{{ getBookingTotalTickets(booking) }}</span>
+            </div>
+            <div class="ax-detail">
+              <span class="ax-label">Amount</span>
+              <span class="ax-value">₹{{ booking.final_amount }}</span>
+            </div>
+            <div class="ax-detail">
+              <span class="ax-label">Payment</span>
+              <span class="ax-value">{{ booking.payment_method ? (booking.payment_method | titlecase) : 'Not Paid' }}</span>
+            </div>
+            <div class="ax-detail">
+              <span class="ax-label">Booked On</span>
+              <span class="ax-value">{{ formatDate(booking.created_on) }}</span>
+            </div>
+          </div>
+
+          <div class="ax-seats" *ngIf="booking.seats && booking.seats.length > 0">
+            <h4>Seats</h4>
+            <div class="ax-seat-list">
+              <div class="ax-seat" *ngFor="let seat of booking.seats">
+                <span class="ax-seat-name">{{ seat.seat_name }} × {{ seat.quantity }}</span>
+                <span class="ax-seat-price">₹{{ seat.subtotal }}</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Pagination -->
+      <div class="ax-pagination" *ngIf="totalPages > 1">
+        <span class="ax-page-info">
+          Page {{ currentPage }} of {{ totalPages }} · {{ totalCount }} bookings
+        </span>
+        <div class="ax-page-controls">
+          <button class="ax-page-btn" [disabled]="!hasPrevious" (click)="onPageChange(currentPage - 1)">
+            &lsaquo; Prev
+          </button>
+          <button
+            *ngFor="let page of [].constructor(totalPages); let i = index"
+            class="ax-page-number"
+            [class.active]="currentPage === i + 1"
+            (click)="onPageChange(i + 1)"
+          >
+            {{ i + 1 }}
+          </button>
+          <button class="ax-page-btn" [disabled]="!hasNext" (click)="onPageChange(currentPage + 1)">
+            Next &rsaquo;
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR modal -->
+  <div *ngIf="showQRModal" class="ax-qr-overlay" (click)="closeQRModal()">
+    <div class="ax-qr-modal" (click)="$event.stopPropagation()">
+      <button class="ax-qr-close" (click)="closeQRModal()" aria-label="Close">&times;</button>
+      <h3>Your Ticket QR</h3>
+      <div class="ax-qr-image-wrap">
+        <img [src]="'data:image/png;base64,' + selectedQRCode" alt="Booking QR Code" />
+      </div>
+      <p class="ax-qr-caption">
+        <strong>{{ selectedBookingCode }}</strong> · {{ selectedEventName }}
+      </p>
+      <button class="ax-qr-download" (click)="downloadQRCode()">Download QR Code</button>
+    </div>
+  </div>
+</div>

@@ -281,3 +281,121 @@ color: #ffffff;
     font-weight: 400;
     padding: 5px 0;
 }
+
+/* ============================================================
+   Antrixh pages font system
+   - main headings & titles -> Cabinet Grotesk
+   - main info & important info (incl. summary/detail) -> Cabinet Grotesk
+   - everything else -> General Sans
+   No Space Grotesk is used on the Antrixh pages.
+   Scoped to the Antrixh components only.
+   ============================================================ */
+app-events-antrixh,
+app-event-booking-antrixh,
+app-event-payment-antrixh,
+app-antrixh-my-bookings,
+app-antrixh-navbar {
+  --font-display: 'Clash Display', system-ui, sans-serif;
+  --font-info: 'Cabinet Grotesk', system-ui, sans-serif;
+  --font-body: 'General Sans', system-ui, sans-serif;
+}
+
+/* Overscroll at the page edges reveals the html (canvas) background —
+   keep it dark on Antrixh pages so it blends with the page background. */
+html:has(app-events-antrixh),
+html:has(app-event-booking-antrixh),
+html:has(app-event-payment-antrixh),
+html:has(app-antrixh-my-bookings) {
+  background: #0b0b0d;
+}
+
+/* rest -> General Sans */
+app-events-antrixh *,
+app-event-booking-antrixh *,
+app-event-payment-antrixh *,
+app-antrixh-my-bookings *,
+app-antrixh-navbar * {
+  font-family: var(--font-body) !important;
+}
+
+/* main headings & titles -> Clash Display (500 weight for event names) */
+app-events-antrixh h1,
+app-events-antrixh h2,
+app-events-antrixh h3,
+app-events-antrixh h4,
+app-events-antrixh h5,
+app-events-antrixh h6,
+app-events-antrixh .slide-title,
+app-events-antrixh .all-events-title,
+app-events-antrixh .event-row-title,
+app-antrixh-my-bookings h1,
+app-antrixh-my-bookings h2,
+app-antrixh-my-bookings h3,
+app-antrixh-my-bookings .ax-section-title,
+app-antrixh-my-bookings h4,
+app-antrixh-my-bookings h5,
+app-antrixh-my-bookings h6,
+app-event-booking-antrixh .event-main-title,
+app-event-payment-antrixh .check-out-total-title {
+  font-family: var(--font-display) !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.02em !important;
+}
+
+/* main info & important info (incl. summary/detail) -> Cabinet Grotesk */
+app-events-antrixh .sr-title,
+app-events-antrixh .search-result-title,
+app-antrixh-my-bookings .ax-section-title,
+app-event-booking-antrixh h1,
+app-event-booking-antrixh h2,
+app-event-booking-antrixh h3,
+app-event-booking-antrixh h4,
+app-event-booking-antrixh h5,
+app-event-booking-antrixh h6,
+app-event-booking-antrixh .section-title,
+app-event-payment-antrixh h1,
+app-event-payment-antrixh h2,
+app-event-payment-antrixh h3,
+app-event-payment-antrixh h4,
+app-event-payment-antrixh h5,
+app-event-payment-antrixh h6,
+app-event-payment-antrixh .card-title,
+app-event-payment-antrixh .radio-title,
+app-antrixh-navbar h1,
+app-antrixh-navbar h2,
+app-antrixh-navbar h3,
+app-antrixh-navbar h4,
+app-antrixh-navbar h5,
+app-antrixh-navbar h6,
+app-antrixh-navbar .sub-heading-text,
+app-events-antrixh .slide-meta,
+app-events-antrixh .event-row-meta,
+app-events-antrixh .sr-meta,
+app-event-booking-antrixh .event-info-glass,
+app-event-booking-antrixh .event-info-row,
+app-event-booking-antrixh .event-info-cell,
+app-event-booking-antrixh .event-info-label,
+app-event-booking-antrixh .event-info-value,
+app-event-booking-antrixh .event-details-section,
+app-event-booking-antrixh .event-detail-label,
+app-event-booking-antrixh .event-detail-value,
+app-event-booking-antrixh .booking-summary,
+app-event-booking-antrixh .summary-item,
+app-event-booking-antrixh .event-address-block,
+app-event-booking-antrixh .event-address-text,
+app-event-booking-antrixh .event-address-text span,
+app-event-booking-antrixh .event-address-text * {
+  font-family: 'Cabinet Grotesk', system-ui, sans-serif !important;
+}
+app-event-payment-antrixh .booking-summary,
+app-event-payment-antrixh .summary-card,
+app-event-payment-antrixh .summary-item,
+app-event-payment-antrixh .ticket-information,
+app-event-payment-antrixh .ticket-information-title,
+app-event-payment-antrixh .ticket-information-points,
+app-event-payment-antrixh .ticket-info-div,
+app-event-payment-antrixh .check-out-title,
+app-event-payment-antrixh .details-box,
+app-event-payment-antrixh .price-breakup {
+  font-family: var(--font-info) !important;
+}

@@ -1,0 +1,290 @@
+<div class="booking-antrixh-page">
+    <app-antrixh-loader *ngIf="isLoading"></app-antrixh-loader>
+
+    <div class="booking-bg" [style.backgroundImage]="bookingBgImage" aria-hidden="true"></div>
+    <div class="booking-bg-overlay" aria-hidden="true"></div>
+
+    <div *ngIf="!isLoading && eventDetails" class="booking-page">
+        <main class="booking-container">
+            <div class="booking-layout">
+                <div class="booking-main-content">
+                    <div class="event-hero">
+                        <div class="hero-img">
+                            <img [src]="eventDetails.eventDetailBanner || eventDetails.banner_image || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1400&q=60'"
+                                [alt]="eventDetails.event_name">
+                        </div>
+                    </div>
+
+                    <h1 class="event-main-title">{{ eventDetails.event_name }}</h1>
+                    <p class="event-category">{{ getEventCategoryName() || 'Stand-up Comedy' }}</p>
+
+                    <div class="event-info-glass">
+                        <div class="event-info-row event-info-row--two">
+                            <div class="event-info-cell">
+                                <span class="event-info-label">Date</span>
+                                <span class="event-info-value">{{ formatDisplayDate(eventDetails.event_date) }}</span>
+                            </div>
+                            <div class="event-info-cell">
+                                <span class="event-info-label">Time</span>
+                                <span class="event-info-value">{{ formatTimeForDisplay(eventDetails.start_time) }}</span>
+                                <span class="event-info-sub">{{ formatDuration(eventDetails.total_duration_minutes) }}</span>
+                            </div>
+                        </div>
+                        <div class="event-info-row event-info-row--two">
+                            <div class="event-info-cell">
+                                <span class="event-info-label">Age Limit</span>
+                                <span class="event-info-value">{{ eventDetails.age_limit ? eventDetails.age_limit + '+' : 'All ages' }}</span>
+                            </div>
+                            <div class="event-info-cell">
+                                <span class="event-info-label">Language</span>
+                                <span class="event-info-value">{{ eventDetails.language || 'Hindi' }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="event-info-glass event-address-block">
+                        <div class="event-info-cell">
+                            <span class="event-info-label">Venue</span>
+                            <div class="event-address-text" (click)="onVenueLocationClick($event)"
+                                [class.clickable]="hasLocationUrl()">
+                                <span>{{ eventDetails.full_address || eventDetails.location }}</span>
+                            </div>
+                            <button class="get-direction-btn" *ngIf="hasLocationUrl()"
+                                (click)="onVenueLocationClick($event)">
+                                <app-location-icon size="20px"></app-location-icon>
+                                Get Direction
+                            </button>
+                        </div>
+                    </div>
+
+                    <hr class="section-divider" />
+
+                    <div class="about-section">
+                        <h2 class="section-title">About the Event</h2>
+                        <div class="about-glass">
+                            <div class="about-text" [innerHTML]="displayDescription | safeHtml"></div>
+
+                            <button *ngIf="shouldTruncateDescription" class="read-more-btn" (click)="toggleDescription()">
+                                {{ isDescriptionExpanded ? 'Read Less ↑' : 'Read More ↓' }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <hr class="section-divider section-divider--bottom" />
+
+                    <div class="similar-shows" *ngIf="similarEvents.length > 0">
+                        <h2 class="section-title">More Shows You Might Like</h2>
+
+                        <div *ngIf="isSimilarLoading" class="loading-mini">Loading similar events...</div>
+
+                        <div *ngIf="!isSimilarLoading" class="shows-grid">
+                            <div *ngFor="let similarEvent of similarEvents; trackBy: trackByEventId" class="mini-card"
+                                (click)="onSimilarEventClick(similarEvent)" tabindex="0">
+                                <div class="mini-poster"
+                                    [style.background-image]="'url(' + (similarEvent.banner_image || 'assets/default-event.jpg') + ')'">
+                                </div>
+                                <div class="mini-title">{{ similarEvent.event_name }}</div>
+                                <div class="mini-sub">{{ formatDisplayDate(similarEvent.event_date) }},
+                                    {{ similarEvent.start_time }}</div>
+                                <div class="mini-sub price">{{ getSimilarEventPrice(similarEvent) }}</div>
+                                <div class="mini-sub location-text"
+                                    (click)="onSimilarEventLocationClick($event, similarEvent)"
+                                    [class.clickable]="hasSimilarEventLocationUrl(similarEvent)"
+                                    [title]="similarEvent.location">
+                                    <span class="location-icon"
+                                        *ngIf="hasSimilarEventLocationUrl(similarEvent)"><app-location-icon size="14px"></app-location-icon></span>
+                                    {{ similarEvent.location }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <aside class="booking-sidebar">
+                    <div class="sidebar-card sticky-sidebar">
+                        <div class="sidebar-price-section">
+                            <span class="sidebar-price-label" *ngIf="hasValidPrice()">Starting from</span>
+                            <span class="sidebar-price-value">{{ getDisplayPrice() }}</span>
+                            <span class="sidebar-price-range">{{ getPriceRangeDisplay() }}</span>
+                        </div>
+
+                        <div class="filling-fast-badge">
+                            <span class="badge-text">Filling Fast</span>
+                        </div>
+                        <button class="book-now-btn" (click)="onBookNow()" [disabled]="!hasValidPrice()"
+                            [class.disabled]="!hasValidPrice()">
+                            Book Now
+                            <span class="btn-arrow" *ngIf="hasValidPrice()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true">
+                                    <title>arrow-right</title>
+                                    <path fill="currentColor" d="M4 11v2h12l-5.5 5.5l1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5L16 11z" />
+                                </svg>
+                            </span>
+                        </button>
+                        <div class="terms-agreement">
+                            <span class="terms-text">By proceeding, you agree to our </span>
+                            <span class="terms-link" (click)="openTermsModal()">Terms & Conditions</span>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+
+            <section class="cta-section">
+                <div class="cta">
+                    <p class="cta-text">List Your Show — It's Free!</p>
+                    <button class="cta-btn" (click)="navigateToSignUp()">Contact Us</button>
+                </div>
+            </section>
+        </main>
+
+        <div class="mobile-sticky-footer">
+            <div class="mobile-footer-content">
+                <button class="mobile-book-btn" (click)="onBookNow()" [disabled]="!hasValidPrice()"
+                    [class.disabled]="!hasValidPrice()">
+                    <ng-container *ngIf="hasValidPrice(); else soldOut">
+                        <span class="bt-main">Buy Tickets</span>
+                        <span class="bt-start">From</span>
+                        <span class="bt-price">{{ getDisplayPrice() }}{{ getPriceRangeDisplay() }}</span>
+                    </ng-container>
+                    <ng-template #soldOut>Sold Out</ng-template>
+                </button>
+                <span class="fast-filling-tag">Fast Filling</span>
+            </div>
+        </div>
+
+        <footer class="events-footer">
+            <div class="events-container">
+                <div class="footer-main">
+                    <div class="footer-col brand-col">
+                        <img class="logo" src="/assets/th_transparent_logo.png" alt="ticket-house-logo" />
+                        <p class="company-tagline">
+                            Your one-stop destination for booking tickets to events, movies, and live shows.
+                        </p>
+                    </div>
+
+                    <div class="footer-col">
+                        <h4 class="footer-title">Support</h4>
+                        <ul class="footer-links-list">
+                            <li><a (click)="openTermsConditions()" style="cursor: pointer;">Terms & Conditions</a></li>
+                            <li><a (click)="openPrivacyPolicy()" style="cursor: pointer;">Privacy Policy</a></li>
+                            <li><a (click)="openRefundPolicy()" style="cursor: pointer;">Refund Policy</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="footer-col">
+                        <h4 class="footer-title">Contact Us</h4>
+                        <ul class="footer-links-list contact-info">
+                            <li><a href="mailto:support@tickethouse.in">support@tickethouse.com</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="footer-bottom">
+                    <p class="copy">
+                        © 2026 Zentro Technologies LLP. All Rights Reserved.
+                        <span class="made-with">Made with <span class="heart">♥</span></span>
+                    </p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <div *ngIf="!isLoading && !eventDetails" class="error-container">
+        <h2>Event Not Found</h2>
+        <p>The event you're looking for doesn't exist or has been removed.</p>
+        <button class="back-btn" (click)="router.navigate(['/'])">Back to Events</button>
+    </div>
+
+    <div class="modal seat-modal" [class.open]="isSeatModalOpen" (click)="closeSeatModalOnBackdrop($event)">
+        <div class="modal-content seat-modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header seat-modal-header">
+                <h3>Select Tickets</h3>
+                <button class="modal-close-btn" (click)="closeSeatModal()">✕</button>
+            </div>
+
+            <div class="modal-body seat-modal-body">
+                <div *ngIf="isSeatLoading" class="seat-loading">
+                    <div class="loading-spinner-small">Loading seat options...</div>
+                </div>
+
+                <div class="seat-selection-section" *ngIf="!isSeatLoading && seatTypes.length > 0">
+                    <div *ngFor="let seatType of seatTypes; trackBy: trackBySeatTypeId" class="seat-card"
+                        [class.selected]="isSeatSelected(seatType.event_seat_type_inventory_id)"
+                        (click)="toggleSeatSelectionFromDiv(seatType.event_seat_type_inventory_id, $event)">
+                        <div class="seat-info-main">
+                            <label class="checkbox-container" (click)="$event.stopPropagation()">
+                                <input type="checkbox" [checked]="isSeatSelected(seatType.event_seat_type_inventory_id)"
+                                    (change)="toggleSeatSelection(seatType.event_seat_type_inventory_id, $event)">
+                                <span class="checkmark"></span>
+                            </label>
+                            <div class="seat-details">
+                                <div class="seat-tags-row">
+                                    <span class="seat-price">₹{{ seatType.price }}</span>
+                                    <span class="seat-type-tag">{{ seatType.seat_name }}</span>
+                                </div>
+                                <div class="seat-available sold-out" *ngIf="seatType.available_seats === 0">
+                                    Sold Out
+                                </div>
+                            </div>
+                        </div>
+
+                        <div *ngIf="selectedSeats[seatType.event_seat_type_inventory_id] > 0" class="seat-qty"
+                            (click)="$event.stopPropagation()">
+                            <button class="qty-btn"
+                                (click)="decreaseSeats(seatType.event_seat_type_inventory_id)">−</button>
+                            <span class="qty-count">{{ selectedSeats[seatType.event_seat_type_inventory_id] }}</span>
+                            <button class="qty-btn"
+                                (click)="increaseSeats(seatType.event_seat_type_inventory_id)">+</button>
+                        </div>
+                    </div>
+
+                    <div *ngIf="hasSelectedSeats()" class="selected-summary">
+                        <div *ngFor="let item of getSelectedSeatsList()" class="summary-item">
+                            <span>{{ item.seatType.seat_name }} × {{ item.quantity }}</span>
+                            <span>₹{{ item.seatType.price * item.quantity }}</span>
+                        </div>
+                        <div class="summary-total">
+                            <span>Total</span>
+                            <span>₹{{ totalAmount }}</span>
+                        </div>
+                    </div>
+
+                    <div *ngIf="!hasSelectedSeats()" class="no-selection-message">
+                        <p>Please select at least one ticket to proceed</p>
+                    </div>
+                </div>
+
+                <div *ngIf="!isSeatLoading && seatTypes.length === 0" class="no-seats-message">
+                    <p>No seat options available for this event</p>
+                </div>
+            </div>
+
+            <div class="modal-footer seat-modal-footer">
+                <button class="proceed-btn" (click)="proceedToCheckout()" [disabled]="!hasSelectedSeats()">
+                    Proceed to Checkout <span class="btn-arrow">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" aria-hidden="true">
+                            <title>arrow-right</title>
+                            <path fill="currentColor" d="M4 11v2h12l-5.5 5.5l1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5L16 11z" />
+                        </svg>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal terms-modal" [class.open]="isTermsModalOpen" (click)="closeTermsModalOnBackdrop($event)">
+        <div class="modal-content terms-modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Terms & Conditions</h3>
+                <button class="modal-close-btn" (click)="closeTermsModal()">✕</button>
+            </div>
+            <div class="modal-body terms-modal-body">
+                <div *ngIf="eventDetails?.terms_and_conditions; else noTerms" class="terms-content"
+                    [innerHTML]="eventDetails?.terms_and_conditions || '' | safeHtml"></div>
+                <ng-template #noTerms>
+                    <div class="terms-na">NA</div>
+                </ng-template>
+            </div>
+        </div>
+    </div>
+</div>

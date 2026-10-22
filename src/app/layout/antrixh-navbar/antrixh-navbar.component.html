@@ -1,0 +1,467 @@
+<header class="antrixh-navbar" [class.scrolled]="isScrolled">
+  <div class="navbar-inner">
+    <!-- LEFT: logo -->
+    <a class="navbar-logo" routerLink="/" aria-label="Ticket House home">
+      <img src="/assets/th_transparent_logo.png" alt="ticket-house-logo" />
+    </a>
+
+    <!-- CENTER: links -->
+    <ul class="menu-links" [class.open]="showMobileMenu">
+      <li>
+        <a routerLink="/" (click)="closeMobileMenu()">Events</a>
+      </li>
+      <li>
+        <a (click)="onViewBookings()">My Bookings</a>
+      </li>
+    </ul>
+
+    <!-- RIGHT: auth + mobile menu toggle -->
+    <div class="navbar-right">
+      <ng-container *ngIf="isUserLoggedIn; else guestActions">
+        <div class="user-welcome-dropdown">
+          <button type="button" class="user-welcome-trigger" (click)="toggleDropdown()">
+            <span class="user-icon"><i class="bi bi-person-circle"></i></span>
+            <span class="user-name">Welcome, {{ getUserDisplayName() }} &#9662;</span>
+          </button>
+
+          <div *ngIf="showUserDropdown" class="user-dropdown-menu">
+            <div class="dropdown-user-info">
+              <div class="user-name-display">{{ getUserDisplayName() }}</div>
+              <div class="user-email-display">{{ getUserEmail() }}</div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <button type="button" class="dropdown-item" (click)="onViewBookings()">
+              My Bookings
+            </button>
+            <div class="dropdown-divider"></div>
+            <button type="button" class="dropdown-item logout-item" (click)="onLogout()">
+              <span class="logout-icon"><i class="bi bi-box-arrow-right"></i></span>
+              Logout
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+      <ng-template #guestActions>
+        <button type="button" class="auth-btn" (click)="onSignUp()">Sign Up</button>
+      </ng-template>
+
+      <button
+        type="button"
+        class="menu-toggle"
+        [class.open]="showMobileMenu"
+        (click)="toggleMobileMenu()"
+        [attr.aria-expanded]="showMobileMenu"
+        aria-label="Toggle navigation menu"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ===== AUTH MODAL ===== -->
+<div *ngIf="showAuthModal" class="modal-overlay" (click)="onCloseAuthModal()">
+  <div class="modal-content auth-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div>
+        <h3>{{ isLoginMode ? 'Sign In' : 'Secure your tickets' }}</h3>
+        <h6 class="sub-heading-text">
+          Enter your details to receive booking confirmation & tickets instantly.
+        </h6>
+      </div>
+      <button class="modal-close" (click)="onCloseAuthModal()" aria-label="Close">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Signup progress steps -->
+      <div *ngIf="!isLoginMode" class="signup-steps">
+        <div class="step" [class.active]="signupStep === 1">
+          <span class="step-number">1</span>
+          <span class="step-text">Your Details</span>
+        </div>
+        <div class="step" [class.active]="signupStep === 2">
+          <span class="step-number">2</span>
+          <span class="step-text">Verify & Confirm</span>
+        </div>
+      </div>
+
+      <!-- Login -->
+      <div *ngIf="isLoginMode && !showOTPVerification && !showForgotPassword" class="login-section">
+        <div class="form-group">
+          <input type="email" [(ngModel)]="loginEmail" placeholder="Email" [disabled]="isLoading" />
+        </div>
+        <div class="form-group password-field">
+          <input
+            [type]="showLoginPassword ? 'text' : 'password'"
+            [(ngModel)]="loginPassword"
+            placeholder="Password"
+            [disabled]="isLoading"
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="showLoginPassword = !showLoginPassword"
+            [attr.aria-label]="showLoginPassword ? 'Hide password' : 'Show password'"
+          >
+            <i class="bi" [class.bi-eye]="!showLoginPassword" [class.bi-eye-slash]="showLoginPassword"></i>
+          </button>
+        </div>
+
+        <div class="forgot-password-container">
+          <a class="forgot-password-link" (click)="onForgotPassword()">Forgot Password?</a>
+        </div>
+
+        <button class="auth-btn" (click)="onLogin()" [disabled]="isLoading || !loginEmail || !loginPassword">
+          <span *ngIf="!isLoading">Sign In</span>
+          <span *ngIf="isLoading">Signing In...</span>
+        </button>
+        <div class="auth-footer">
+          <p>Don't have an account? <a (click)="switchToSignup()">Sign Up</a></p>
+        </div>
+      </div>
+
+      <!-- Forgot password: email -->
+      <div *ngIf="isLoginMode && showForgotPassword && forgotPasswordStep === 1" class="forgot-password-section">
+        <div class="forgot-header">
+          <h4>Reset Password</h4>
+          <p>Enter your email address to receive an OTP</p>
+        </div>
+        <div class="form-group">
+          <input type="email" [(ngModel)]="forgotPasswordEmail" placeholder="Email" [disabled]="isLoading" />
+        </div>
+        <button class="auth-btn" (click)="sendForgotPasswordOTP()" [disabled]="isLoading || !forgotPasswordEmail">
+          <span>Send OTP</span>
+        </button>
+        <div class="auth-footer">
+          <a (click)="backToLogin()">&larr; Back to Login</a>
+        </div>
+      </div>
+
+      <!-- Forgot password: OTP -->
+      <div *ngIf="isLoginMode && showForgotPassword && forgotPasswordStep === 2" class="otp-verification-section">
+        <div class="verification-header">
+          <h4>Verify OTP</h4>
+          <p>Enter the 4-digit code sent to<br /><strong>{{ forgotPasswordEmail }}</strong></p>
+        </div>
+
+        <div class="otp-input-container">
+          <div class="otp-inputs">
+            <input
+              *ngFor="let i of [0, 1, 2, 3]; let idx = index"
+              type="text"
+              maxlength="1"
+              [(ngModel)]="forgotPasswordOtpDigits[idx]"
+              (input)="onForgotOtpInput($event, idx)"
+              (keydown)="onForgotOtpKeyDown($event, idx)"
+              [disabled]="isLoading || forgotPasswordOtpRequestInProgress"
+              [class.sending]="forgotPasswordOtpRequestInProgress"
+              class="otp-digit"
+            />
+          </div>
+        </div>
+
+        <div *ngIf="forgotPasswordOtpRequestInProgress" class="otp-request-timer">
+          <div class="timer-count">Expect OTP in {{ formatForgotPasswordOtpRequestTimer() }}</div>
+          <div class="timer-progress">
+            <div class="progress-bar" [style.width]="(forgotPasswordOtpRequestTimer / 30) * 100 + '%'"></div>
+          </div>
+        </div>
+
+        <div class="otp-timer" *ngIf="!forgotPasswordOtpRequestInProgress && otpTimer > 0">
+          OTP expires in: {{ formatOtpTimer() }}
+        </div>
+
+        <div
+          *ngIf="!forgotPasswordOtpRequestInProgress && otpTimer === 0 && !forgotPasswordOtpId"
+          class="otp-retry"
+        >
+          <p class="text-warning">Didn't receive OTP?</p>
+          <button class="resend-btn" (click)="resendForgotPasswordOTP()" [disabled]="isLoading">Resend OTP</button>
+        </div>
+
+        <div class="otp-actions">
+          <button
+            class="resend-btn"
+            (click)="resendForgotPasswordOTP()"
+            [disabled]="otpTimer > 0 || isLoading || forgotPasswordOtpRequestInProgress"
+          >
+            Resend OTP
+          </button>
+          <button
+            class="verify-btn"
+            (click)="verifyForgotPasswordOTP()"
+            [disabled]="!isForgotOtpComplete() || isLoading || forgotPasswordOtpRequestInProgress"
+          >
+            <span *ngIf="!isLoading">Verify OTP</span>
+            <span *ngIf="isLoading">Verifying...</span>
+          </button>
+        </div>
+
+        <div class="auth-footer">
+          <a (click)="backToForgotStep1()">&larr; Back to Email</a>
+        </div>
+      </div>
+
+      <!-- Forgot password: set new password -->
+      <div *ngIf="isLoginMode && showForgotPassword && forgotPasswordStep === 3" class="set-password-section">
+        <div class="forgot-header">
+          <h4>Set New Password</h4>
+          <p>Enter your new password below</p>
+        </div>
+
+        <div class="form-group">
+          <input type="email" [value]="forgotPasswordEmail" placeholder="Email" disabled class="disabled-input" />
+        </div>
+
+        <div class="form-group password-field">
+          <input
+            [type]="showNewPassword ? 'text' : 'password'"
+            [(ngModel)]="newPassword"
+            placeholder="New Password"
+            [disabled]="isLoading"
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="showNewPassword = !showNewPassword"
+            [attr.aria-label]="showNewPassword ? 'Hide password' : 'Show password'"
+          >
+            <i class="bi" [class.bi-eye]="!showNewPassword" [class.bi-eye-slash]="showNewPassword"></i>
+          </button>
+        </div>
+
+        <div class="form-group password-field">
+          <input
+            [type]="showConfirmPassword ? 'text' : 'password'"
+            [(ngModel)]="confirmPassword"
+            placeholder="Confirm Password"
+            [disabled]="isLoading"
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="showConfirmPassword = !showConfirmPassword"
+            [attr.aria-label]="showConfirmPassword ? 'Hide password' : 'Show password'"
+          >
+            <i class="bi" [class.bi-eye]="!showConfirmPassword" [class.bi-eye-slash]="showConfirmPassword"></i>
+          </button>
+        </div>
+
+        <div *ngIf="newPassword && !isNewPasswordValid()" class="password-validation-container">
+          <div class="password-requirements">
+            <div class="requirement" [class.valid]="hasNewUpperCase()">
+              <span class="requirement-icon">{{ hasNewUpperCase() ? '✓' : '○' }}</span>
+              <span class="requirement-text">At least one uppercase letter</span>
+            </div>
+            <div class="requirement" [class.valid]="hasNewLowerCase()">
+              <span class="requirement-icon">{{ hasNewLowerCase() ? '✓' : '○' }}</span>
+              <span class="requirement-text">At least one lowercase letter</span>
+            </div>
+            <div class="requirement" [class.valid]="hasNewNumber()">
+              <span class="requirement-icon">{{ hasNewNumber() ? '✓' : '○' }}</span>
+              <span class="requirement-text">At least one number</span>
+            </div>
+            <div class="requirement" [class.valid]="hasNewSpecialChar()">
+              <span class="requirement-icon">{{ hasNewSpecialChar() ? '✓' : '○' }}</span>
+              <span class="requirement-text">At least one special character (@$!%*?&)</span>
+            </div>
+            <div class="requirement" [class.valid]="hasNewMinLength()">
+              <span class="requirement-icon">{{ hasNewMinLength() ? '✓' : '○' }}</span>
+              <span class="requirement-text">Minimum 8 characters</span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="confirmPassword && newPassword !== confirmPassword" class="validation-error">
+          <small>Passwords do not match</small>
+        </div>
+
+        <button
+          class="auth-btn"
+          (click)="setNewPassword()"
+          [disabled]="isLoading || !isNewPasswordValid() || newPassword !== confirmPassword"
+        >
+          <span *ngIf="!isLoading">Set Password</span>
+          <span *ngIf="isLoading">Updating...</span>
+        </button>
+
+        <div class="auth-footer">
+          <a (click)="backToLogin()">&larr; Back to Login</a>
+        </div>
+      </div>
+
+      <!-- Signup step 1 -->
+      <div *ngIf="!isLoginMode && signupStep === 1" class="signup-section">
+        <div class="form-group">
+          <input
+            type="text"
+            [(ngModel)]="signupFirstName"
+            placeholder="Full Name"
+            [disabled]="isLoading"
+            #firstName="ngModel"
+            required
+            minlength="2"
+          />
+          <div *ngIf="firstName.invalid && (firstName.dirty || firstName.touched)" class="validation-error">
+            <small *ngIf="firstName.errors?.['required']">Name is required</small>
+            <small *ngIf="firstName.errors?.['minlength']">Name must be at least 2 characters</small>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <input
+            type="email"
+            [(ngModel)]="signupEmail"
+            placeholder="Email (for ticket confirmation)"
+            [disabled]="isLoading"
+            #email="ngModel"
+            required
+            email
+          />
+          <div *ngIf="email.invalid && (email.dirty || email.touched)" class="validation-error">
+            <small *ngIf="email.errors?.['required']">Email is required</small>
+            <small *ngIf="email.errors?.['email']">Please enter a valid email</small>
+          </div>
+        </div>
+
+        <div class="form-group password-field">
+          <input
+            [type]="showSignupPassword ? 'text' : 'password'"
+            [(ngModel)]="signupPassword"
+            placeholder="Create a password (for easy access later)"
+            [disabled]="isLoading"
+            #password="ngModel"
+            required
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="showSignupPassword = !showSignupPassword"
+            [attr.aria-label]="showSignupPassword ? 'Hide password' : 'Show password'"
+          >
+            <i class="bi" [class.bi-eye]="!showSignupPassword" [class.bi-eye-slash]="showSignupPassword"></i>
+          </button>
+        </div>
+
+        <div
+          *ngIf="signupPassword && !isPasswordValid() && (password.dirty || password.touched)"
+          class="password-validation-container"
+        >
+          <div class="password-requirements">
+            <div class="requirement" [class.valid]="hasUpperCase()">
+              <span class="requirement-icon">{{ hasUpperCase() ? '✓' : '○' }}</span>
+              <span class="requirement-text">At least one uppercase letter</span>
+            </div>
+            <div class="requirement" [class.valid]="hasLowerCase()">
+              <span class="requirement-icon">{{ hasLowerCase() ? '✓' : '○' }}</span>
+              <span class="requirement-text">At least one lowercase letter</span>
+            </div>
+            <div class="requirement" [class.valid]="hasNumber()">
+              <span class="requirement-icon">{{ hasNumber() ? '✓' : '○' }}</span>
+              <span class="requirement-text">At least one number</span>
+            </div>
+            <div class="requirement" [class.valid]="hasSpecialChar()">
+              <span class="requirement-icon">{{ hasSpecialChar() ? '✓' : '○' }}</span>
+              <span class="requirement-text">At least one special character (@$!%*?&)</span>
+            </div>
+            <div class="requirement" [class.valid]="hasMinLength()">
+              <span class="requirement-icon">{{ hasMinLength() ? '✓' : '○' }}</span>
+              <span class="requirement-text">Minimum 8 characters</span>
+            </div>
+          </div>
+          <div class="validation-error password-error">
+            <small>Password must meet all requirements above</small>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group country-code">
+            <select [(ngModel)]="signupCountryCode" [disabled]="isLoading">
+              <option value="+91">+91 IN</option>
+              <option value="+1">+1 US</option>
+              <option value="+44">+44 UK</option>
+              <option value="+61">+61 AU</option>
+              <option value="+65">+65 SG</option>
+            </select>
+          </div>
+          <div class="form-group phone-number">
+            <input type="text" [(ngModel)]="signupPhone" placeholder="Phone Number (optional)" [disabled]="isLoading" />
+          </div>
+        </div>
+
+        <button
+          class="auth-btn"
+          (click)="onSignupStep1()"
+          [disabled]="isLoading || !signupFirstName || !signupEmail || !isPasswordValid() || !isValidSignupStep1()"
+        >
+          <span *ngIf="!isLoading">Send OTP</span>
+          <span *ngIf="isLoading">Sending OTP...</span>
+        </button>
+
+        <div class="auth-footer">
+          <p>Already have an account? <a (click)="switchToLogin()">Log In</a></p>
+        </div>
+      </div>
+
+      <!-- Signup step 2: OTP -->
+      <div *ngIf="signupStep === 2 || showOTPVerification" class="otp-verification-section">
+        <div class="verification-header">
+          <h4>Verify Your Email</h4>
+          <p>Enter the 4-digit code sent to<br /><strong>{{ signupEmail || loginEmail }}</strong></p>
+        </div>
+
+        <div class="otp-input-container">
+          <div class="otp-inputs">
+            <input
+              *ngFor="let i of [0, 1, 2, 3]; let idx = index"
+              type="text"
+              maxlength="1"
+              [(ngModel)]="otpDigits[idx]"
+              (input)="onOtpInput($event, idx)"
+              (keydown)="onOtpKeyDown($event, idx)"
+              [disabled]="isLoading || otpRequestInProgress"
+              [class.sending]="otpRequestInProgress"
+              class="otp-digit"
+            />
+          </div>
+        </div>
+
+        <div *ngIf="otpRequestInProgress" class="otp-request-timer">
+          <div class="timer-count">Expect OTP in {{ formatOtpRequestTimer() }}</div>
+          <div class="timer-progress">
+            <div class="progress-bar" [style.width]="(otpRequestTimer / 30) * 100 + '%'"></div>
+          </div>
+        </div>
+
+        <div class="otp-timer" *ngIf="!otpRequestInProgress && otpTimer > 0">
+          OTP expires in: {{ formatOtpTimer() }}
+        </div>
+
+        <div *ngIf="!otpRequestInProgress && otpTimer === 0 && !currentOtpId" class="otp-retry">
+          <p class="text-warning">Didn't receive OTP?</p>
+          <button class="resend-btn" (click)="resendOTP()" [disabled]="isLoading">Resend OTP</button>
+        </div>
+
+        <div class="otp-actions">
+          <button class="resend-btn" (click)="resendOTP()" [disabled]="otpTimer > 0 || isLoading || otpRequestInProgress">
+            Resend OTP
+          </button>
+          <button class="verify-btn" (click)="verifyOTP()" [disabled]="!isOtpComplete() || isLoading || otpRequestInProgress">
+            <span *ngIf="!isLoading">Verify OTP</span>
+            <span *ngIf="isLoading">Verifying...</span>
+          </button>
+        </div>
+
+        <div class="auth-footer" *ngIf="signupStep === 2">
+          <a (click)="goBackToStep1()">&larr; Back to Signup</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay for user dropdown -->
+<div *ngIf="showUserDropdown" class="dropdown-overlay" (click)="toggleDropdown()"></div>

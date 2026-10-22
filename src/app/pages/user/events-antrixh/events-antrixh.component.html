@@ -1,0 +1,221 @@
+<div class="events-page">
+  <!-- ===== PAGE LOADER ===== -->
+  <app-antrixh-loader *ngIf="isLoadingEvents"></app-antrixh-loader>
+
+  <!-- ===== HERO SLIDER ===== -->
+  <section class="hero-slider">
+    <div class="hero-bg" [style.backgroundImage]="heroBackgroundImage"></div>
+    <div class="hero-overlay" aria-hidden="true"></div>
+
+    <div class="slider-loading" *ngIf="isLoadingEvents">
+      <div class="spinner"></div>
+    </div>
+
+    <div class="slider-empty" *ngIf="!isLoadingEvents && upcomingEvents.length === 0">
+      <p>No events available right now.</p>
+    </div>
+
+    <ng-container *ngIf="!isLoadingEvents && upcomingEvents.length > 0">
+      <button class="slider-arrow prev" (click)="prevSlide()" aria-label="Previous event">&#10094;</button>
+
+      <div class="slider-viewport" #sliderViewport (scroll)="onSliderScroll()">
+        <div class="slider-track">
+          <div
+            class="slide"
+            *ngFor="let event of loopEvents; let i = index; trackBy: trackByIndex"
+            [class.is-center]="isCenterSlide(i)"
+            (click)="onSlideClick(i, event)"
+          >
+            <div class="slide-card">
+              <img
+                class="slide-image"
+                [src]="event.banner_image || fallbackImg"
+                [alt]="event.event_name"
+              />
+
+              <div class="slide-info" *ngIf="isCenterSlide(i)">
+                <h2 class="slide-title">{{ event.event_name }}</h2>
+                <p class="slide-meta">
+                  {{ formatEventDate(event.event_date) }} &bull; {{ event.start_time }}
+                </p>
+                <p
+                  class="slide-meta location"
+                  (click)="onLocationClick($event, event)"
+                  [class.clickable]="hasLocationUrl(event)"
+                >
+                  <span class="pin"><app-location-icon size="14px"></app-location-icon></span> {{ event.location }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="slider-arrow next" (click)="nextSlide()" aria-label="Next event">&#10095;</button>
+    </ng-container>
+  </section>
+
+  <!-- ===== ALL EVENTS ===== -->
+  <section class="all-events" *ngIf="!isLoadingEvents && upcomingEvents.length > 0">
+    <div class="events-header">
+      <h2 class="all-events-title">All Events</h2>
+    </div>
+
+    <div class="events-list" [class.view-grid]="viewMode === 'grid'" *ngIf="filteredEvents.length > 0; else noMatch">
+      <div class="event-row" *ngFor="let event of filteredEvents; trackBy: trackByEventId">
+        <div class="event-row-media">
+          <img
+            class="event-row-image"
+            [src]="event.banner_image || fallbackImg"
+            [alt]="event.event_name"
+            (click)="onEventClick(event)"
+          />
+          <span class="event-row-media-overlay"></span>
+        </div>
+
+        <div class="event-row-details">
+          <h3 class="event-row-title" (click)="onEventClick(event)">{{ event.event_name }}</h3>
+          <p class="event-row-meta">
+            <span class="event-row-date"
+              >{{ formatEventWeekday(event.event_date) }},
+              {{ formatEventShortDate(event.event_date) }}</span
+            >
+            {{ formatEventYear(event.event_date) }}
+            &bull; {{ formatEventTime(event.start_time) }}
+          </p>
+
+          <span class="event-row-price">
+            <ng-container *ngIf="getEventPrice(event) !== null; else soldOutRow">
+              &#8377;{{ getEventPrice(event) }}
+            </ng-container>
+            <ng-template #soldOutRow>Sold Out</ng-template>
+          </span>
+
+          <p
+            class="event-row-meta location"
+            (click)="onLocationClick($event, event)"
+            [class.clickable]="hasLocationUrl(event)"
+          >
+            <app-location-icon size="13px"></app-location-icon>
+            {{ event.location }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noMatch>
+      <div class="no-match">
+        <p>No events match your filters.</p>
+        <button class="clear-btn" (click)="clearFilters()">Clear filters</button>
+      </div>
+    </ng-template>
+  </section>
+
+  <!-- ===== BOTTOM GLASS PILL (Filter / Search) ===== -->
+  <div class="pill-backdrop" *ngIf="showFilters || showSearch" (click)="closePanels()"></div>
+
+  <div class="pill-panel" *ngIf="showFilters">
+    <div class="filter-group">
+      <label>Search</label>
+      <input type="text" placeholder="Search events..." [(ngModel)]="searchQuery" />
+    </div>
+    <div class="filter-group">
+      <label>Date</label>
+      <select [(ngModel)]="selectedDate">
+        <option value="">All Dates</option>
+        <option *ngFor="let opt of eventDateOptions" [value]="opt.value">{{ opt.label }}</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Location</label>
+      <select [(ngModel)]="selectedLocation">
+        <option value="">All Locations</option>
+        <option *ngFor="let loc of eventLocationOptions" [value]="loc">{{ loc }}</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>View</label>
+      <div class="view-toggle">
+        <button type="button" class="view-btn" [class.active]="viewMode === 'list'" (click)="setViewMode('list')">
+          List
+        </button>
+        <button type="button" class="view-btn" [class.active]="viewMode === 'grid'" (click)="setViewMode('grid')">
+          Grid
+        </button>
+      </div>
+    </div>
+    <button class="clear-btn" (click)="clearFilters()">Clear filters</button>
+  </div>
+
+  <div class="pill-panel search-panel" *ngIf="showSearch">
+    <div class="search-field">
+      <i class="bi bi-search"></i>
+      <input type="text" placeholder="Search events..." [(ngModel)]="searchQuery" />
+      <button type="button" class="search-clear" *ngIf="searchQuery" (click)="searchQuery = ''" aria-label="Clear">
+        &#10005;
+      </button>
+    </div>
+    <div class="search-hint" *ngIf="!searchQuery">Type to search events by name or location.</div>
+    <div class="search-results" *ngIf="searchQuery">
+      <div
+        class="search-result"
+        *ngFor="let event of filteredEvents; trackBy: trackByEventId"
+        (click)="onSearchResultClick(event)"
+      >
+        <img [src]="event.banner_image || fallbackImg" [alt]="event.event_name" />
+        <div class="sr-body">
+          <div class="sr-title">{{ event.event_name }}</div>
+          <div class="sr-meta">{{ event.location }}</div>
+        </div>
+      </div>
+      <div class="search-empty" *ngIf="filteredEvents.length === 0">No events found.</div>
+    </div>
+  </div>
+
+  <div class="bottom-pill">
+    <button type="button" class="pill-btn" [class.active]="showFilters" (click)="toggleFilters()">
+      <i class="bi bi-funnel"></i><span>Filter</span>
+    </button>
+    <span class="pill-divider"></span>
+    <button type="button" class="pill-btn" [class.active]="showSearch" (click)="toggleSearch()">
+      <i class="bi bi-search"></i><span>Search</span>
+    </button>
+  </div>
+
+  <!-- ===== FOOTER (PC only) ===== -->
+  <footer class="events-footer">
+    <div class="events-container">
+      <div class="footer-main">
+        <div class="footer-col brand-col">
+          <img class="logo" src="/assets/th_transparent_logo.png" alt="ticket-house-logo" />
+          <p class="company-tagline">
+            Your one-stop destination for booking tickets to events, movies, and live shows.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-title">Support</h4>
+          <ul class="footer-links-list">
+            <li><a (click)="openTermsConditions()" style="cursor: pointer;">Terms &amp; Conditions</a></li>
+            <li><a (click)="openPrivacyPolicy()" style="cursor: pointer;">Privacy Policy</a></li>
+            <li><a (click)="openRefundPolicy()" style="cursor: pointer;">Refund Policy</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-title">Contact Us</h4>
+          <ul class="footer-links-list contact-info">
+            <li><a href="mailto:support@tickethouse.in">support@tickethouse.in</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p class="copy">
+          © 2026 Zentro Technologies LLP. All Rights Reserved.
+          <span class="made-with">Made with <span class="heart">♥</span></span>
+        </p>
+      </div>
+    </div>
+  </footer>
+</div>

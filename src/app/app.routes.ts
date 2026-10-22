@@ -2,16 +2,15 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth-guard';
 import { roleGuard } from './core/guards/role-guard';
 import { LayoutComponent } from './layout/layout.component';
+import { AntrixhLayoutComponent } from './layout/antrixh-layout/antrixh-layout.component';
 import { PrivacyPolicyComponent } from './pages/Policy/privacy-policy/privacy-policy.component';
 import { TermsConditionsComponent } from './pages/Policy/terms-conditions/terms-conditions.component';
 import { RefundPolicyComponent } from './pages/Policy/refund-policy/refund-policy.component';
+import { AntrixhTermsConditionsComponent } from './pages/user/antrixh-terms-conditions/antrixh-terms-conditions.component';
+import { AntrixhPrivacyPolicyComponent } from './pages/user/antrixh-privacy-policy/antrixh-privacy-policy.component';
+import { AntrixhRefundPolicyComponent } from './pages/user/antrixh-refund-policy/antrixh-refund-policy.component';
 
 export const routes: Routes = [
-  {
-    path: '',
-    redirectTo: 'events',
-    pathMatch: 'full',
-  },
   {
     path: 'auth',
     children: [
@@ -28,23 +27,62 @@ export const routes: Routes = [
   },
   {
     path: '',
+    component: AntrixhLayoutComponent, // Antrixh shell: navbar + top/bottom blur bars
+    children: [
+      {
+        // The Antrixh events page IS the homepage - served at the domain root.
+        path: '',
+        pathMatch: 'full',
+        loadComponent: () =>
+          import('./pages/user/events-antrixh/events-antrixh.component').then(
+            (m) => m.EventsAntrixhComponent
+          ),
+      },
+      {
+        // Legacy deep link - keep it working but land on the clean root URL.
+        path: 'events-antrixh',
+        redirectTo: '/',
+        pathMatch: 'full',
+      },
+      {
+        path: 'event-booking-antrixh/:event_id/:event_name',
+        loadComponent: () =>
+          import('./pages/user/event-booking-antrixh/event-booking-antrixh.component').then(
+            (m) => m.EventBookingAntrixhComponent
+          ),
+      },
+      {
+        path: 'event-payment-antrixh/:event_id/:event_name',
+        loadComponent: () =>
+          import('./pages/user/event-payment-antrixh/event-payment-antrixh.component').then(
+            (m) => m.EventPaymentAntrixhComponent
+          ),
+      },
+      {
+        path: 'my-bookings-antrixh/:user_id',
+        loadComponent: () =>
+          import('./pages/user/antrixh-my-bookings/antrixh-my-bookings.component').then(
+            (m) => m.AntrixhMyBookingsComponent
+          ),
+      },
+      { path: 'terms-conditions-antrixh', component: AntrixhTermsConditionsComponent },
+      { path: 'privacy-policy-antrixh', component: AntrixhPrivacyPolicyComponent },
+      { path: 'refund-policy-antrixh', component: AntrixhRefundPolicyComponent },
+    ],
+  },
+  {
+    path: '',
     component: LayoutComponent, // Layout wraps ALL routes below
     children: [
       // PUBLIC USER ROUTES - No auth guard needed
-      // {
-      //   path: 'events',
-      //   loadComponent: () =>
-      //     import('./pages/user/events/events.component').then((m) => m.EventsComponent),
-      // },
       {
-        path: '',
+        path: 'events',
         loadComponent: () =>
           import('./pages/user/events/events.component').then((m) => m.EventsComponent),
       },
-      // Also keep /events as an alias that redirects to empty path
       {
-        path: 'events',
-        redirectTo: '',
+        path: '',
+        redirectTo: '/',
         pathMatch: 'full',
       },
       {
@@ -157,7 +195,7 @@ export const routes: Routes = [
   // Wildcard route
   {
     path: '**',
-    redirectTo: 'events',
+    redirectTo: '/',
   },
   
   // {
