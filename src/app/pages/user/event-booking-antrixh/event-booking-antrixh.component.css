@@ -913,115 +913,6 @@
   background: #f8f9fa;
 }
 
-/* FOOTER */
-.events-footer {
-  background: #000000;
-  padding: 60px 0 20px;
-  margin-top: 60px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  color: #ffffff;
-  width: 100%;
-}
-
-.footer-main {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  gap: 40px;
-  margin-bottom: 40px;
-  max-width: 1240px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0 20px;
-}
-
-.footer-col {
-  display: flex;
-  flex-direction: column;
-}
-
-.brand-col .logo {
-  width: 20%;
-  margin-bottom: 20px;
-}
-
-.company-tagline {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 14px;
-  line-height: 1.6;
-  margin: 0 0 16px 0;
-  max-width: 270px;
-}
-
-.footer-title {
-  color: #ffffff;
-  font-size: 18px;
-  font-weight: 700;
-  margin: 0 0 20px 0;
-  position: relative;
-  padding-bottom: 10px;
-}
-
-.footer-title::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 40px;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.footer-links-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.footer-links-list li {
-  margin-bottom: 12px;
-}
-
-.footer-links-list a {
-  color: rgba(255, 255, 255, 0.7);
-  text-decoration: none;
-  font-size: 14px;
-  transition: all 0.3s ease;
-  display: inline-block;
-  cursor: pointer;
-}
-
-.footer-links-list a:hover {
-  color: #ffffff;
-  transform: translateX(5px);
-  background: var(--gradient-main);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.contact-info a {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.footer-bottom {
-  padding-top: 30px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  text-align: center;
-  max-width: 1240px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 20px;
-  padding-right: 20px;
-}
-
-.copy {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.5);
-  margin: 0;
-}
-
 /* Mobile Sticky Footer for Price and Book Now */
 .mobile-sticky-footer {
   display: none;
@@ -1116,10 +1007,7 @@
   
 
   
-  .footer-main {
-    grid-template-columns: 1.5fr 1fr 1fr 1fr;
-    gap: 30px;
-  }
+
   
   /* Add padding to bottom of main content to account for sticky footer */
   .booking-main-content {
@@ -1176,20 +1064,7 @@
   
 
   
-  .footer-main {
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-  }
-  
-  .brand-col {
-    grid-column: 1 / -1;
-    text-align: center;
-  }
-  
-  .brand-col .logo {
-    margin-left: auto;
-    margin-right: auto;
-  }
+
   
   .company-tagline {
     max-width: 100%;
@@ -1673,6 +1548,10 @@ html {
     gap: 30px;
     text-align: left; /* Change to left alignment for the whole footer */
   }
+
+  .footer-col + .footer-col {
+    padding-left: 0;
+  }
   
   .brand-col {
     text-align: center; /* Keep logo and company tagline centered */
@@ -1707,12 +1586,6 @@ html {
     text-align: left;
     display: block;
     width: 100%;
-  }
-  
-  /* Keep the title underline starting from left */
-  .footer-col:not(.brand-col) .footer-title::after {
-    left: 0;
-    transform: none;
   }
   
   /* Ensure links are left aligned */
@@ -2109,7 +1982,7 @@ html {
   }
   
   .cta-text {
-    font-size: 18px;
+    font-size: 22px;
   }
   
   .event-details-section {
@@ -2188,7 +2061,7 @@ html {
   background: #0b0b0d;
   color: #ffffff;
   padding-top: 70px;
-  padding-bottom: 120px;
+  padding-bottom: 80px;
 }
 
 /* ===== Blurred event-banner full-page background (like the antrixh hero) ===== */
@@ -2899,4 +2772,10 @@ html {
 .loading-spinner-small::before {
   border-color: rgba(255, 255, 255, 0.2);
   border-top-color: #ffffff;
+}
+
+@media (min-width: 769px) {
+  .booking-antrixh-page {
+    padding-bottom: 16px;
+  }
 }

@@ -1,0 +1,183 @@
+/* ===== FOOTER (PC only) — mirrors the event booking page footer ===== */
+.events-footer {
+  background: #000000;
+  padding: 40px 0 12px;
+  margin-top: 24px;
+  color: #ffffff;
+  width: 100%;
+  display: none; /* Hidden by default on mobile */
+  position: relative;
+  z-index: 10;
+}
+
+/* Show on desktop for all pages */
+@media (min-width: 769px) {
+  .events-footer {
+    display: block;
+  }
+}
+
+/* Hide on mobile when hideOnMobile is true (events page) */
+@media (max-width: 768px) {
+  .events-footer.hide-on-mobile {
+    display: none !important;
+  }
+
+  /* Show on mobile when hideOnMobile is false (policy pages, booking page) */
+  .events-footer:not(.hide-on-mobile) {
+    display: block;
+  }
+}
+
+.footer-main {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 30px;
+  margin-bottom: 30px;
+  max-width: 1240px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 20px;
+}
+
+.footer-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-col .logo {
+  width: 50%;
+  margin-bottom: 20px;
+}
+
+.company-tagline {
+  color: #ffffff;
+  font-size: 24px;
+  word-spacing: 4px;
+  letter-spacing: 0.2px;
+  font-weight: 300;
+  line-height: 1.15;
+  margin: 0 0 16px 0;
+  max-width: 360px;
+  font-family: 'Clash Display', system-ui, sans-serif !important;
+}
+
+.footer-title {
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 300;
+  margin: 0 0 20px 0;
+  font-family: 'Clash Display', system-ui, sans-serif !important;
+}
+
+.footer-links-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links-list li {
+  margin-bottom: 14px;
+}
+
+.footer-links-list a {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.footer-links-list a::before {
+  content: '\2192';
+  font-size: 0.9em;
+  line-height: 1;
+  transition: transform 0.3s ease;
+}
+
+.footer-links-list a:hover::before {
+  color: #ffffff;
+  -webkit-text-fill-color: #ffffff;
+  transform: translateX(3px);
+}
+
+.footer-links-list a:hover {
+  color: #ffffff;
+  transform: translateX(5px);
+  background: var(--gradient-main);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.contact-info a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-bottom {
+  padding-top: 20px;
+  padding-bottom: 32px;
+  text-align: center;
+  max-width: 1240px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.copy {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+.made-with {
+  margin-left: 8px;
+}
+
+.heart {
+  color: #ff4d6d;
+  font-size: 16px;
+  display: inline-block;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (min-width: 769px) {
+  .events-footer {
+    display: block;
+  }
+
+  .brand-col .logo {
+    width: 25%;
+  }
+}
+
+@media (max-width: 900px) {
+  .footer-main {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .brand-col {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .footer-main {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .brand-col {
+    grid-column: 1;
+  }
+
+  .company-tagline {
+    font-size: 32px;
+  }
+}

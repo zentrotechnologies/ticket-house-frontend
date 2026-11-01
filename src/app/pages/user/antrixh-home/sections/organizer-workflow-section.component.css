@@ -1,0 +1,220 @@
+:host,
+:host * {
+  font-family: var(--font-display, 'Antrixh Clash'), system-ui, sans-serif !important;
+}
+
+.workflow-section {
+  position: relative;
+  padding: 133px 7vw 142px;
+  overflow: hidden;
+  background: #000;
+}
+
+.workflow-section::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  content: '';
+}
+
+.workflow-shell {
+  max-width: 1160px;
+  margin: 0 auto;
+}
+
+.workflow-heading {
+  max-width: 700px;
+  margin-bottom: 72px;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 23px;
+  color: rgba(246, 239, 249, 0.56);
+  font-size: 10px;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.eyebrow span {
+  color: #fff;
+}
+
+.workflow-heading h2 {
+  margin: 0;
+  font-size: clamp(50px, 7vw, 88px);
+  font-weight: 500;
+  line-height: 0.94;
+  letter-spacing: -0.035em;
+}
+
+.workflow-heading h2 span {
+  color: #fff;
+}
+
+.workflow-heading > p:last-child {
+  max-width: 440px;
+  margin: 22px 0 0;
+  color: rgba(239, 235, 244, 0.61);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.workflow-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: start;
+  gap: 18px;
+}
+
+.workflow-step {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #000;
+  isolation: isolate;
+}
+
+.workflow-step::before {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  background:
+    radial-gradient(circle 22px at 50% 0, #000 99%, transparent 100%),
+    radial-gradient(circle 22px at 50% 100%, #000 99%, transparent 100%);
+  content: '';
+  pointer-events: none;
+}
+
+.workflow-step::after {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: repeating-linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.3) 0 6px,
+    transparent 6px 12px
+  );
+  content: '';
+  pointer-events: none;
+}
+
+.step-copy {
+  display: contents;
+}
+
+.step-number {
+  position: absolute;
+  z-index: 3;
+  top: 22px;
+  left: 22px;
+  color: #fff;
+  font-size: clamp(20px, 2.2vw, 26px);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.step-image {
+  position: absolute;
+  z-index: 0;
+  top: 20%;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+}
+
+.step-image::after {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    #000 0%,
+    rgba(0, 0, 0, 0.8) 18%,
+    rgba(0, 0, 0, 0.6) 48%,
+    rgba(0, 0, 0, 0.2) 100%
+  );
+  content: '';
+}
+
+.step-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.workflow-step h3 {
+  position: absolute;
+  z-index: 3;
+  top: 100px;
+  right: 22px;
+  left: 22px;
+  max-width: 260px;
+  margin: 0;
+  color: #fff;
+  font-size: clamp(25px, 3vw, 36px);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+}
+
+.workflow-step p {
+  position: absolute;
+  z-index: 3;
+  right: 22px;
+  bottom: calc(50% + 12px);
+  left: 22px;
+  max-width: 300px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+@media (max-width: 760px) {
+  .workflow-section {
+    padding: 95px 7vw 100px;
+  }
+
+  .workflow-heading {
+    margin-bottom: 48px;
+  }
+
+  .workflow-steps {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .workflow-step,
+  .workflow-step + .workflow-step {
+    min-height: 0;
+  }
+
+  .step-number {
+    top: 20px;
+    left: 20px;
+  }
+
+  .workflow-step h3 {
+    top: 92px;
+    right: 20px;
+    left: 20px;
+    font-size: clamp(27px, 4vw, 32px);
+  }
+
+  .workflow-step p {
+    right: 20px;
+    left: 20px;
+  }
+}

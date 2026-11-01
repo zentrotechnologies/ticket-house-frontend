@@ -22,6 +22,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { SafeHtmlPipe } from '../../../core/pipes/safe-html-pipe';
 import { AntrixhLoaderComponent } from '../../../layout/antrixh-loader/antrixh-loader.component';
 import { LocationIconComponent } from '../../../shared/location-icon/location-icon.component';
+import { AntrixhFooterComponent } from '../../../shared/antrixh-footer/antrixh-footer.component';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 const MAX_TICKETS_PER_BOOKING = 10;
@@ -46,7 +47,7 @@ interface MapUrlData {
 @Component({
   selector: 'app-event-booking-antrixh',
   standalone: true,
-  imports: [CommonModule, SafeHtmlPipe, AntrixhLoaderComponent, LocationIconComponent],
+  imports: [CommonModule, SafeHtmlPipe, AntrixhLoaderComponent, LocationIconComponent, AntrixhFooterComponent],
   templateUrl: './event-booking-antrixh.component.html',
   styleUrl: './event-booking-antrixh.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -634,18 +635,6 @@ export class EventBookingAntrixhComponent implements OnInit {
     if (this.isTermsModalOpen) {
       this.closeTermsModal();
     }
-  }
-
-  openPrivacyPolicy(): void {
-    window.open(this.router.createUrlTree(['/privacy-policy-antrixh']).toString(), '_blank');
-  }
-
-  openTermsConditions(): void {
-    window.open(this.router.createUrlTree(['/terms-conditions-antrixh']).toString(), '_blank');
-  }
-
-  openRefundPolicy(): void {
-    window.open(this.router.createUrlTree(['/refund-policy-antrixh']).toString(), '_blank');
   }
 
   hasValidPrice(): boolean {

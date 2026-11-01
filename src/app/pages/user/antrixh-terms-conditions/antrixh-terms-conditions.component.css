@@ -1,6 +1,6 @@
 /* Antrixh Terms & Conditions - Dark Theme */
 .terms-conditions-container {
-  background: #0b0b0d;
+  background: #000000;
   color: #ffffff;
   min-height: 100vh;
   padding: 90px 0 80px;
@@ -104,6 +104,12 @@
 .company-name {
   font-weight: 600;
   color: #ffffff;
+}
+
+@media (min-width: 769px) {
+  .terms-conditions-container {
+    padding-bottom: 24px;
+  }
 }
 
 @media (max-width: 768px) {

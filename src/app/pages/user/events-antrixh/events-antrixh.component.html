@@ -18,7 +18,15 @@
     <ng-container *ngIf="!isLoadingEvents && upcomingEvents.length > 0">
       <button class="slider-arrow prev" (click)="prevSlide()" aria-label="Previous event">&#10094;</button>
 
-      <div class="slider-viewport" #sliderViewport (scroll)="onSliderScroll()">
+      <div
+        class="slider-viewport"
+        #sliderViewport
+        (scroll)="onSliderScroll()"
+        (touchstart)="onSliderDragStart()"
+        (touchend)="onSliderDragEnd()"
+        (touchcancel)="onSliderDragEnd()"
+        [class.no-slide-transition]="disableSlideTransition"
+      >
         <div class="slider-track">
           <div
             class="slide"
@@ -33,7 +41,7 @@
                 [alt]="event.event_name"
               />
 
-              <div class="slide-info" *ngIf="isCenterSlide(i)">
+              <div class="slide-info" *ngIf="isCenterSlide(i)" [class.animate]="animateActiveInfo">
                 <h2 class="slide-title">{{ event.event_name }}</h2>
                 <p class="slide-meta">
                   {{ formatEventDate(event.event_date) }} &bull; {{ event.start_time }}
@@ -183,39 +191,5 @@
   </div>
 
   <!-- ===== FOOTER (PC only) ===== -->
-  <footer class="events-footer">
-    <div class="events-container">
-      <div class="footer-main">
-        <div class="footer-col brand-col">
-          <img class="logo" src="/assets/th_transparent_logo.png" alt="ticket-house-logo" />
-          <p class="company-tagline">
-            Your one-stop destination for booking tickets to events, movies, and live shows.
-          </p>
-        </div>
-
-        <div class="footer-col">
-          <h4 class="footer-title">Support</h4>
-          <ul class="footer-links-list">
-            <li><a (click)="openTermsConditions()" style="cursor: pointer;">Terms &amp; Conditions</a></li>
-            <li><a (click)="openPrivacyPolicy()" style="cursor: pointer;">Privacy Policy</a></li>
-            <li><a (click)="openRefundPolicy()" style="cursor: pointer;">Refund Policy</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-col">
-          <h4 class="footer-title">Contact Us</h4>
-          <ul class="footer-links-list contact-info">
-            <li><a href="mailto:support@tickethouse.in">support@tickethouse.in</a></li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="footer-bottom">
-        <p class="copy">
-          © 2026 Zentro Technologies LLP. All Rights Reserved.
-          <span class="made-with">Made with <span class="heart">♥</span></span>
-        </p>
-      </div>
-    </div>
-  </footer>
+  <app-antrixh-footer [hideOnMobile]="true"></app-antrixh-footer>
 </div>

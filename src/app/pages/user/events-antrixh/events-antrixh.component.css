@@ -2,16 +2,16 @@
 
 :host {
   display: block;
-  background: #0b0b0d;
+  background: #000000;
   color: #ffffff;
 }
 
 .events-page {
   width: 100%;
   min-height: 100vh;
-  background: #0b0b0d;
+  background: #000000;
   color: #ffffff;
-  padding-bottom: 120px;
+  padding-bottom: 80px;
 }
 
 /* ===== HERO SLIDER ===== */
@@ -59,6 +59,7 @@
   margin: 0 -20px; /* full-bleed to the screen edges */
   overflow-x: auto;
   overflow-y: hidden;
+  scroll-snap-type: x proximity;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -71,9 +72,8 @@
   display: flex;
   align-items: flex-start;
   gap: 16px;
-  padding: 2px 4px;
-  /* Reserve the peak height (centered card: image 1.5625 * slide-w + info)
-     so card width animations never move the content below the slider. */
+  padding: 2px max(4px, calc((100vw - var(--slide-w)) / 2));
+  /* Reserve room for the active card's scale without shifting content below. */
   height: calc(var(--slide-w) * 1.5625 + 132px);
 }
 
@@ -81,11 +81,19 @@
   flex: 0 0 auto;
   width: var(--slide-w);
   cursor: pointer;
-  transition: width 0.5s ease;
+  scroll-snap-align: center;
+  transform-origin: center top;
+  transition: transform 0.9s cubic-bezier(0.25, 0.8, 0.25, 1);
+  will-change: transform;
 }
 
 .slide.is-center {
-  width: calc(var(--slide-w) * 1.25);
+  transform: scale(1.08);
+  z-index: 2;
+}
+
+.slider-viewport.no-slide-transition .slide {
+  transition: none !important;
 }
 
 .slide-card {
@@ -111,6 +119,9 @@
   flex-direction: column;
   flex: 1;
   padding: 12px 8px 0;
+}
+
+.slide-info.animate {
   animation: slideInfoIn 0.5s ease both;
 }
 
@@ -280,126 +291,6 @@
   width: 32px;
   height: 2px;
   background: rgba(255, 255, 255, 0.25);
-}
-
-/* ===== FOOTER (PC only) — mirrors the event booking page footer ===== */
-.events-footer {
-  display: none;
-  background: #000000;
-  padding: 60px 0 140px;
-  margin-top: 60px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  color: #ffffff;
-  width: 100%;
-}
-
-.footer-main {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  gap: 40px;
-  margin-bottom: 40px;
-  max-width: 1240px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0 20px;
-}
-
-.footer-col {
-  display: flex;
-  flex-direction: column;
-}
-
-.brand-col .logo {
-  width: 20%;
-  margin-bottom: 20px;
-}
-
-.company-tagline {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 14px;
-  line-height: 1.6;
-  margin: 0 0 16px 0;
-  max-width: 270px;
-}
-
-.footer-title {
-  color: #ffffff;
-  font-size: 18px;
-  font-weight: 700;
-  margin: 0 0 20px 0;
-  position: relative;
-  padding-bottom: 10px;
-}
-
-.footer-title::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 40px;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.footer-links-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.footer-links-list li {
-  margin-bottom: 12px;
-}
-
-.footer-links-list a {
-  color: rgba(255, 255, 255, 0.7);
-  text-decoration: none;
-  font-size: 14px;
-  transition: all 0.3s ease;
-  display: inline-block;
-  cursor: pointer;
-}
-
-.footer-links-list a:hover {
-  color: #ffffff;
-  transform: translateX(5px);
-  background: var(--gradient-main);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.contact-info a {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.footer-bottom {
-  padding-top: 30px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  text-align: center;
-  max-width: 1240px;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 20px;
-  padding-right: 20px;
-}
-
-.copy {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.5);
-  margin: 0;
-}
-
-.made-with {
-  margin-left: 8px;
-}
-
-.heart {
-  color: #ff4d6d;
-  font-size: 16px;
-  display: inline-block;
 }
 
 /* ===== BOTTOM GLASS PILL PANELS ===== */
@@ -831,12 +722,9 @@
     padding-bottom: 0; /* the footer handles the space below the fixed pill */
   }
 
-  .events-footer {
-    display: block;
-  }
-
   .all-events {
-    margin-top: 120px; /* clear the fixed navbar now that the hero is gone */
+    margin-top: 0;
+    padding-top: 120px; /* clear the fixed navbar now that the hero is gone */
   }
 
   .events-header {

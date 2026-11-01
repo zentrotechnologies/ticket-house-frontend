@@ -510,7 +510,7 @@
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
   .ax-bookings-page {
-    padding: 88px 0 24px;
+    padding: 88px 0 40px;
   }
 
   .ax-bookings-header {

@@ -30,19 +30,20 @@ export const routes: Routes = [
     component: AntrixhLayoutComponent, // Antrixh shell: navbar + top/bottom blur bars
     children: [
       {
-        // The Antrixh events page IS the homepage - served at the domain root.
+        // The Antrixh homepage is served at the domain root.
         path: '',
         pathMatch: 'full',
+        loadComponent: () =>
+          import('./pages/user/antrixh-home/antrixh-home.component').then(
+            (m) => m.AntrixhHomeComponent
+          ),
+      },
+      {
+        path: 'events-antrixh',
         loadComponent: () =>
           import('./pages/user/events-antrixh/events-antrixh.component').then(
             (m) => m.EventsAntrixhComponent
           ),
-      },
-      {
-        // Legacy deep link - keep it working but land on the clean root URL.
-        path: 'events-antrixh',
-        redirectTo: '/',
-        pathMatch: 'full',
       },
       {
         path: 'event-booking-antrixh/:event_id/:event_name',
@@ -346,5 +347,4 @@ export const routes: Routes = [
 ];
 
 // console.log('Routes configured:', routes);
-
 

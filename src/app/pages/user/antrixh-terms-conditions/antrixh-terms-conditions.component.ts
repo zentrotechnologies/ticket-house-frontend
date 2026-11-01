@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { AntrixhFooterComponent } from '../../../shared/antrixh-footer/antrixh-footer.component';
 
 @Component({
   selector: 'app-antrixh-terms-conditions',
   standalone: true,
-  imports: [],
+  imports: [AntrixhFooterComponent],
   templateUrl: './antrixh-terms-conditions.component.html',
   styleUrls: ['./antrixh-terms-conditions.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -122,6 +122,8 @@
     </div>
   </div>
 
+  <app-antrixh-footer [hideOnMobile]="false"></app-antrixh-footer>
+
   <!-- QR modal -->
   <div *ngIf="showQRModal" class="ax-qr-overlay" (click)="closeQRModal()">
     <div class="ax-qr-modal" (click)="$event.stopPropagation()">

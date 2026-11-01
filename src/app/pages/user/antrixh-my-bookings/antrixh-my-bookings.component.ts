@@ -20,11 +20,12 @@ import {
 } from '../../../core/models/auth.model';
 import { ApiService } from '../../../core/services/api.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { AntrixhFooterComponent } from '../../../shared/antrixh-footer/antrixh-footer.component';
 
 @Component({
   selector: 'app-antrixh-my-bookings',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, AntrixhFooterComponent],
   templateUrl: './antrixh-my-bookings.component.html',
   styleUrl: './antrixh-my-bookings.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

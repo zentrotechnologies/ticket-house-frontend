@@ -1,0 +1,237 @@
+:host,
+:host * {
+  font-family: var(--font-display, 'Antrixh Clash'), system-ui, sans-serif !important;
+}
+
+.organizer-cta {
+  position: relative;
+  padding: 112px 7vw 100px;
+  overflow: hidden;
+  background: #000;
+}
+
+.organizer-cta::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  content: '';
+}
+
+.cta-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 0.8fr;
+  align-items: start;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0;
+  background: #000;
+}
+
+.cta-copy {
+  position: relative;
+  z-index: 1;
+  max-width: 500px;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 23px;
+  color: rgba(246, 239, 249, 0.57);
+  font-size: 10px;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.eyebrow span {
+  color: #fff;
+}
+
+.cta-copy h2 {
+  margin: 0;
+  font-size: clamp(53px, 7vw, 91px);
+  font-weight: 500;
+  line-height: 0.89;
+  letter-spacing: -0.035em;
+}
+
+.cta-copy > p:not(.eyebrow) {
+  max-width: 390px;
+  margin: 22px 0 25px;
+  color: rgba(239, 235, 244, 0.63);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.cta-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 22px;
+  padding: 13px 17px 13px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.82);
+  border-radius: 999px;
+  background: #fff;
+  color: #111014;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.24);
+  transition: background 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.cta-link:hover {
+  transform: translateY(-2px);
+  background: #f2edf5;
+  box-shadow: 0 10px 28px rgba(var(--brand-purple-rgb), 0.12);
+}
+
+.cta-link span {
+  font-size: 17px;
+}
+
+.cta-gallery {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  height: min(38vw, 410px);
+  min-height: 300px;
+  margin-top: 35px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.cta-gallery::before,
+.cta-gallery::after {
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  left: 0;
+  height: 20%;
+  content: '';
+  pointer-events: none;
+  backdrop-filter: blur(12px);
+}
+
+.cta-gallery::before {
+  top: 0;
+  background: linear-gradient(to bottom, #000 4%, rgba(0, 0, 0, 0.82) 24%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, transparent 100%);
+}
+
+.cta-gallery::after {
+  bottom: 0;
+  background: linear-gradient(to top, #000 4%, rgba(0, 0, 0, 0.82) 24%, transparent 100%);
+  mask-image: linear-gradient(to top, #000 0%, transparent 100%);
+}
+
+.cta-image-window {
+  overflow: hidden;
+}
+
+.cta-image-track {
+  display: flex;
+  flex-direction: column;
+  animation-duration: 38s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.cta-image-track img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.track-up {
+  animation-name: cta-slide-up;
+}
+
+.track-down {
+  animation-name: cta-slide-down;
+  animation-duration: 44s;
+}
+
+@keyframes cta-slide-up {
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes cta-slide-down {
+  from {
+    transform: translateY(-50%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+.cta-foot {
+  display: flex;
+  justify-content: space-between;
+  max-width: 1160px;
+  margin: 22px auto 0;
+  color: rgba(247, 241, 249, 0.4);
+  font-size: 10px;
+}
+
+.cta-foot a {
+  color: rgba(247, 241, 249, 0.67);
+  text-decoration: none;
+}
+
+.cta-foot a:hover {
+  color: #fff;
+}
+
+.cta-foot a span {
+  margin-left: 5px;
+}
+
+@media (max-width: 760px) {
+  .organizer-cta {
+    padding: 85px 7vw 60px;
+  }
+
+  .cta-card {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .cta-gallery {
+    height: 280px;
+    min-height: 0;
+    margin-top: 0;
+  }
+
+  .cta-image-track img {
+    border-radius: 10px;
+  }
+
+  .cta-foot {
+    gap: 15px;
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 420px) {
+  .cta-foot {
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta-image-track {
+    animation: none;
+  }
+}

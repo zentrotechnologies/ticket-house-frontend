@@ -1,0 +1,61 @@
+<section class="hero" aria-labelledby="home-title">
+  <div class="hero-glow hero-glow-violet" aria-hidden="true"></div>
+  <div class="hero-glow hero-glow-coral" aria-hidden="true"></div>
+  <div class="hero-grid" aria-hidden="true"></div>
+
+  <div class="hero-content">
+    <h1 id="home-title">Make a night <span>of it.</span></h1>
+    <p class="hero-copy">
+      Live music, new ideas, and the people you want to share them with.
+      Find the plans you’ll still be talking about tomorrow.
+    </p>
+    <a class="primary-link" routerLink="/events-antrixh">
+      Find your next event <span aria-hidden="true">↗</span>
+    </a>
+    <p class="hero-footnote">Good things happen when you show up.</p>
+  </div>
+
+  <div class="hero-art" aria-hidden="true">
+    <div class="orbit orbit-one"></div>
+    <div class="orbit orbit-two"></div>
+    <div class="light-streak"></div>
+    <div class="event-glass">
+      <div class="glass-topline">
+        <span class="live-indicator">OPEN TO WHAT'S NEXT</span>
+        <span class="glass-index">TH / {{ activePhotoIndex + 1 | number: '2.0' }}</span>
+      </div>
+      <div class="poster-art">
+        <img
+          *ngFor="let photo of posterPhotos; let i = index"
+          class="poster-photo"
+          [class.active]="i === activePhotoIndex"
+          [src]="photo.src"
+          alt=""
+        />
+        <span class="poster-title">BE<br />THERE.</span>
+      </div>
+      <div class="glass-caption">
+        <span>{{ activePhotoLabel }}</span>
+        <span class="caption-arrow">↗</span>
+      </div>
+    </div>
+    <div
+      class="floating-note note-top"
+      style="transition: transform 450ms ease"
+      [style.transform]="'rotate(' + topNoteAngles[activePhotoIndex] + 'deg)'"
+    >
+      <span class="note-icon">✳</span>
+      <span>Make it a<br /><strong>shared moment</strong></span>
+    </div>
+    <div
+      class="floating-note note-bottom"
+      style="transition: transform 450ms ease"
+      [style.transform]="'rotate(' + bottomNoteAngles[activePhotoIndex] + 'deg)'"
+    >
+      <span class="note-wave">〰</span>
+      <span>Out there is<br /><strong>where it happens</strong></span>
+    </div>
+  </div>
+
+  
+</section>

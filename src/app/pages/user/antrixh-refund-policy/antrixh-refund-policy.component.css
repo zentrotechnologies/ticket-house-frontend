@@ -1,6 +1,6 @@
 /* Antrixh Refund Policy - Dark Theme */
 .refund-policy-container {
-  background: #0b0b0d;
+  background: #000000;
   color: #ffffff;
   min-height: 100vh;
   padding: 90px 0 80px;
@@ -109,6 +109,12 @@
 .highlight {
   color: #ffffff;
   font-weight: 600;
+}
+
+@media (min-width: 769px) {
+  .refund-policy-container {
+    padding-bottom: 24px;
+  }
 }
 
 @media (max-width: 768px) {

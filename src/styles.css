@@ -62,6 +62,11 @@ body {
   line-height: 1.6;
 }
 
+html:has(app-antrixh-layout),
+body:has(app-antrixh-layout) {
+  background: #000;
+}
+
 /* Utility Classes */
 .text-center { text-align: center; }
 .text-left { text-align: left; }
@@ -328,6 +333,7 @@ app-events-antrixh h6,
 app-events-antrixh .slide-title,
 app-events-antrixh .all-events-title,
 app-events-antrixh .event-row-title,
+app-events-antrixh .company-tagline,
 app-antrixh-my-bookings h1,
 app-antrixh-my-bookings h2,
 app-antrixh-my-bookings h3,

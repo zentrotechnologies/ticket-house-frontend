@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import {
+  AfterViewChecked,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -15,16 +16,17 @@ import { UpcomingEventResponse } from '../../../core/models/auth.model';
 import { ApiService } from '../../../core/services/api.service';
 import { AntrixhLoaderComponent } from '../../../layout/antrixh-loader/antrixh-loader.component';
 import { LocationIconComponent } from '../../../shared/location-icon/location-icon.component';
+import { AntrixhFooterComponent } from '../../../shared/antrixh-footer/antrixh-footer.component';
 
 @Component({
   selector: 'app-events-antrixh',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, AntrixhLoaderComponent, LocationIconComponent],
+  imports: [CommonModule, RouterModule, FormsModule, AntrixhLoaderComponent, LocationIconComponent, AntrixhFooterComponent],
   templateUrl: './events-antrixh.component.html',
   styleUrl: './events-antrixh.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EventsAntrixhComponent implements OnInit, OnDestroy {
+export class EventsAntrixhComponent implements OnInit, OnDestroy, AfterViewChecked {
   readonly fallbackImg =
     'https://images.unsplash.com/photo-1526178611801-4f9d2f6d1a6c?w=800&q=60';
 
@@ -34,11 +36,17 @@ export class EventsAntrixhComponent implements OnInit, OnDestroy {
 
   // Hero slider state
   activeSlideIndex = 0;
+  animateActiveInfo = true;
+  disableSlideTransition = false;
   private sliderInterval: ReturnType<typeof setInterval> | null = null;
+  private sliderStartTimeout: ReturnType<typeof setTimeout> | null = null;
+  private isSliderDragging = false;
+  private isUserScrolling = false;
+  private lastScrollLeft = 0;
+  private scrollDirection: 'left' | 'right' | null = null;
   private loopResetScheduled = false;
   private scrollDebounce: ReturnType<typeof setTimeout> | null = null;
-  private readonly sliderGap = 16;
-  private readonly sliderPadX = 4;
+  private initialCenterDone = false;
   @ViewChild('sliderViewport') sliderViewport?: ElementRef<HTMLElement>;
 
   // Filters
@@ -66,8 +74,19 @@ export class EventsAntrixhComponent implements OnInit, OnDestroy {
     this.stopSlider();
   }
 
+  ngAfterViewChecked(): void {
+    if (this.initialCenterDone || this.isLoadingEvents || this.upcomingEvents.length === 0) {
+      return;
+    }
+    if (!this.sliderViewport?.nativeElement) return;
+
+    this.initialCenterDone = true;
+    this.scrollToActive(false);
+  }
+
   // ===== DATA =====
   loadUpcomingEvents(): void {
+    this.initialCenterDone = false;
     this.isLoadingEvents = true;
 
     this.apiService.getUpcomingEventsDefault().subscribe({
@@ -77,7 +96,6 @@ export class EventsAntrixhComponent implements OnInit, OnDestroy {
           this.upcomingEvents.forEach((event) => this.loadEventPrice(event.event_id));
           this.activeSlideIndex = this.upcomingEvents.length >= 2 ? this.upcomingEvents.length : 0;
           this.startSlider();
-          setTimeout(() => this.scrollToActive(false), 0);
         } else {
           this.upcomingEvents = [];
         }
@@ -134,11 +152,19 @@ export class EventsAntrixhComponent implements OnInit, OnDestroy {
     return window.innerWidth > 768;
   }
 
-  private startSlider(): void {
+  private startSlider(delay = 0): void {
     this.stopSlider();
-    if (this.isDesktopViewport()) return;
-    if (this.upcomingEvents.length > 1) {
-      this.sliderInterval = setInterval(() => this.nextSlide(), 7000);
+    if (this.isDesktopViewport() || this.upcomingEvents.length < 2) return;
+
+    const begin = () => {
+      this.sliderStartTimeout = null;
+      this.sliderInterval = setInterval(() => this.nextSlide(true), 7000);
+    };
+
+    if (delay > 0) {
+      this.sliderStartTimeout = setTimeout(begin, delay);
+    } else {
+      begin();
     }
   }
 
@@ -147,29 +173,38 @@ export class EventsAntrixhComponent implements OnInit, OnDestroy {
       clearInterval(this.sliderInterval);
       this.sliderInterval = null;
     }
+    if (this.sliderStartTimeout) {
+      clearTimeout(this.sliderStartTimeout);
+      this.sliderStartTimeout = null;
+    }
   }
 
-  nextSlide(): void {
+  nextSlide(fromAutoplay = false): void {
     const n = this.upcomingEvents.length;
     if (n < 2) return;
+    this.animateActiveInfo = true;
     this.activeSlideIndex++;
     this.scrollToActive(true);
     this.scheduleLoopReset();
+    if (!fromAutoplay) this.startSlider(3000);
   }
 
   prevSlide(): void {
     const n = this.upcomingEvents.length;
     if (n < 2) return;
+    this.animateActiveInfo = true;
     this.activeSlideIndex--;
     this.scrollToActive(true);
     this.scheduleLoopReset();
+    this.startSlider(3000);
   }
 
   goToSlide(index: number): void {
+    this.animateActiveInfo = true;
     this.activeSlideIndex = index;
     this.scrollToActive(true);
     this.scheduleLoopReset();
-    this.startSlider();
+    this.startSlider(3000);
   }
 
   // Non-center slides get centered on click; the centered slide opens the event.
@@ -189,18 +224,37 @@ export class EventsAntrixhComponent implements OnInit, OnDestroy {
     if (this.activeSlideIndex >= n * 2) {
       this.loopResetScheduled = true;
       setTimeout(() => {
-        this.activeSlideIndex -= n;
         this.loopResetScheduled = false;
-        setTimeout(() => this.scrollToActive(false), 0);
+        if (this.activeSlideIndex < n * 2) return;
+
+        this.animateActiveInfo = false;
+        this.disableSlideTransition = true;
+        this.activeSlideIndex -= n;
+        this.cdr.markForCheck();
+        this.scrollToActive(false);
+        this.restoreSlideTransition();
       }, 520);
     } else if (this.activeSlideIndex < n) {
       this.loopResetScheduled = true;
       setTimeout(() => {
-        this.activeSlideIndex += n;
         this.loopResetScheduled = false;
-        setTimeout(() => this.scrollToActive(false), 0);
+        if (this.activeSlideIndex >= n) return;
+
+        this.animateActiveInfo = false;
+        this.disableSlideTransition = true;
+        this.activeSlideIndex += n;
+        this.cdr.markForCheck();
+        this.scrollToActive(false);
+        this.restoreSlideTransition();
       }, 520);
     }
+  }
+
+  private restoreSlideTransition(): void {
+    setTimeout(() => {
+      this.disableSlideTransition = false;
+      this.cdr.markForCheck();
+    }, 50);
   }
 
   // The slider only exists on mobile, so start/stop it when the viewport
@@ -208,16 +262,53 @@ export class EventsAntrixhComponent implements OnInit, OnDestroy {
   @HostListener('window:resize')
   onResize(): void {
     const shouldRun = !this.isDesktopViewport() && this.upcomingEvents.length > 1;
-    if (shouldRun && !this.sliderInterval) {
+    if (shouldRun && !this.sliderInterval && !this.sliderStartTimeout) {
       this.startSlider();
-    } else if (!shouldRun) {
+    }
+
+    if (shouldRun) {
+      this.scrollToActive(false);
+    } else {
       this.stopSlider();
     }
+  }
+
+  onSliderDragStart(): void {
+    this.isSliderDragging = true;
+    this.isUserScrolling = true;
+    const viewport = this.sliderViewport?.nativeElement;
+    if (viewport) this.lastScrollLeft = viewport.scrollLeft;
+    this.scrollDirection = null;
+    if (this.scrollDebounce) {
+      clearTimeout(this.scrollDebounce);
+      this.scrollDebounce = null;
+    }
+    this.stopSlider();
+  }
+
+  onSliderDragEnd(): void {
+    this.isSliderDragging = false;
+    this.startSlider(3000);
+    setTimeout(() => {
+      this.isUserScrolling = false;
+      this.scrollDirection = null;
+      this.onSliderScroll();
+    }, 50);
   }
 
   // Called while the viewport is scrolled manually (mouse/touch/drag); after a
   // short pause the slide nearest the center becomes the active one.
   onSliderScroll(): void {
+    if (this.isSliderDragging) {
+      const viewport = this.sliderViewport?.nativeElement;
+      if (viewport) {
+        if (viewport.scrollLeft > this.lastScrollLeft) this.scrollDirection = 'right';
+        else if (viewport.scrollLeft < this.lastScrollLeft) this.scrollDirection = 'left';
+        this.lastScrollLeft = viewport.scrollLeft;
+      }
+      return;
+    }
+
     if (this.scrollDebounce) clearTimeout(this.scrollDebounce);
     this.scrollDebounce = setTimeout(() => {
       this.scrollDebounce = null;
@@ -225,68 +316,111 @@ export class EventsAntrixhComponent implements OnInit, OnDestroy {
     }, 150);
   }
 
-  // Where the active slide sits inside the viewport: on PC the active card is
-  // the 2nd full slide from the left edge (after 1 cropped + 1 full card);
-  // on mobile it stays centered.
-  private activeOffset(viewport: HTMLElement, w: number): number {
-    if (window.innerWidth > 768) {
-      return w * 1.5 + this.sliderGap * 2;
-    }
-    return (viewport.clientWidth - w * 1.25) / 2;
-  }
-
   private syncActiveFromScroll(): void {
     const viewport = this.sliderViewport?.nativeElement;
+    if (!viewport) return;
+
+    const slides = viewport.querySelectorAll<HTMLElement>('.slide');
+    if (slides.length === 0) return;
+
+    const viewportCenter = viewport.getBoundingClientRect().left + viewport.clientWidth / 2;
+    let closestIndex = 0;
+    let closestDistance = Number.POSITIVE_INFINITY;
+
+    slides.forEach((slide, index) => {
+      const rect = slide.getBoundingClientRect();
+      const distance = Math.abs(rect.left + rect.width / 2 - viewportCenter);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = index;
+      }
+    });
+
+    if (this.isUserScrolling && this.scrollDirection && this.upcomingEvents.length >= 2) {
+      const current = this.activeSlideIndex;
+      if (this.scrollDirection === 'right' && closestIndex <= current) {
+        closestIndex = Math.min(current + 1, this.loopEvents.length - 1);
+      } else if (this.scrollDirection === 'left' && closestIndex >= current) {
+        closestIndex = Math.max(current - 1, 0);
+      }
+    }
+
+    const physicalIndex = closestIndex;
     const n = this.upcomingEvents.length;
-    if (!viewport || n < 2) return;
+    if (n >= 2) {
+      if (closestIndex < n) {
+        closestIndex += n;
+      } else if (closestIndex >= n * 2) {
+        closestIndex -= n;
+      }
+    }
 
-    const w = this.resolveSlideWidth(viewport);
-    if (!w) return;
-
-    const index = Math.round(
-      (viewport.scrollLeft + this.activeOffset(viewport, w) - this.sliderPadX) /
-        (w + this.sliderGap)
-    );
-
-    const max = this.loopEvents.length - 1;
-    const clamped = Math.min(Math.max(index, 0), max);
-    if (clamped !== this.activeSlideIndex) {
-      this.activeSlideIndex = clamped;
+    const jumpingCopies = physicalIndex !== closestIndex;
+    if (closestIndex !== this.activeSlideIndex) {
+      const nextEvent = this.loopEvents[closestIndex];
+      const currentEvent = this.loopEvents[this.activeSlideIndex];
+      this.animateActiveInfo = nextEvent?.event_id !== currentEvent?.event_id;
+      this.activeSlideIndex = closestIndex;
+      this.cdr.markForCheck();
+      if (jumpingCopies) this.scrollToActive(false);
+      if (this.isUserScrolling && !jumpingCopies) {
+        this.smoothScrollToSlide(this.activeSlideIndex);
+      }
+      this.startSlider(3000);
+    } else if (physicalIndex !== this.activeSlideIndex) {
+      if (this.isUserScrolling) {
+        this.smoothScrollToSlide(this.activeSlideIndex);
+      } else {
+        this.scrollToActive(false);
+      }
+      this.startSlider(3000);
     }
   }
 
-  // Unregistered custom properties (e.g. calc()) don't evaluate through
-  // getComputedStyle, so fall back to measuring a probe element.
-  private resolveSlideWidth(viewport: HTMLElement): number {
-    const raw = getComputedStyle(viewport).getPropertyValue('--slide-w').trim();
-    const numeric = parseFloat(raw);
-    if (numeric) {
-      return raw.endsWith('vw') ? (numeric / 100) * window.innerWidth : numeric;
-    }
-
-    const probe = document.createElement('div');
-    probe.style.cssText = 'position:absolute;visibility:hidden;width:var(--slide-w);';
-    viewport.appendChild(probe);
-    const width = probe.offsetWidth;
-    probe.remove();
-    return width;
-  }
-
-  // Centering is computed from the CSS size variables instead of probing the
-  // live DOM, so the correct position is used even while widths are animating.
   private scrollToActive(smooth = true): void {
     const viewport = this.sliderViewport?.nativeElement;
     if (!viewport || this.isDesktopViewport()) return;
 
-    const w = this.resolveSlideWidth(viewport);
-    if (!w) return;
+    requestAnimationFrame(() => {
+      const slides = viewport.querySelectorAll<HTMLElement>('.slide');
+      const slide = slides[this.activeSlideIndex];
+      if (!slide || !viewport.isConnected) return;
 
-    const left =
-      this.activeSlideIndex * (w + this.sliderGap) +
-      this.sliderPadX -
-      this.activeOffset(viewport, w);
+      const viewportRect = viewport.getBoundingClientRect();
+      const slideRect = slide.getBoundingClientRect();
+      const slideCenter =
+        viewport.scrollLeft + slideRect.left - viewportRect.left + slideRect.width / 2;
+      const targetLeft = slideCenter - viewport.clientWidth / 2;
 
-    viewport.scrollTo({ left, behavior: smooth ? 'smooth' : 'auto' });
+      viewport.scrollTo({
+        left: targetLeft,
+        behavior: smooth ? 'smooth' : 'auto',
+      });
+    });
+  }
+
+  private smoothScrollToSlide(index: number): void {
+    const viewport = this.sliderViewport?.nativeElement;
+    if (!viewport || this.isDesktopViewport()) return;
+
+    const slides = viewport.querySelectorAll<HTMLElement>('.slide');
+    const slide = slides[index];
+    if (!slide || !viewport.isConnected) return;
+
+    const viewportRect = viewport.getBoundingClientRect();
+    const slideRect = slide.getBoundingClientRect();
+    const slideCenter =
+      viewport.scrollLeft + slideRect.left - viewportRect.left + slideRect.width / 2;
+    const targetLeft = slideCenter - viewport.clientWidth / 2;
+
+    if (typeof (viewport as any).scrollTo === 'function') {
+      viewport.scrollTo({
+        left: targetLeft,
+        behavior: 'smooth',
+      });
+    } else {
+      viewport.scrollLeft = targetLeft;
+    }
   }
 
   isCenterSlide(index: number): boolean {
@@ -431,18 +565,6 @@ export class EventsAntrixhComponent implements OnInit, OnDestroy {
   onEventClick(event: UpcomingEventResponse): void {
     const slug = this.createSlug(event.event_name);
     this.router.navigate(['/event-booking-antrixh', event.event_id, slug]);
-  }
-
-  openPrivacyPolicy(): void {
-    window.open(this.router.createUrlTree(['/privacy-policy-antrixh']).toString(), '_blank');
-  }
-
-  openTermsConditions(): void {
-    window.open(this.router.createUrlTree(['/terms-conditions-antrixh']).toString(), '_blank');
-  }
-
-  openRefundPolicy(): void {
-    window.open(this.router.createUrlTree(['/refund-policy-antrixh']).toString(), '_blank');
   }
 
   private createSlug(text: string): string {

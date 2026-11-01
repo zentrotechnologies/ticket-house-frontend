@@ -8,7 +8,10 @@
     <!-- CENTER: links -->
     <ul class="menu-links" [class.open]="showMobileMenu">
       <li>
-        <a routerLink="/" (click)="closeMobileMenu()">Events</a>
+        <a routerLink="/" (click)="closeMobileMenu()">Home</a>
+      </li>
+      <li>
+        <a routerLink="/events-antrixh" (click)="closeMobileMenu()">Events</a>
       </li>
       <li>
         <a (click)="onViewBookings()">My Bookings</a>

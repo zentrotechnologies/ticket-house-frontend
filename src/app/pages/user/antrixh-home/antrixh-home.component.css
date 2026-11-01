@@ -1,0 +1,40 @@
+@font-face {
+  font-family: 'Antrixh Clash';
+  src: url('/fonts/ClashDisplay_Complete/ClashDisplay_Complete/Fonts/WEB/fonts/ClashDisplay-Variable.woff2')
+    format('woff2');
+  font-style: normal;
+  font-weight: 200 700;
+  font-display: swap;
+}
+
+:host {
+  --font-display: 'Antrixh Clash', system-ui, sans-serif;
+  --brand-purple: #9234ea;
+  --brand-magenta: #e236a3;
+  --brand-red: #ef4343;
+  --brand-purple-rgb: 146, 52, 234;
+  --brand-magenta-rgb: 226, 54, 163;
+  --brand-red-rgb: 239, 67, 67;
+  --brand-gradient: linear-gradient(
+    110deg,
+    var(--brand-purple) 0%,
+    var(--brand-magenta) 54%,
+    var(--brand-red) 100%
+  );
+  display: block;
+  min-height: 100vh;
+  background: #000;
+  color: #f7f5fa;
+  font-family: var(--font-display) !important;
+}
+
+.home-page {
+  min-height: 100vh;
+  overflow: hidden;
+  background: #000;
+}
+
+:host,
+:host * {
+  font-family: var(--font-display) !important;
+}

@@ -2,6 +2,8 @@
 
 :host {
   display: block;
+  min-height: 100vh;
+  background: #000;
 }
 
 /* ===== TOP GRADIENT BLUR BAR (BLACK TINT) ===== */
@@ -10,7 +12,7 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 10vh;
+  height: 12vh;
   z-index: 150;
   pointer-events: none;
 }
@@ -20,8 +22,8 @@
   content: '';
   position: absolute;
   inset: 0;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
   -webkit-mask-image: linear-gradient(
     to bottom,
     rgba(0, 0, 0, 1) 0%,
@@ -52,7 +54,7 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 10vh;
+  height: 12vh;
   z-index: 150;
   pointer-events: none;
 }
@@ -62,8 +64,8 @@
   content: '';
   position: absolute;
   inset: 0;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
   -webkit-mask-image: linear-gradient(
     to top,
     rgba(0, 0, 0, 1) 0%,

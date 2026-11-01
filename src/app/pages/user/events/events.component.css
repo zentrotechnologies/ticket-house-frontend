@@ -452,7 +452,7 @@
   margin: 0;
   color: white;
   text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  line-height: 1.2;
+  line-height: 1.01;
   position: relative;
   z-index: 1;
 }
