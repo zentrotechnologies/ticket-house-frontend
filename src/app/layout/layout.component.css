@@ -3,6 +3,16 @@
   min-height: 100vh;
 }
 
+.main-content:has(app-event-organizer) {
+  background: #0b0b0d;
+  color: #f7f5fa;
+}
+
+.main-content:has(app-admin-dashboard) {
+  background: #000;
+  color: #f7f5fa;
+}
+
 .main-content {
   flex: 1;
   margin-left: 250px;

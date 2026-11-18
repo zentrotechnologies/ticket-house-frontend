@@ -105,8 +105,10 @@
           <i class="bi bi-info-circle me-2" style="color: #2c2e72;"></i>
           Event Summary
         </h5>
-        <button type="button" class="btn-close" aria-label="Close"
-          (click)="closeModalProperly('eventSummaryModal')"></button>
+        <button type="button" class="btn btn-secondary" aria-label="Close"
+          (click)="closeModalProperly('eventSummaryModal')">
+          <i class="bi bi-x-lg"></i> Close
+        </button>
       </div>
 
       <div class="modal-body" *ngIf="!isLoadingSummary; else loadingTemplate">
@@ -331,11 +333,6 @@
         </div>
       </ng-template>
 
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeModalProperly('eventSummaryModal')">
-          <i class="bi bi-x-lg"></i> Close
-        </button>
-      </div>
     </div>
   </div>
 </div>

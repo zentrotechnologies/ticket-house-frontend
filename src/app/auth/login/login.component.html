@@ -49,9 +49,9 @@
                                 id="email" 
                                 name="email" 
                                 required 
-                                placeholder=" "
+                                placeholder="Email Address"
                                 [class.invalid]="isFieldInvalid('email')">
-                            <label for="email">Email Address<span class="text-danger">*</span></label>
+                            <label for="email" class="visually-hidden">Email Address</label>
                             <div class="error-message" *ngIf="isFieldInvalid('email')">
                                 {{ getFieldError('email') }}
                             </div>
@@ -66,20 +66,16 @@
                                 id="password" 
                                 name="password" 
                                 required 
-                                placeholder=" "
+                                placeholder="Password"
                                 [class.invalid]="isFieldInvalid('password')">
-                            <label for="password">Password<span class="text-danger">*</span></label>
-                            <!-- <i 
-                                class="fas toggle-eye-icon" 
-                                [class.fa-eye]="!showPassword" 
-                                [class.fa-eye-slash]="showPassword"
-                                (click)="togglePasswordVisibility()"></i> -->
-                            <i 
-                            class="bi toggle-eye-icon" 
-                            [class.bi-eye]="!showPassword" 
-                            [class.bi-eye-slash]="showPassword"
-                            (click)="togglePasswordVisibility()">
-                            </i>
+                            <label for="password" class="visually-hidden">Password</label>
+                            <button
+                                type="button"
+                                class="toggle-eye-button"
+                                [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+                                (click)="togglePasswordVisibility()">
+                                <i class="bi" [class.bi-eye]="!showPassword" [class.bi-eye-slash]="showPassword"></i>
+                            </button>
                             <div class="error-message" *ngIf="isFieldInvalid('password')">
                                 {{ getFieldError('password') }}
                             </div>
@@ -106,17 +102,12 @@
                         </button>
                     </form>
 
-                    <!-- Divider -->
-                    <div class="divider">
-                        <div class="divider-line"></div>
-                        <div class="divider-text">or</div>
-                        <div class="divider-line"></div>
-                    </div>
-
                     <!-- Social Login Options -->
                     <div class="social-login">
-                        <div class="social-text text-center mb-3">
-                            <span>Sign In With</span>
+                        <div class="divider">
+                            <div class="divider-line"></div>
+                            <div class="social-text">Or Sign In With</div>
+                            <div class="divider-line"></div>
                         </div>
                         <div class="social-buttons">
                             <button type="button" class="social-btn google-btn">
