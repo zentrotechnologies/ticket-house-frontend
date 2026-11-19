@@ -83,7 +83,7 @@ export const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: '/',
+        redirectTo: '/events-antrixh',
         pathMatch: 'full',
       },
       {
@@ -196,7 +196,7 @@ export const routes: Routes = [
   // Wildcard route
   {
     path: '**',
-    redirectTo: '/',
+    redirectTo: '/events-antrixh',
   },
   
   // {

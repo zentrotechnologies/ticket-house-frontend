@@ -299,7 +299,16 @@ export class EventPaymentAntrixhComponent implements OnInit {
     // If no data found, redirect
     if (!this.seatSelections.length) {
       this.toastr.warning('Please select seats first', 'Selection Required');
-      this.router.navigate(['/event-booking', this.eventId, this.eventNameSlug]);
+      this.router.navigate(['/event-booking-antrixh', this.eventId, this.eventNameSlug]);
+    }
+  }
+
+  private navigateToMyBookingsAntrixh(): void {
+    const userId = this.userId || this.authService.getCurrentUserId();
+    if (userId) {
+      this.router.navigate(['/my-bookings-antrixh', userId]);
+    } else {
+      this.router.navigate(['/events-antrixh']);
     }
   }
 
@@ -565,7 +574,7 @@ export class EventPaymentAntrixhComponent implements OnInit {
           this.isProcessing = false;
 
           setTimeout(() => {
-            this.router.navigate(['/my-bookings']);
+            this.navigateToMyBookingsAntrixh();
           }, 1500);
         }
         this.cdr.markForCheck();
@@ -579,7 +588,7 @@ export class EventPaymentAntrixhComponent implements OnInit {
           this.showQRCodeModal(bookingId);
         } else {
           setTimeout(() => {
-            this.router.navigate(['/my-bookings']);
+            this.navigateToMyBookingsAntrixh();
           }, 1500);
         }
         this.cdr.markForCheck();
@@ -625,7 +634,7 @@ export class EventPaymentAntrixhComponent implements OnInit {
           this.clearAllLocalStorage();
 
           setTimeout(() => {
-            this.router.navigate(['/']);
+            this.router.navigate(['/events-antrixh']);
           }, 2000);
         }
         this.cdr.markForCheck();
@@ -641,7 +650,7 @@ export class EventPaymentAntrixhComponent implements OnInit {
         this.clearAllLocalStorage();
 
         setTimeout(() => {
-          this.router.navigate(['/']);
+          this.router.navigate(['/events-antrixh']);
         }, 2000);
         this.cdr.markForCheck();
       },
@@ -651,7 +660,7 @@ export class EventPaymentAntrixhComponent implements OnInit {
   onSuccessModalClose(): void {
     this.showProcessingModal = false;
     this.showSuccessModal = false;
-    this.router.navigate(['/']);
+    this.router.navigate(['/events-antrixh']);
   }
 
   clearAllLocalStorage(): void {

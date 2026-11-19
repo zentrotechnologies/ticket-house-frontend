@@ -12,7 +12,7 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 12vh;
+  height: 15vh;
   z-index: 150;
   pointer-events: none;
 }
@@ -22,20 +22,20 @@
   content: '';
   position: absolute;
   inset: 0;
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
+  backdrop-filter: blur(75px);
+  -webkit-backdrop-filter: blur(75px);
   -webkit-mask-image: linear-gradient(
     to bottom,
     rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.75) 35%,
-    rgba(0, 0, 0, 0.35) 70%,
+    rgba(0, 0, 0, 0.85) 40%,
+    rgba(0, 0, 0, 0.45) 75%,
     rgba(0, 0, 0, 0) 100%
   );
   mask-image: linear-gradient(
     to bottom,
     rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.75) 35%,
-    rgba(0, 0, 0, 0.35) 70%,
+    rgba(0, 0, 0, 0.85) 40%,
+    rgba(0, 0, 0, 0.45) 75%,
     rgba(0, 0, 0, 0) 100%
   );
 }
@@ -45,7 +45,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0) 100%);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.50) 0%, rgba(0, 0, 0, 0) 100%);
 }
 
 /* ===== BOTTOM GRADIENT BLUR BAR (BLACK TINT) ===== */
@@ -54,7 +54,7 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 12vh;
+  height: 15vh;
   z-index: 150;
   pointer-events: none;
 }
@@ -64,20 +64,20 @@
   content: '';
   position: absolute;
   inset: 0;
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
+  backdrop-filter: blur(75px);
+  -webkit-backdrop-filter: blur(75px);
   -webkit-mask-image: linear-gradient(
     to top,
     rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.75) 35%,
-    rgba(0, 0, 0, 0.35) 70%,
+    rgba(0, 0, 0, 0.85) 40%,
+    rgba(0, 0, 0, 0.45) 75%,
     rgba(0, 0, 0, 0) 100%
   );
   mask-image: linear-gradient(
     to top,
     rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.75) 35%,
-    rgba(0, 0, 0, 0.35) 70%,
+    rgba(0, 0, 0, 0.85) 40%,
+    rgba(0, 0, 0, 0.45) 75%,
     rgba(0, 0, 0, 0) 100%
   );
 }
@@ -87,5 +87,5 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0) 100%);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.50) 0%, rgba(0, 0, 0, 0) 100%);
 }

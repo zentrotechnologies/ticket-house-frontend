@@ -22,9 +22,9 @@
         class="slider-viewport"
         #sliderViewport
         (scroll)="onSliderScroll()"
-        (touchstart)="onSliderDragStart()"
-        (touchend)="onSliderDragEnd()"
-        (touchcancel)="onSliderDragEnd()"
+        (touchstart)="onSliderDragStart($event)"
+        (touchend)="onSliderDragEnd($event)"
+        (touchcancel)="onSliderDragCancel()"
         [class.no-slide-transition]="disableSlideTransition"
       >
         <div class="slider-track">

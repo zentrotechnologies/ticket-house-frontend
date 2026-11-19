@@ -44,6 +44,10 @@ export class EventsAntrixhComponent implements OnInit, OnDestroy, AfterViewCheck
   private isUserScrolling = false;
   private lastScrollLeft = 0;
   private scrollDirection: 'left' | 'right' | null = null;
+  private touchStartX: number | null = null;
+  private isProgrammaticScroll = false;
+  private programmaticScrollTimeout: ReturnType<typeof setTimeout> | null = null;
+  private scrollAnimationFrame: number | null = null;
   private loopResetScheduled = false;
   private scrollDebounce: ReturnType<typeof setTimeout> | null = null;
   private initialCenterDone = false;
@@ -71,6 +75,8 @@ export class EventsAntrixhComponent implements OnInit, OnDestroy, AfterViewCheck
 
   ngOnDestroy(): void {
     if (this.scrollDebounce) clearTimeout(this.scrollDebounce);
+    if (this.programmaticScrollTimeout) clearTimeout(this.programmaticScrollTimeout);
+    if (this.scrollAnimationFrame !== null) cancelAnimationFrame(this.scrollAnimationFrame);
     this.stopSlider();
   }
 
@@ -132,7 +138,7 @@ export class EventsAntrixhComponent implements OnInit, OnDestroy, AfterViewCheck
     return this.eventPrices.get(event.event_id) ?? null;
   }
 
-  // Triplicated list so the slider can loop seamlessly in both directions.
+  // Triplicate the list so the slider can loop seamlessly in both directions.
   get loopEvents(): UpcomingEventResponse[] {
     const n = this.upcomingEvents.length;
     if (n < 2) return this.upcomingEvents;
@@ -273,7 +279,8 @@ export class EventsAntrixhComponent implements OnInit, OnDestroy, AfterViewCheck
     }
   }
 
-  onSliderDragStart(): void {
+  onSliderDragStart(event: TouchEvent): void {
+    this.touchStartX = event.changedTouches[0]?.clientX ?? null;
     this.isSliderDragging = true;
     this.isUserScrolling = true;
     const viewport = this.sliderViewport?.nativeElement;
@@ -286,19 +293,39 @@ export class EventsAntrixhComponent implements OnInit, OnDestroy, AfterViewCheck
     this.stopSlider();
   }
 
-  onSliderDragEnd(): void {
+  onSliderDragEnd(event: TouchEvent): void {
+    const touch = event.changedTouches[0];
+    const swipeDistance = this.touchStartX !== null && touch
+      ? this.touchStartX - touch.clientX
+      : 0;
+    this.touchStartX = null;
     this.isSliderDragging = false;
+    this.isUserScrolling = false;
+    this.scrollDirection = null;
+
+    if (Math.abs(swipeDistance) >= 30) {
+      if (swipeDistance > 0) this.nextSlide();
+      else this.prevSlide();
+    } else {
+      this.scrollToActive(true);
+      this.startSlider(3000);
+    }
+  }
+
+  onSliderDragCancel(): void {
+    this.touchStartX = null;
+    this.isSliderDragging = false;
+    this.isUserScrolling = false;
+    this.scrollDirection = null;
+    this.scrollToActive(true);
     this.startSlider(3000);
-    setTimeout(() => {
-      this.isUserScrolling = false;
-      this.scrollDirection = null;
-      this.onSliderScroll();
-    }, 50);
   }
 
   // Called while the viewport is scrolled manually (mouse/touch/drag); after a
   // short pause the slide nearest the center becomes the active one.
   onSliderScroll(): void {
+    if (this.isProgrammaticScroll) return;
+
     if (this.isSliderDragging) {
       const viewport = this.sliderViewport?.nativeElement;
       if (viewport) {
@@ -392,10 +419,7 @@ export class EventsAntrixhComponent implements OnInit, OnDestroy, AfterViewCheck
         viewport.scrollLeft + slideRect.left - viewportRect.left + slideRect.width / 2;
       const targetLeft = slideCenter - viewport.clientWidth / 2;
 
-      viewport.scrollTo({
-        left: targetLeft,
-        behavior: smooth ? 'smooth' : 'auto',
-      });
+      this.animateScrollTo(viewport, targetLeft, smooth);
     });
   }
 
@@ -413,14 +437,50 @@ export class EventsAntrixhComponent implements OnInit, OnDestroy, AfterViewCheck
       viewport.scrollLeft + slideRect.left - viewportRect.left + slideRect.width / 2;
     const targetLeft = slideCenter - viewport.clientWidth / 2;
 
-    if (typeof (viewport as any).scrollTo === 'function') {
-      viewport.scrollTo({
-        left: targetLeft,
-        behavior: 'smooth',
-      });
-    } else {
-      viewport.scrollLeft = targetLeft;
+    this.animateScrollTo(viewport, targetLeft, true);
+  }
+
+  private animateScrollTo(viewport: HTMLElement, targetLeft: number, smooth: boolean): void {
+    if (this.scrollAnimationFrame !== null) {
+      cancelAnimationFrame(this.scrollAnimationFrame);
+      this.scrollAnimationFrame = null;
     }
+    if (this.programmaticScrollTimeout) {
+      clearTimeout(this.programmaticScrollTimeout);
+      this.programmaticScrollTimeout = null;
+    }
+
+    this.isProgrammaticScroll = true;
+    const startLeft = viewport.scrollLeft;
+    const distance = targetLeft - startLeft;
+    if (!smooth || Math.abs(distance) < 0.5) {
+      viewport.scrollLeft = targetLeft;
+      this.programmaticScrollTimeout = setTimeout(() => {
+        this.isProgrammaticScroll = false;
+        this.programmaticScrollTimeout = null;
+      }, 50);
+      return;
+    }
+
+    const duration = 600;
+    const startTime = performance.now();
+    const animate = (time: number): void => {
+      const progress = Math.min((time - startTime) / duration, 1);
+      const easedProgress =
+        progress < 0.5
+          ? 4 * progress * progress * progress
+          : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+      viewport.scrollLeft = startLeft + distance * easedProgress;
+
+      if (progress < 1) {
+        this.scrollAnimationFrame = requestAnimationFrame(animate);
+      } else {
+        this.scrollAnimationFrame = null;
+        this.isProgrammaticScroll = false;
+      }
+    };
+
+    this.scrollAnimationFrame = requestAnimationFrame(animate);
   }
 
   isCenterSlide(index: number): boolean {

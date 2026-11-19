@@ -70,7 +70,7 @@ export class AntrixhMyBookingsComponent implements OnInit, OnDestroy {
 
     if (!this.isUserLoggedIn) {
       this.toastr.warning('Please login to view your bookings', 'Authentication Required');
-      this.router.navigate(['/']);
+      this.router.navigate(['/events-antrixh']);
       return;
     }
 
@@ -82,7 +82,7 @@ export class AntrixhMyBookingsComponent implements OnInit, OnDestroy {
 
         if (!this.userId) {
           this.toastr.error('User information not found', 'Error');
-          this.router.navigate(['/']);
+          this.router.navigate(['/events-antrixh']);
           return;
         }
 
@@ -144,7 +144,7 @@ export class AntrixhMyBookingsComponent implements OnInit, OnDestroy {
   }
 
   onBackToEvents(): void {
-    this.router.navigate(['/']);
+    this.router.navigate(['/events-antrixh']);
   }
 
   formatDate(dateString: string): string {

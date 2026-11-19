@@ -92,7 +92,7 @@ export class EventBookingAntrixhComponent implements OnInit {
       this.eventNameSlug = params['event_name'] || '';
 
       if (this.eventId <= 0) {
-        this.router.navigate(['/']);
+        this.router.navigate(['/events-antrixh']);
         return;
       }
 
@@ -122,7 +122,7 @@ export class EventBookingAntrixhComponent implements OnInit {
             this.loadSimilarEvents();
           }
         } else {
-          this.router.navigate(['/']);
+          this.router.navigate(['/events-antrixh']);
         }
         this.isLoading = false;
         this.cdr.markForCheck();

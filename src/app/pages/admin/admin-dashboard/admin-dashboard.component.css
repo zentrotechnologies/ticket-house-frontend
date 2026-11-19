@@ -2049,22 +2049,22 @@
   right: 0;
   bottom: 0;
   z-index: 2;
-  height: 12vh;
+  height: 15vh;
   pointer-events: none;
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.75), transparent);
+  backdrop-filter: blur(75px);
+  -webkit-backdrop-filter: blur(75px);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.50), transparent);
   -webkit-mask-image: linear-gradient(
     to top,
     rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.75) 35%,
+    rgba(0, 0, 0, 0.50) 35%,
     rgba(0, 0, 0, 0.35) 70%,
     rgba(0, 0, 0, 0) 100%
   );
   mask-image: linear-gradient(
     to top,
     rgba(0, 0, 0, 1) 0%,
-    rgba(0, 0, 0, 0.75) 35%,
+    rgba(0, 0, 0, 0.50) 35%,
     rgba(0, 0, 0, 0.35) 70%,
     rgba(0, 0, 0, 0) 100%
   );
@@ -2081,7 +2081,7 @@
 }
 
 :host #eventSummaryModal .modal-body {
-  padding-bottom: 12vh;
+  padding-bottom: 15vh;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.25) #1c1c21;
 }

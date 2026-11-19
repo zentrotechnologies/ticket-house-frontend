@@ -158,7 +158,7 @@
     <div *ngIf="!isLoading && !eventDetails" class="error-container">
         <h2>Event Not Found</h2>
         <p>The event you're looking for doesn't exist or has been removed.</p>
-        <button class="back-btn" (click)="router.navigate(['/'])">Back to Events</button>
+        <button class="back-btn" (click)="router.navigate(['/events-antrixh'])">Back to Events</button>
     </div>
 
     <div class="modal seat-modal" [class.open]="isSeatModalOpen" (click)="closeSeatModalOnBackdrop($event)">
